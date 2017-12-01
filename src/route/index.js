@@ -16,51 +16,51 @@ import Mailbox from '@/views/Mailbox';
 import Page2 from '@/views/Page2';
 
 export const childRoutes = [
-  {
-    'path':'/home',
-    'component': Home,
-    'exactly': true
-  },
-  {
-    'path':'/form',
-    'component': Form
-  },
-  {
-    'path':'/table',
-    'component': Table
-  },
-  {
-    'path':'/calendar',
-    'component': Calendar
-  },
-  {
-    'path':'/timeline',
-    'component': Timeline
-  },
-  {
-    'path':'/steps',
-    'component': Steps
-  },
-  {
-    'path':'/cards',
-    'component': Cards
-  },
-  {
-    'path':'/mailbox',
-    'component': Mailbox
-  },
-  {
-    'path':'/page2',
-    'component': Page2
-  }
+    {
+        'path':'/home',
+        'component': Home,
+        'exactly': true
+    },
+    {
+        'path':'/form',
+        'component': Form
+    },
+    {
+        'path':'/table',
+        'component': Table
+    },
+    {
+        'path':'/calendar',
+        'component': Calendar
+    },
+    {
+        'path':'/timeline',
+        'component': Timeline
+    },
+    {
+        'path':'/steps',
+        'component': Steps
+    },
+    {
+        'path':'/cards',
+        'component': Cards
+    },
+    {
+        'path':'/mailbox',
+        'component': Mailbox
+    },
+    {
+        'path':'/page2',
+        'component': Page2
+    }
 ];
 
 const routes = (
-  <Switch>
-    <Route path="/login" component={Login}/>
-    <Route path="/register" component={Register}/>
-    <Route path="/" component={Layout}/>
-  </Switch>
+    <Switch>
+        <Route path="/login" component={Login}/>
+        <Route path="/register" component={Register}/>
+        <Route path="/" component={Layout}/>
+    </Switch>
 );
 
 export default routes
