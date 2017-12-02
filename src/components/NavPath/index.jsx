@@ -15,20 +15,19 @@ const propTypes = {
 }
 
 class NavPath extends React.Component {
-    constructor (props) {
+    constructor(props) {
         super(props)
     }
 
-    render () {
+    render() {
         const { data } = this.props
-        const bread = data.map((item)=>{
+        const bread = data.map((item,index) => {
             return (
-                <Breadcrumb.Item key={'bc-'+item.key}>{item.name}</Breadcrumb.Item>
+                <Breadcrumb.Item key={'bc-' + index}>{item}</Breadcrumb.Item>
             )
         })
         return (
             <Breadcrumb style={{ margin: '12px 0' }}>
-                <Breadcrumb.Item key='bc-0'>首页</Breadcrumb.Item>
                 {bread}
             </Breadcrumb>
         )

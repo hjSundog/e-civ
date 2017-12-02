@@ -7,9 +7,8 @@ import { Route, Redirect } from 'react-router-dom';
 
 import { childRoutes } from '@/route'
 import authHOC from '@/utils/auth'
-
-import NavPath from '@/components/NavPath'
 import Header from '@/components/Header'
+import NavPath from '@/components/NavPath'
 import Sidebar from '@/components/Sidebar'
 import Footer from '@/components/Footer'
 import {fetchProfile, logout} from '@/actions/auth';

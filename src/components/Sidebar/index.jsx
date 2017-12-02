@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { withRouter, matchPath } from 'react-router'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon } from 'antd'
+import { Layout, Menu, Icon, Row, Col, Badge, Dropdown, Avatar, Popover } from 'antd'
 import { Link } from 'react-router-dom'
 import { getAllMenu, updateNavPath } from '../../actions/menu'
 
@@ -62,6 +62,13 @@ class Sidebar extends React.Component {
     });
   }
 
+	handleLogOut = () => {
+		const { logout } = this.props
+		logout().payload.promise.then(() => {
+			this.props.history.replace('/login');
+		});
+  }
+
   menuClickHandle = (item) => {
     this.setState({
       activeKey: item.key
@@ -72,36 +79,33 @@ class Sidebar extends React.Component {
   render () {
     const { items, updateNavPath, history } = this.props
     let { activeKey, openKey } = this.state
+    // const { profile } = this.props
+    // let username = profile.user ? profile.user.name : '';
 
-    const _menuProcess = (nodes, pkey) => {
-      return Array.isArray(nodes) && nodes.map((item, i) => {
-        const menu = _menuProcess(item.child, item.key);
-        if(item.url && isActive(item.url, history)){
-          activeKey = 'menu'+item.key
-          openKey = 'sub'+pkey
-        }
-        if (menu.length > 0) {
-          return (
-            <SubMenu
-              key={'sub'+item.key}
-              title={<span><Icon type={item.icon} /><span className="nav-text">{item.name}</span></span>}
-            >
-              {menu}
-            </SubMenu>
-          )
-        } else {
-          return (
-            <Menu.Item key={'menu'+item.key}>
-              {
-                item.url ? <Link to={item.url}>{item.icon && <Icon type={item.icon} />}{item.name}</Link> : <span>{item.icon && <Icon type={item.icon} />}{item.name}</span>
-              }
-            </Menu.Item>
-          )
-        }
-      });
-    }
+    const menu = (
+			<Menu>
+				<Menu.Item>
+					选项1
+        </Menu.Item>
+				<Menu.Item>
+					选项2
+        </Menu.Item>
+				<Menu.Item>
+					<a onClick={this.handleLogOut}>注销</a>
+				</Menu.Item>
+			</Menu>
+		);
 
-    const menu = _menuProcess(items);
+		const content = (
+			<div>
+				<p>Content</p>
+				<p>Content</p>
+				<p>Content</p>
+				<p>Content</p>
+				<p>Content</p>
+			</div>
+    );
+
 
     return (
       <Sider
@@ -124,7 +128,7 @@ Sidebar.defaultProps = defaultProps;
 function mapStateToProps(state) {
 
   return {
-    items: state.menu.items
+    items: state.menu.items,
   }
 }
 

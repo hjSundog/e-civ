@@ -124,6 +124,22 @@ class commonHeader extends React.Component {
                 </Row>
             </Header>
         )
+
+        // return (
+        //     <Header style={{ background: '#fff', padding: 0 }}>
+
+        //         <Menu
+        //             theme="blue"
+        //             mode="horizontal"
+        //             defaultSelectedKeys={['0']}
+        //             style={{lineHeight: '64px'}}
+        //         >
+        //             {navs.map((nav,index)=>{
+        //                 return <Menu.Item key={index}>{nav}</Menu.Item>
+        //             })}
+        //         </Menu>
+        //     </Header>
+        // )
     }
 }
 
