@@ -8,6 +8,7 @@
         "plugin:react/recommended"
     ],
     "parserOptions": {
+        "ecmaVersion": 6,
         "ecmaFeatures": {
             "experimentalObjectRestSpread": true,
             "jsx": true
@@ -23,7 +24,6 @@
         "no-param-reassign": "off",
         "comma-dangle": "off",
         "react/jsx-indent": ["error", 4],
-        "react/jsx-indent-props": ["error", 4],
         "react/no-string-refs": "off",
         "react/jsx-filename-extension": "off",
         "react/jsx-no-bind": "warn",
@@ -38,7 +38,9 @@
         "react/sort-comp": "warn",
         "no-shadow": "warn",
         "no-mixed-operators": "warn",
-        "react/forbid-prop-types": "warn"
+        "react/forbid-prop-types": "warn",
+        // 自定义
+        "no-console": "off"
     },
     "globals": {
         "module": true,

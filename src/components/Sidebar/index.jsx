@@ -110,21 +110,8 @@ class Sidebar extends React.Component {
           collapsed={this.state.collapsed}
           onCollapse={this.onCollapse}
         >
-        <div className="ant-layout-logo"></div>
-        <Menu
-          mode={this.state.mode} theme="dark"
-          selectedKeys={[activeKey]}
-          defaultOpenKeys={[openKey]}
-          onClick={this.menuClickHandle}
-        >
-          {menu}
-        </Menu>
-        <div className="sider-trigger">
-          <Icon
-              className="trigger"
-              type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
-              onClick={this.toggle}
-            />
+        <div>
+            keke
         </div>
       </Sider>
     )

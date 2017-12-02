@@ -19,54 +19,56 @@ import './index.less';
 const { Content } = Layout;
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+    constructor(props) {
+        super(props);
+    }
 
-  componentWillMount() {
-    const {actions} = this.props;
-    actions.fetchProfile();
-  }
+    componentWillMount() {
+        const {actions} = this.props;
+        actions.fetchProfile();
+    }
 
-  render() {
-    const {auth, navpath, actions} = this.props;
+    render() {
+        const {auth, navpath, actions} = this.props;
 
-    return (
-      <Layout className="ant-layout-has-sider">
-        <Sidebar />
-        <Layout>
-          <Header profile={auth} logout={actions.logout} />
-          <Content style={{ margin: '0 16px' }}>
-            <NavPath data={navpath} />
-            <div style={{ minHeight: 360 }}>
-              <Redirect to="/home"/>
-              {childRoutes.map((route, index) => (
-                <Route key={index} path={route.path} component={authHOC(route.component)} exactly={route.exactly} />
-              ))}
-            </div>
-          </Content>
-          <Footer />
-        </Layout>
-      </Layout>
-    );
-  }
+        return (
+            <Layout className="ant-layout-has-sider">
+                <Layout>
+                    <Header profile={auth} logout={actions.logout} />
+                    <Layout>
+                        <Sidebar>Sider</Sidebar>
+                        <Content style={{ margin: '0 16px' }}>
+                            <NavPath data={navpath} />
+                            <div style={{ minHeight: 360 }}>
+                                <Redirect to="/home"/>
+                                {childRoutes.map((route, index) => (
+                                    <Route key={index} path={route.path} component={authHOC(route.component)} exactly={route.exactly} />
+                                ))}
+                            </div>
+                        </Content>
+                    </Layout>
+                    <Footer />
+                </Layout>
+            </Layout>
+        );
+    }
 }
 
 App.propTypes = {
-  auth: PropTypes.object,
-  navpath: PropTypes.array
+    auth: PropTypes.object,
+    navpath: PropTypes.array
 };
 
 const mapStateToProps = (state) => {
-  const { auth, menu } = state;
-  return {
-    auth: auth ? auth : null,
-    navpath: menu.navpath
-  };
+    const { auth, menu } = state;
+    return {
+        auth: auth ? auth : null,
+        navpath: menu.navpath
+    };
 };
 
 function mapDispatchToProps(dispatch) {
-  return {actions: bindActionCreators({fetchProfile, logout}, dispatch)};
+    return {actions: bindActionCreators({fetchProfile, logout}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
