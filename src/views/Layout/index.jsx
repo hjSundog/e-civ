@@ -7,9 +7,8 @@ import { Route, Redirect } from 'react-router-dom';
 
 import { childRoutes } from '@/route'
 import authHOC from '@/utils/auth'
-
-import NavPath from '@/components/NavPath'
 import Header from '@/components/Header'
+import NavPath from '@/components/NavPath'
 import Sidebar from '@/components/Sidebar'
 import Footer from '@/components/Footer'
 import {fetchProfile, logout} from '@/actions/auth';
@@ -32,21 +31,27 @@ class App extends React.Component {
         const {auth, navpath, actions} = this.props;
 
         return (
-            <Layout className="ant-layout-has-sider">
-                <Sidebar />
-                <Layout>
-                    <Header profile={auth} logout={actions.logout} />
-                    <Content style={{ margin: '0 16px' }}>
-                        <NavPath data={navpath} />
-                        <div style={{ minHeight: 360 }}>
-                            <Redirect to="/home"/>
-                            {childRoutes.map((route, index) => (
-                                <Route key={index} path={route.path} component={authHOC(route.component)} exactly={route.exactly} />
-                            ))}
-                        </div>
-                    </Content>
-                    <Footer />
-                </Layout>
+            <Layout style={{flexDirection: 'column'}}>
+                <Content >
+                    <Layout>
+                        <Sidebar profile={auth} logout={actions.logout}/>
+                        <Content>
+                            <Layout>
+                                <Header navs={navpath}/>
+                                <NavPath data={navpath} />
+                                <Content style={{ margin: '0 16px' }}>
+                                    <div style={{ minHeight: 360 }}>
+                                        <Redirect to="/home"/>
+                                        {childRoutes.map((route, index) => (
+                                            <Route key={index} path={route.path} component={authHOC(route.component)} exactly={route.exactly} />
+                                        ))}
+                                    </div>
+                                </Content>
+                            </Layout>
+                        </Content> 
+                    </Layout>
+                </Content>
+                <Footer />
             </Layout>
         );
     }
