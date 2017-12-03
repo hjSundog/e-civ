@@ -1,4 +1,5 @@
 import React from 'react';
+import './index.less'
 
 class Donation extends React.Component {
 
