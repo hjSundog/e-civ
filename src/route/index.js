@@ -14,6 +14,7 @@ import Steps from '@/views/Steps';
 import Cards from '@/views/Cards';
 import Mailbox from '@/views/Mailbox';
 import Page2 from '@/views/Page2';
+import Donation from '@/views/Donation';
 
 import WebsocketTest from '@/views/WebsocketTest'
 
@@ -54,6 +55,10 @@ export const childRoutes = [
     {
         'path':'/page2',
         'component': Page2
+    },
+    {
+        'path': '/donation',
+        'component': Donation
     }
 ];
 
