@@ -15,6 +15,8 @@ import Cards from '@/views/Cards';
 import Mailbox from '@/views/Mailbox';
 import Page2 from '@/views/Page2';
 
+import WebsocketTest from '@/views/WebsocketTest'
+
 export const childRoutes = [
     {
         'path':'/home',
@@ -59,6 +61,7 @@ const routes = (
     <Switch>
         <Route path="/login" component={Login}/>
         <Route path="/register" component={Register}/>
+        <Route path="/websocket" component={WebsocketTest} />
         <Route path="/" component={Layout}/>
     </Switch>
 );
