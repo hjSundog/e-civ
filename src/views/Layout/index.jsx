@@ -11,7 +11,7 @@ import Header from '@/components/Header'
 import NavPath from '@/components/NavPath'
 import Sidebar from '@/components/Sidebar'
 import Footer from '@/components/Footer'
-import {fetchProfile, logout} from '@/actions/auth';
+import {logout} from '@/actions/user';
 
 import './index.less';
 
@@ -24,7 +24,6 @@ class App extends React.Component {
 
     componentWillMount() {
         const {actions} = this.props;
-        actions.fetchProfile();
     }
 
     render() {
@@ -59,9 +58,9 @@ App.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-    const { auth, menu } = state;
+    const { user, menu } = state;
     return {
-        auth: auth ? auth : null,
+        user: user ? user : null,
         navpath: menu.navpath
     };
 };
