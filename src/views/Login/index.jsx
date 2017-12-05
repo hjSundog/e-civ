@@ -11,8 +11,6 @@ import './index.less'
 
 const propTypes = {
     user: PropTypes.object,
-    loggingIn: PropTypes.bool,
-    loginErrors: PropTypes.string
 };
 
 class Login extends React.Component {
@@ -20,7 +18,10 @@ class Login extends React.Component {
     constructor (props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            form: {
+
+            }
         }
     }
 
@@ -51,8 +52,8 @@ class Login extends React.Component {
         })
     }
 
-    toRegister () {
-        this.props.history.replace('/register');
+    toSignup () {
+        this.props.history.replace('/signup');
     }
 
     render () {
@@ -63,7 +64,7 @@ class Login extends React.Component {
                     <Form layout="horizontal" onSubmit={this.handleSubmit.bind(this)} className="login-form">
                         <h2 className="logo"><span>logo</span></h2>
                         <FormItem>
-                            {getFieldDecorator('user')(
+                            {getFieldDecorator('username')(
                                 <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder='admin' />
                             )}
                         </FormItem>
@@ -76,7 +77,7 @@ class Login extends React.Component {
                             <Button className="btn-login" type='primary' size="large" icon="poweroff" loading={this.state.loading} htmlType='submit'>登录</Button>
                         </p>
                         <p>
-                            <Button className="btn-register" size="large" icon="right-square-o" htmlType='button' onClick={this.toRegister.bind(this)} >去注册</Button>
+                            <Button className="btn-register" size="large" icon="right-square-o" htmlType='button' onClick={this.toSignup.bind(this)} >去注册</Button>
                         </p>
                     </Form>
                 </Col>
@@ -91,12 +92,12 @@ Login.propTypes = propTypes;
 Login = Form.create()(Login);
 
 function mapStateToProps(state) {
-    const {auth} = state;
-    if (auth.user) {
-        return {user: auth.user, loggingIn: auth.loggingIn, loginErrors: ''};
+    const {user} = state;
+    if (user) {
+        return {user: user};
     }
 
-    return {user: null, loggingIn: auth.loggingIn, loginErrors: auth.loginErrors};
+    return {user: null};
 }
 
 function mapDispatchToProps(dispatch) {

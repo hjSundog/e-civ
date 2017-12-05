@@ -27,12 +27,12 @@ class App extends React.Component {
     }
 
     render() {
-        const {auth, navpath, actions} = this.props;
+        const {user, navpath, actions} = this.props;
 
         return (
             <Layout className="ant-layout-has-sider">
                 <Layout>
-                    <Header profile={auth} logout={actions.logout} />
+                    <Header profile={user} logout={actions.logout} />
                     <Layout>
                         <Sidebar>Sider</Sidebar>
                         <Content style={{ margin: '0 16px' }}>
@@ -66,7 +66,7 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({fetchProfile, logout}, dispatch)};
+    return {actions: bindActionCreators({logout}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
