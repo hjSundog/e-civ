@@ -1,6 +1,5 @@
 module.exports = {
     "name": "admin",
-    "username": "admin",
     "meta": {
         "age": 22,
         "sex": "male"

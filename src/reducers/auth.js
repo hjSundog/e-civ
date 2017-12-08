@@ -3,18 +3,23 @@ import {
     REMOVE_USER
 } from '../actions/user';
 
+let user;
+try {
+    user = JSON.parse(window.localStorage.getItem('user'))
+} catch(err) {
+    user = null
+}
 const initialState = {
-    user: null,
+    user: user
 };
 
-
-export default function user(state = initialState, action = {}) {
+export default function auth(state = initialState, action = {}) {
     switch (action.type) {
     case SET_USER:
-        window.localStorage.setItem('user', action.payload.data);
+        window.localStorage.setItem('user', JSON.stringify(action.payload.user));
         return {
             ...state,
-            user: user
+            user: action.payload.user
         }
     case REMOVE_USER:
         window.localStorage.removeItem('user');

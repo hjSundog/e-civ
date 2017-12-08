@@ -1,26 +1,19 @@
-import api from '../api'
-
 export const SET_USER = 'SET_USER'
 export const REMOVE_USER = 'REMOVE_USER';
 
-export function login({username, password}) {
+export function set_user(user) {
     return {
-        type: 'LOGIN',
+        type: SET_USER,
         payload: {
-            promise: api.post('/login', {
-                data: {
-                    username,
-                    password
-                }
-            })
+            user
         }
     }
 }
 
-export function logout() {
+export function remove_user() {
 
     return {
-        type: 'REMOVE_USER',
+        type: REMOVE_USER,
         payload: {
 
         }

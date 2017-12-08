@@ -1,8 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Layout, Row, Col, Icon, Badge, Menu, Dropdown, Avatar, Popover } from 'antd'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import Iconfont from '../Iconfont'
 import './index.less'
+import { remove_user } from '../../actions/user'
 import { Link, withRouter } from 'react-router-dom'
 
 const { Header } = Layout;
@@ -25,6 +28,7 @@ class commonHeader extends React.Component {
         this.state = {
             current: 'mail'
         }
+        this.handleLogOut = this.handleLogOut.bind(this)
     }
 
     handleClick(e) {
@@ -34,15 +38,14 @@ class commonHeader extends React.Component {
         });
     }
     handleLogOut() {
-        const {logout} = this.props
-        logout().payload.promise.then(() => {
-            this.props.history.replace('/login');
-        });
+        const {remove_user} = this.props
+        remove_user()
+        this.props.history.replace('/login');
     }
 
     render () {
-        const {profile} = this.props
-        let username = profile.user ? profile.user.name : '';
+        const {user} = this.props
+        let username = user ? user.name : '';
         const menu = (
             <Menu>
                 <Menu.Item>
@@ -143,4 +146,19 @@ class commonHeader extends React.Component {
     }
 }
 
-export default withRouter(commonHeader)
+function mapStateToProps(state) {
+    const {auth} = state;
+    if (auth.user) {
+        return {user: auth.user};
+    }
+
+    return {user: null};
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        remove_user: bindActionCreators(remove_user, dispatch)
+    }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(commonHeader))

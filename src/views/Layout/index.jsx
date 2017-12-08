@@ -11,7 +11,7 @@ import Header from '@/components/Header'
 import NavPath from '@/components/NavPath'
 import Sidebar from '@/components/Sidebar'
 import Footer from '@/components/Footer'
-import {logout} from '@/actions/user';
+import {remove_user} from '@/actions/user';
 
 import './index.less';
 
@@ -32,7 +32,7 @@ class App extends React.Component {
         return (
             <Layout className="ant-layout-has-sider">
                 <Layout>
-                    <Header profile={user} logout={actions.logout} />
+                    <Header profile={user} logout={actions.remove_user} />
                     <Layout>
                         <Sidebar>Sider</Sidebar>
                         <Content style={{ margin: '0 16px' }}>
@@ -66,7 +66,7 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({logout}, dispatch)};
+    return {actions: bindActionCreators({remove_user}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
