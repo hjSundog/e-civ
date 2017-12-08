@@ -1,0 +1,27 @@
+@tile-gap: 12px;
+@tile-side-length: 165px;
+
+.tile {
+    position: relative;
+    width: @tile-side-length;
+    height: @tile-side-length;
+    cursor: pointer;
+    background: #525252;
+    box-sizing: border-box;
+    box-shadow: inset 0px 0px 1px #ffffcc;
+
+    color: #fff;
+    .tile-content {
+        height: 100%;
+        width: 100%;
+    }
+    .tile-brand {
+        width: 100%;
+        bottom: 0;
+        position: absolute;
+        min-height: 30px;
+    }
+    &.double {
+        width: (@tile-gap + 2 * @tile-side-length);
+    }
+}
