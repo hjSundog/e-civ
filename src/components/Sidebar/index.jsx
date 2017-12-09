@@ -5,7 +5,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { Layout, Menu, Icon, Row, Col, Badge, Dropdown, Avatar, Popover } from 'antd'
 import { Link } from 'react-router-dom'
-import { getAllMenu, updateNavPath } from '../../actions/menu'
 
 const SubMenu = Menu.SubMenu
 
@@ -46,7 +45,6 @@ class Sidebar extends React.Component {
   }
 
   componentDidMount () {
-    this.props.getAllMenu()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -73,11 +71,10 @@ class Sidebar extends React.Component {
     this.setState({
       activeKey: item.key
     })
-    this.props.updateNavPath(item.keyPath, item.key)
   }
 
   render () {
-    const { items, updateNavPath, history } = this.props
+    const { items, history } = this.props
     let { activeKey, openKey } = this.state
     // const { profile } = this.props
     // let username = profile.user ? profile.user.name : '';
@@ -128,14 +125,13 @@ Sidebar.defaultProps = defaultProps;
 function mapStateToProps(state) {
 
   return {
-    items: state.menu.items,
+    // items: state.menu.items,
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    getAllMenu: bindActionCreators(getAllMenu, dispatch),
-    updateNavPath: bindActionCreators(updateNavPath, dispatch)
+
   }
 }
 

@@ -12,7 +12,10 @@ import Calendar from '@/views/Calendar';
 import Timeline from '@/views/Timeline';
 import Steps from '@/views/Steps';
 import Cards from '@/views/Cards';
-import Mailbox from '@/views/Mailbox';
+
+import Mailbox from '@/views/Mailbox/Index';
+import MailboxConversation from '@/views/Mailbox/Detail';
+
 import Page2 from '@/views/Page2';
 import Donation from '@/views/Donation';
 
@@ -47,6 +50,10 @@ export const childRoutes = [
     {
         'path':'/cards',
         'component': Cards
+    },
+    {
+        'path': '/mailbox/:personId',
+        'component': MailboxConversation,
     },
     {
         'path':'/mailbox',

@@ -6,6 +6,9 @@ import configureStore from './store/configureStore';
 
 import Root from './containers/Root';
 
+import 'normalize.css';
+import './style/index.less'
+
 const store = configureStore();
 
 render(

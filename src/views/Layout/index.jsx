@@ -8,7 +8,6 @@ import { Route, Redirect } from 'react-router-dom';
 import { childRoutes } from '@/route'
 import authHOC from '@/utils/auth'
 import Header from '@/components/Header'
-import NavPath from '@/components/NavPath'
 import Sidebar from '@/components/Sidebar'
 import Footer from '@/components/Footer'
 import {remove_user} from '@/actions/user';
@@ -27,7 +26,7 @@ class App extends React.Component {
     }
 
     render() {
-        const {user, navpath, actions} = this.props;
+        const {user, actions} = this.props;
 
         return (
             <Layout className="ant-layout-has-sider">
@@ -36,9 +35,8 @@ class App extends React.Component {
                     <Layout>
                         <Sidebar>Sider</Sidebar>
                         <Content style={{ margin: '0 16px' }}>
-                            <NavPath data={navpath} />
                             <div style={{ minHeight: 360 }}>
-                                <Redirect to="/home"/>
+                                {/* <Redirect to="/home"/> */}
                                 {childRoutes.map((route, index) => (
                                     <Route key={index} path={route.path} component={authHOC(route.component)} exactly={route.exactly} />
                                 ))}
@@ -54,14 +52,12 @@ class App extends React.Component {
 
 App.propTypes = {
     auth: PropTypes.object,
-    navpath: PropTypes.array
 };
 
 const mapStateToProps = (state) => {
-    const { user, menu } = state;
+    const { user } = state;
     return {
         user: user ? user : null,
-        navpath: menu.navpath
     };
 };
 

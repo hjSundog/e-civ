@@ -12,7 +12,13 @@ class Iconfont extends React.Component {
 
     render () {
         return (
-            <svg className={prefix} aria-hidden="true">
+            <svg className={prefix}
+                aria-hidden="true"
+                onMouseEnter={this.props.onMouseEnter}
+                onMouseLeave={this.props.onMouseLeave}
+                onFocus={this.props.onFocus}
+                onClick={this.props.onClick}
+            >
                 <use xlinkHref={`#${prefix}-${this.props.type}`} />
             </svg>
         )

@@ -1,0 +1,43 @@
+.wrapper {
+    display: flex;
+
+    padding: 25px 0 50px;
+    position: relative;
+    min-height: 340px;
+    width: 960px;
+    margin: 0 auto;
+}
+@media (max-width: 767px) {
+.wrapper {
+    width: auto;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+}
+
+
+.mailbox-content {
+    flex: 1;
+    & > header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding: 10px 0;
+    }
+}
+
+.mailbox-aside {
+    flex: 0 1 200px;
+    .mailbox-message {
+        margin-left: auto;
+        width: 150px;
+
+
+        padding: 10px;
+        border: 1px solid #adcf66;
+        background: #f2fddb;
+    }
+}
