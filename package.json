@@ -1,7 +1,7 @@
 {
-  "name": "react-antd-admin",
-  "version": "0.2.0",
-  "description": "React Ant.Design Admin UI",
+  "name": "e-civ",
+  "version": "0.0.2",
+  "description": "A social online game",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --require babel-register tests/.setup.js tests/**/*-test.js --compilers css:mocha-compiler.js",
@@ -11,9 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/fireyy/react-antd-admin.git"
+    "url": "https://github.com/hjSundog/e-civ.git"
   },
-  "author": "fireyy",
+  "author": "hjSundog",
+  "contributors": [
+    {
+      "name" : "liangyuyi",
+      "email" : "443474713@qq.com",
+      "url" : "http://lwio.me/"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
     "antd": "^3.0.0",
