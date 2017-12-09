@@ -10,6 +10,7 @@ import authHOC from '@/utils/auth'
 import Header from '@/components/Header'
 import Sidebar from '@/components/Sidebar'
 import Footer from '@/components/Footer'
+import Iconfont from '@/components/Iconfont'
 import {remove_user} from '@/actions/user';
 
 import './index.less';
@@ -45,6 +46,12 @@ class App extends React.Component {
                     </Layout>
                     <Footer />
                 </Layout>
+                <div id="toolkit">
+                    <div id="feedback" className="toolkit-item">
+                        <Iconfont type="feedback"></Iconfont>
+                        <p>反馈</p>
+                    </div>
+                </div>
             </Layout>
         );
     }
