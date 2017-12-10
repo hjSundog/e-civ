@@ -37,12 +37,14 @@ export default class Mailcard extends React.Component {
 }
 
 Mailcard.propTypes = {
-    from: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        img_url: PropTypes.string,
-        person_id: PropTypes.string,
-        icon: PropTypes.string,
-        icon_tip: PropTypes.string,
-    }),
-    content: PropTypes.string.isRequired
+    mail: PropTypes.shape({
+        from: PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            img_url: PropTypes.string,
+            person_id: PropTypes.string,
+            icon: PropTypes.string,
+            icon_tip: PropTypes.string,
+        }),
+        content: PropTypes.string.isRequired
+    })
 }

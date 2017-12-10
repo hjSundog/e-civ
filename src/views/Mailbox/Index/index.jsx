@@ -1,18 +1,34 @@
 import React from 'react'
 // import api from '../../api';
 
-import Mailcard from '../Common/Mail'
+import Mailcard from '../Common/Mailcard'
+import PublishModal from '../Common/PublishModal'
 
 import './index.less'
 
 export default class MailboxPage extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            publishModalVisible: false
+        }
+    }
+    showPublishModal = () => {
+        this.setState({
+            publishModalVisible: true
+        })
+    }
     render() {
+        const { publishModalVisible } = this.state;
         return (
             <div className="wrapper">
                 <div className="mailbox-content">
                     <header>
                         <span>最近联系</span>
-                        <button id="create-conversation" className="e-civ blue">写私信</button>
+                        <button id="create-conversation"
+                            className="e-civ blue"
+                            onClick={this.showPublishModal}>写私信</button>
+                        <PublishModal visible={publishModalVisible}></PublishModal>
                     </header>
                     <div className="mailbox-conversations">
                         <Mailcard mail={{
