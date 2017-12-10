@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Modal, Button, Input, Form, Automplete } from 'antd'
+import { Modal, Button} from 'antd'
 import Iconfont from '@/components/Iconfont'
 import './index.less'
 
@@ -10,7 +10,7 @@ export default class PublishModal extends React.Component {
         super(props)
         this.state = {
             visible: false,
-            publishLoading: false,
+            deleteLoading: false,
         }
     }
     componentWillReceiveProps(nextProps) {
@@ -18,15 +18,17 @@ export default class PublishModal extends React.Component {
             visible: nextProps.visible
         })
     }
-    handleSubmit = () => {
+    handleDelete = (mail) => {
+        console.log(`delete mail id ${mail.id}`)
         // 如果成功了
         setTimeout(() => {
-            this.props.onAfterSubmit();
+            this.props.onAfterDelete();
+            this.props.onCancel();
         }, 3000)
     }
     handleCancel = () => {
         this.setState({
-            publishLoading: false,
+            deleteLoading: false,
         })
         this.props.onCancel && this.props.onCancel();
     }
@@ -35,7 +37,7 @@ export default class PublishModal extends React.Component {
         console.log('onSelect', value);
     }
     render() {
-        const { visible, publishLoading } = this.state
+        const { visible, deleteLoading } = this.state
         const { mail } = this.props
         return (
             <Modal
@@ -43,19 +45,14 @@ export default class PublishModal extends React.Component {
                 title="写私信"
                 onCancel={this.handleCancel}
                 footer={[
-                    <Button key="submit" type="primary" loading={publishLoading} onClick={this.handleSubmit}>
-                        发出私信
+                    <Button key="submit" type="primary" loading={deleteLoading} onClick={this.handleDelete.bind(mail)}>
+                        确定删除
                     </Button>,
+                    <Button key="cancel" onClick={this.handleCancel}>
+                        取消
+                    </Button>
                 ]}
             >
-                <Form>
-                    <Form.Item>
-                        <Input placeholder="填写对方的用户名" disabled={mail && Boolean(mail.to.id)} />
-                    </Form.Item>
-                    <Form.Item>
-                        <Input.TextArea placeholder="填写私信内容" autosize={{ minRows: 2, maxRows: 6 }} />
-                    </Form.Item>
-                </Form>
             </Modal>
         );
     }
@@ -64,19 +61,13 @@ export default class PublishModal extends React.Component {
 PublishModal.propTypes = {
     visible: PropTypes.bool.isRequired,
     mail: PropTypes.shape({
-        from: PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            img_url: PropTypes.string,
-            person_id: PropTypes.string,
-            icon: PropTypes.string,
-            icon_tip: PropTypes.string,
-        }),
-        content: PropTypes.string.isRequired
+        id: PropTypes.string.isRequired
     }),
     onCancel: PropTypes.func,
-    onAfterSubmit: PropTypes.func,
+    onAfterDelete: PropTypes.func,
 }
 
 PublishModal.defaultProps = {
-    onCancel: () => {}
+    onCancel: () => {},
+    onAfterDelete: () => {}
 };

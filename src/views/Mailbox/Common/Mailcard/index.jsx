@@ -5,29 +5,35 @@ import Iconfont from '@/components/Iconfont'
 import './index.less'
 
 export default class Mailcard extends React.Component {
+    onReply = () => {
+        this.props.onReply(this.props.mail)
+    }
+    onDelete = () => {
+        this.props.onDelete(this.props.mail)
+    }
     render() {
-        const { from, content } = this.props.mail
+        const { mail } = this.props
         return (
             <div className="mailcard">
                 <a className="mailcard-avatar link-avatar50">
-                    <img className="img-avatar50" src={from.img_url} />
+                    <img className="img-avatar50" src={mail.from.img_url} />
                 </a>
                 <div className="mailcard-main">
                     <header>
-                        <a className="mailcard-from">{from.name}</a>
-                        <Tooltip placement="top" title={from.icon_tip}>
-                            <Iconfont type={from.icon}></Iconfont>
+                        <a className="mailcard-from">{mail.from.name}</a>
+                        <Tooltip placement="top" title={mail.from.icon_tip}>
+                            <Iconfont type={mail.from.icon}></Iconfont>
                         </Tooltip>
                     </header>
                     <div className="mailcard-content">
-                        {content}
+                        {mail.content}
                     </div>
                     <footer className="mailcard-meta">
                         <time>10月25日 17:33</time>
                         <div className="operations">
                             <a name="inspect">查看对话</a>
-                            <a name="reply">回复</a>
-                            <a name="delete">删除</a>
+                            <a onClick={this.onReply} name="reply">回复</a>
+                            <a onClick={this.onDelete}  name="delete">删除</a>
                         </div>
                     </footer>
                 </div>
@@ -37,6 +43,8 @@ export default class Mailcard extends React.Component {
 }
 
 Mailcard.propTypes = {
+    onReply: PropTypes.func,
+    onDelete: PropTypes.func,
     mail: PropTypes.shape({
         from: PropTypes.shape({
             name: PropTypes.string.isRequired,
@@ -48,3 +56,8 @@ Mailcard.propTypes = {
         content: PropTypes.string.isRequired
     })
 }
+
+Mailcard.defaultProps = {
+    onReply: () => {},
+    onDelete: () => {}
+};
