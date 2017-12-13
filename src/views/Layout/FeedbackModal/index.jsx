@@ -20,11 +20,14 @@ class FeedbackModal extends React.Component {
             visible: nextProps.visible
         })
     }
-    handleFeedback = (mail) => {
-        console.log(`delete mail id ${mail.id}`)
+    handleFeedback = () => {
+        console.log(`feedback send`)
+        this.setState({
+            feedbackLoading: true
+        })
         // 如果成功了
         setTimeout(() => {
-            this.props.onAfterDelete();
+            this.props.onAfterFeedback();
             this.props.onCancel();
         }, 3000)
     }
@@ -47,7 +50,7 @@ class FeedbackModal extends React.Component {
                 title="写反馈"
                 onCancel={this.handleCancel}
                 footer={[
-                    <Button key="submit" type="primary" loading={feedbackLoading} onClick={this.handleFeedback.bind(mail)}>
+                    <Button key="submit" type="primary" loading={feedbackLoading} onClick={this.handleFeedback}>
                         反馈
                     </Button>,
                     <Button key="cancel" onClick={this.handleCancel}>
@@ -72,7 +75,7 @@ class FeedbackModal extends React.Component {
 FeedbackModal.propTypes = {
     visible: PropTypes.bool.isRequired,
     onCancel: PropTypes.func,
-    onAfterDelete: PropTypes.func,
+    onAfterFeedback: PropTypes.func,
 }
 
 FeedbackModal.defaultProps = {

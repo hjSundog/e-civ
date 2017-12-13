@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Layout, Affix , Row, Col} from 'antd';
+import {Layout, Badge , Row, Col} from 'antd';
 import { Route, Redirect } from 'react-router-dom';
 
 import { childRoutes } from '@/route'
@@ -12,6 +12,7 @@ import Sidebar from '@/components/Sidebar'
 import Footer from '@/components/Footer'
 import Iconfont from '@/components/Iconfont'
 import FeedbackModal from './FeedbackModal'
+import ChatWindow from '@/components/ChatWindow';
 import {remove_user} from '@/actions/user';
 
 import './index.less';
@@ -23,6 +24,7 @@ class App extends React.Component {
         super(props);
         this.state = {
             feedbackVisible: false,
+            chatroomsVisible: false,
         }
     }
 
@@ -35,9 +37,14 @@ class App extends React.Component {
             feedbackVisible: true,
         })
     }
-    handleFeedbackCancel = () => {
+    handleChatroomsClick = () => {
         this.setState({
-            feedbackVisible: false,
+            chatroomsVisible: !this.state.chatroomsVisible,
+        })
+    }
+    handleChatroomsMini = () => {
+        this.setState({
+            chatroomsVisible: false,
         })
     }
 
@@ -67,11 +74,25 @@ class App extends React.Component {
                         <Iconfont type="feedback"></Iconfont>
                         <p>反馈</p>
                     </div>
+                    <Badge count={4}>
+                        <div id="chatrooms" className="toolkit-item" onClick={this.handleChatroomsClick}>
+                            <Iconfont type="chatrooms"></Iconfont>
+                            <p>聊天室</p>
+                        </div>
+                    </Badge>
                     <FeedbackModal
                         visible={feedbackVisible}
                         onCancel={this.handleFeedbackCancel}
                     >
                     </FeedbackModal>
+                    <ChatWindow
+                        agentProfile={{
+                            teamName: 'react-live-chat',
+                            imageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png'
+                        }}
+                        onClose={this.handleChatroomsMini}
+                        isOpen={this.state.chatroomsVisible}
+                    />
                 </div>
             </Layout>
         );

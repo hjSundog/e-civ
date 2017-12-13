@@ -25,6 +25,7 @@
   "dependencies": {
     "antd": "^3.0.0",
     "axios": "^0.15.3",
+    "emoji-js": "^3.4.0",
     "g2-mobile": "2.1.13",
     "history": "^4.3.0",
     "lodash": "^4.16.4",
@@ -32,6 +33,7 @@
     "prop-types": "^15.5.10",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
+    "react-draggable": "^3.0.4",
     "react-helmet": "^5.2.0",
     "react-redux": "^5.0.0",
     "react-router": "^4.1.0",
