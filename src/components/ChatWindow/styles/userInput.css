@@ -12,7 +12,7 @@
 
 
 .sc-user-input--text {
-  width: 300px;
+  width: 500px;
   resize: none;
   border: none;
   outline: none;
@@ -41,7 +41,7 @@
 }
 
 .sc-user-input--buttons {
-  width: 100px;
+  width: 40px;
   position: absolute;
   right: 30px;
   height: 100%;

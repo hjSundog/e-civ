@@ -1,6 +1,4 @@
-import './emojiPicker.css';
-import './index.css';
-import './launcher.css';
+import './index.css'
 import './header.css';
 import './message.css';
 import './userInput.css';

@@ -6,13 +6,31 @@ import UserInput from './UserInput'
 import Header from './Header'
 
 
+/**
+ * 聊天室可拖动窗口
+ * Thinking: Websocket集成在这里还是放Layout里面，这个只是纯展示？ 如果是集成则需要提供新消息到来的事件给父组件。
+ * --Decision: 最后决定还是集成在ChatWindow里面，这样可以热插拔
+ * TODO: 出现与最小化动画
+ * @class ChatWindow
+ * @extends {Component}
+ */
 class ChatWindow extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            messageList: [],
+            // 异步请求广播站信息
+            radioStation: {
+                logo_url: ''
+            }
+
+        }
     }
 
     onUserInputSubmit = (message) => {
-        this.props.onUserInputSubmit(message);
+        this.setState({
+            messageList: this.state.messageList.concat(message)
+        })
     }
 
     onMessageReceived(message) {
@@ -20,7 +38,7 @@ class ChatWindow extends Component {
     }
 
     render() {
-        let messageList = this.props.messageList;
+        let { messageList,radioStation } = this.state;
         let classList = [
             "sc-chat-window",
             (this.props.isOpen ? "opened" : "closed")
@@ -37,13 +55,13 @@ class ChatWindow extends Component {
             >
                 <div className={classList.join(' ')}>
                     <Header
-                        teamName={this.props.agentProfile.teamName}
-                        imageUrl={this.props.agentProfile.imageUrl}
+                        teamName={radioStation.name}
+                        imageUrl={radioStation.logo_url}
                         onClose={this.props.onClose}
                     />
                     <MessageList
                         messages={messageList}
-                        imageUrl={this.props.agentProfile.imageUrl}
+                        imageUrl={''}
                     />
                     <UserInput onSubmit={this.onUserInputSubmit}/>
                 </div>
