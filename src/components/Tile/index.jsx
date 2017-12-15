@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 import './index.less'
 
 class Tile extends React.Component {
@@ -20,8 +19,15 @@ class Tile extends React.Component {
         )
     }
 }
+
+Tile.defaultProps = {
+    className: ''
+};
+
 Tile.propTypes = {
-    className: String
-}
+    className: PropTypes.string,
+    children: PropTypes.arrayOf(PropTypes.object)
+};
+
 
 export default Tile;

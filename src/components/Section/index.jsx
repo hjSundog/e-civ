@@ -37,12 +37,18 @@ class Section extends React.Component {
         )
     }
 }
+
+Section.defaultProps = {
+    className: '',
+    tip: '',
+};
+
 Section.propTypes = {
     className: PropTypes.string,
     title: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.element
-    ]),
+    ]).isRequired,
     tip: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.element

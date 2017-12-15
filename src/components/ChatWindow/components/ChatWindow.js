@@ -4,6 +4,7 @@ import Draggable from 'react-draggable'
 import MessageList from './MessageList'
 import UserInput from './UserInput'
 import Header from './Header'
+import Websocket from '@/components/Websocket'
 
 
 /**
@@ -21,20 +22,28 @@ class ChatWindow extends Component {
             messageList: [],
             // 异步请求广播站信息
             radioStation: {
-                logo_url: ''
+                logo_url: '',
+                channel: 'asd'
             }
 
         }
     }
 
     onUserInputSubmit = (message) => {
-        this.setState({
-            messageList: this.state.messageList.concat(message)
-        })
+        // message组装成本人格式
+        this.setState({ messages: [...this.state.messages, message] });
     }
 
-    onMessageReceived(message) {
+    onMessageReceived = (message) => {
         this.setState({ messages: [...this.state.messages, message] });
+    }
+
+    renderWebsocket = () => {
+        const channel = this.state.radioStation.channel
+        return this.props.isOpen
+            ? <Websocket url={`ws://localhost:8089?channel=${channel}&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIiwibWV0YSI6eyJhZ2UiOjIyLCJzZXgiOiJtYWxlIn0sInBlcnNvbl9pZCI6bnVsbCwiaWF0IjoxNTEyMzc5OTc4LCJleHAiOjIyNjk3NjIzNzh9.grCzWUCxgijvOfgecQ-GUD0sssPHSY9bLRX2kYyLO_A`}
+                onMessage={this.onMessageReceived}/>
+            : null
     }
 
     render() {
@@ -64,6 +73,8 @@ class ChatWindow extends Component {
                         imageUrl={''}
                     />
                     <UserInput onSubmit={this.onUserInputSubmit}/>
+                    {this.renderWebsocket()}
+
                 </div>
             </Draggable>
         );
@@ -78,13 +89,7 @@ ChatWindow.defaultProps = {
 
 ChatWindow.propTypes = {
     isOpen: PropTypes.bool.isRequired,
-    agentProfile: PropTypes.shape({
-        teamName: PropTypes.string.isRequired,
-        imageUrl: PropTypes.string.isRequired
-    }),
     onClose: PropTypes.func,
-    onUserInputSubmit: PropTypes.func,
-    messageList: PropTypes.arrayOf(PropTypes.object)
 };
 
 export default ChatWindow;

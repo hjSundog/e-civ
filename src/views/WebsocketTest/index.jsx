@@ -26,7 +26,7 @@ class WebsocketTest extends React.Component {
     render() {
         return (
             <div>
-                <Websocket url='ws://localhost:8089?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoibGlhbmd5dXlpIiwidXNlcm5hbWUiOiJsaWFuZ3l1eWkiLCJtZXRhIjp7ImFnZSI6MjIsInNleCI6Im1hbGUifSwicGVyc29uX2lkIjpudWxsLCJpYXQiOjE1MTIyOTA3NjEsImV4cCI6MTUxMjM3NzE2MX0.jpjg-EGitaqSaynYMC5OeqnyJrcS9TjlwpQziblLCkM'
+                <Websocket url='ws://localhost:8089?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIiwibWV0YSI6eyJhZ2UiOjIyLCJzZXgiOiJtYWxlIn0sInBlcnNvbl9pZCI6bnVsbCwiaWF0IjoxNTEyMzc5OTc4LCJleHAiOjIyNjk3NjIzNzh9.grCzWUCxgijvOfgecQ-GUD0sssPHSY9bLRX2kYyLO_A'
                     onMessage={this.handleData.bind(this)}/>
                 <div>
                     {

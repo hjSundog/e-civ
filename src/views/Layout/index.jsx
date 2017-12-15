@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Layout, Badge , Row, Col} from 'antd';
-import { Route, Redirect } from 'react-router-dom';
+import { Route, Redirect, Switch } from 'react-router-dom';
 
 import { childRoutes } from '@/route'
 import authHOC from '@/utils/auth'
@@ -60,10 +60,14 @@ class App extends React.Component {
                         <Sidebar>Sider</Sidebar>
                         <Content style={{ margin: '0 16px' }}>
                             <div style={{ minHeight: 360 }}>
-                                {/* <Redirect to="/home"/> */}
-                                {childRoutes.map((route, index) => (
-                                    <Route key={index} path={route.path} component={authHOC(route.component)} exactly={route.exactly} />
-                                ))}
+                                <Switch>
+                                    <Route exact strict path="/">
+                                        <Redirect to="/home"/>
+                                    </Route>
+                                    {childRoutes.map((route, index) => (
+                                        <Route key={index} path={route.path} component={authHOC(route.component)} exactly={route.exactly} />
+                                    ))}
+                                </Switch>
                             </div>
                         </Content>
                     </Layout>
