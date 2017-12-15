@@ -20,6 +20,7 @@ import Page2 from '@/views/Page2';
 import Donation from '@/views/Donation';
 
 import WebsocketTest from '@/views/WebsocketTest'
+import Charactor from '@/views/Charactor';
 
 export const childRoutes = [
     {
@@ -66,6 +67,10 @@ export const childRoutes = [
     {
         'path': '/donation',
         'component': Donation
+    },
+    {
+        'path': '/charactor',
+        'component': Charactor
     }
 ];
 
