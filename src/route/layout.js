@@ -14,6 +14,8 @@ import Cards from '@/views/Cards';
 import Mailbox from '@/views/Mailbox/Index';
 import MailboxConversation from '@/views/Mailbox/Detail';
 
+import Skill from '@/views/Skill/Index';
+
 import Page2 from '@/views/Page2';
 import Donation from '@/views/Donation';
 
@@ -56,6 +58,10 @@ export const childRoutes = [
     {
         'path':'/mailbox',
         'component': Mailbox
+    },
+    {
+        'path': '/skill',
+        'component': Skill
     },
     {
         'path':'/page2',
