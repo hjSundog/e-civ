@@ -33,4 +33,21 @@ mock.onGet('/randomuser').reply((config) => {
     });
 });
 
+mock.onPost('/persons').reply(config => {
+    let postData = config.params;
+    if(postData.name && postData.meta ) {
+        return [200,require('./mock/person')]
+    } else {
+        return [422, {message: "Incorrect user or password"} ];
+    }
+})
+
+
+mock.onGet(/\/persons\/\w+/).reply(config => {
+    console.log(config.url)
+    return [200, require('./mock/person')]
+})
+
+
+
 export default mockAxios;

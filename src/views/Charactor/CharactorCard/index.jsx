@@ -1,9 +1,14 @@
 import React from 'react'
-import { Select, Row, Col } from 'antd'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { Select, Row, Col, Radio, Button } from 'antd'
 //import Iconfont from '../../components/Iconfont';
 import './index.less'
+//import { withRouter } from './C:/Users/Mistaker/AppData/Local/Microsoft/TypeScript/2.6/node_modules/@types/react-router';
 
 const Option = Select.Option
+const RadioButton = Radio.Button
+const RadioGroup = Radio.Group
 
 const skins = ['black', 'yellow', 'white']
 
@@ -15,7 +20,7 @@ const cityData = {
 
 const heightData = ['150']
 
-export default class CharactorCard extends React.Component {
+class CharactorCard extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -129,7 +134,57 @@ export default class CharactorCard extends React.Component {
                         </Row>
                     </Col>
                 </Row>
+                <Row justify="center" style={{ margin: '10px 16px' }}>
+                    <Col span={24} style={{display:'flex',justifyContent:'center'}}>
+                        <RadioGroup defaultValue='男'>
+                            <RadioButton value="男">男</RadioButton>
+                            <RadioButton value="女">女</RadioButton>
+                        </RadioGroup>
+                    </Col>
+                </Row>
+                <Row justify="center" style={{ margin: '0 16px' }}>
+                    <Col span={24} style={{display:'flex',justifyContent:'center'}}>
+                        <Button type="primary" onClick={this.handleSubmit} loading={this.state.loading}>创建</Button>
+                    </Col>
+                </Row>
             </div>
         )
     }
 }
+
+CharactorCard.defaultProps = {
+    options: [{
+        sex: '男',
+        type: 'select'
+    },{
+        age: 18,
+        type: 'select'
+    },{
+        skin: 'yellow',
+        type: 'select'
+    }],
+    callback: function(){
+        return null
+    }
+}
+
+CharactorCard.propTypes = {
+    options: PropTypes.arrayOf(
+        PropTypes.object        
+    ),
+    callback: PropTypes.func
+}
+
+
+// function mapStateToProps(state) {
+//     return state
+// }
+
+// function mapDispatchToProps(dispatch) {
+//     return {
+
+//     }
+// }
+
+export default CharactorCard
+//export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CharactorCard))
