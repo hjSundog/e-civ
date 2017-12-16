@@ -2,15 +2,15 @@
 @tile-side-length: 165px;
 
 .tile {
+    display: inline-block;
     position: relative;
     width: @tile-side-length;
     height: @tile-side-length;
+    margin-right: @tile-gap;
+    margin-bottom: @tile-gap;
     cursor: pointer;
-    background: #525252;
     box-sizing: border-box;
     box-shadow: inset 0px 0px 1px #ffffcc;
-
-    color: #fff;
     .tile-content {
         height: 100%;
         width: 100%;
@@ -21,7 +21,18 @@
         position: absolute;
         min-height: 30px;
     }
-    &.double {
+    &.tile-double {
         width: (@tile-gap + 2 * @tile-side-length);
+    }
+    /*
+     * Tile Position
+     */
+    &.tile-center {
+        .tile-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
     }
 }

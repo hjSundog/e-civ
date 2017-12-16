@@ -31,8 +31,11 @@ class Section extends React.Component {
     render () {
         return (
             <div className={`section ${this.props.className}`}>
-                {this.renderTitle()}
-                {this.renderTip()}
+                <header>
+                    {this.renderTitle()}
+                    {this.renderTip()}
+                </header>
+                {this.props.children}
             </div>
         )
     }
@@ -45,6 +48,10 @@ Section.defaultProps = {
 
 Section.propTypes = {
     className: PropTypes.string,
+    children: PropTypes.oneOfType([
+        PropTypes.element,
+        PropTypes.arrayOf(PropTypes.element)
+    ]),
     title: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.element

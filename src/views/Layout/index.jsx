@@ -58,7 +58,7 @@ class App extends React.Component {
                     <Header profile={user} logout={actions.remove_user} />
                     <Layout>
                         <Sidebar>Sider</Sidebar>
-                        <Content style={{ margin: '0 16px' }}>
+                        <Content>
                             <div style={{ minHeight: 360 }}>
                                 {LayoutRouter}
                             </div>
