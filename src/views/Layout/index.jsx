@@ -6,7 +6,7 @@ import {Layout, Badge , Row, Col} from 'antd';
 import { Route, Redirect, Switch } from 'react-router-dom';
 
 import { childRoutes } from '@/route'
-import authHOC from '@/utils/auth'
+import LayoutRouter from '@/route/layout'
 import Header from '@/components/Header'
 import Sidebar from '@/components/Sidebar'
 import Footer from '@/components/Footer'
@@ -60,14 +60,7 @@ class App extends React.Component {
                         <Sidebar>Sider</Sidebar>
                         <Content style={{ margin: '0 16px' }}>
                             <div style={{ minHeight: 360 }}>
-                                <Switch>
-                                    <Route exact strict path="/">
-                                        <Redirect to="/home"/>
-                                    </Route>
-                                    {childRoutes.map((route, index) => (
-                                        <Route key={index} path={route.path} component={authHOC(route.component)} exactly={route.exactly} />
-                                    ))}
-                                </Switch>
+                                {LayoutRouter}
                             </div>
                         </Content>
                     </Layout>
