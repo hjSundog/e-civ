@@ -40,12 +40,16 @@ mock.onGet('/radioStation').reply(config => {
     } else {
         return [404, {message: "当前位置没有广播站"} ];
     }
+mock.onGet(/\/users\/\d+/).reply(config => {
+    console.log('获取user角色')
+    console.log(config.url)
+    return [200, require('./mock/person')]
 })
 
 mock.onPost('/persons').reply(config => {
-    let postData = config.params;
+    let postData = JSON.parse(config.data);
     if(postData.name && postData.meta ) {
-        return [200,require('./mock/person')]
+        return [200,{...require('./mock/person'),...postData}]
     } else {
         return [422, {message: "Incorrect user or password"} ];
     }

@@ -1,4 +1,5 @@
 module.exports = {
+    _id: 123,
     name: 'test',
     person_id: null,
     attributes: {

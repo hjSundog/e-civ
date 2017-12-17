@@ -47,9 +47,14 @@ class Login extends React.Component {
                 message.error(res.data.error);
             }
             if (res.status === 200)  {
-                message.success('Welcome ' + res.data.name);
                 this.props.set_user(res.data)
-                this.props.history.replace('/');
+                //判断是否已经有角色
+                if (res.data.person_id ){
+                    message.success('Welcome ' + res.data.name) 
+                    this.props.history.replace('/')
+                } else {
+                    this.props.history.replace('/charactor')
+                }
             }
         }).catch(err => {
             this.setState({

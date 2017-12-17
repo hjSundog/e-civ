@@ -19,7 +19,6 @@ import Skill from '@/views/Skill/Index';
 import Page2 from '@/views/Page2';
 import Donation from '@/views/Donation';
 
-import Charactor from '@/views/Charactor';
 
 export const childRoutes = [
     {
@@ -71,10 +70,6 @@ export const childRoutes = [
         'path': '/donation',
         'component': Donation
     },
-    {
-        'path': '/charactor',
-        'component': Charactor
-    }
 ];
 
 // "/"目录下路由

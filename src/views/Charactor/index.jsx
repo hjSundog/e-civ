@@ -1,13 +1,15 @@
 import React from 'react'
-import axios from 'axios'
-import { Button, Radio, Row, Col } from 'antd'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { Button, Radio, Row, Col, message } from 'antd'
 //import Iconfont from '../../components/Iconfont';
 import CharactorCard from './CharactorCard';
 import './index.less'
-
-
-
-export default class Charactor extends React.Component {
+import api from '../../api'
+import { withRouter } from 'react-router'
+import * as PersonActionCreators from '@/actions/person'
+import { set_user } from '@/actions/user'
+class Charactor extends React.Component {
 
     constructor (props) {
         super(props)
@@ -17,21 +19,39 @@ export default class Charactor extends React.Component {
     }
 
     componentWillMount () {
+        //
     }
-    handleCreatePerson() {
+    //这里有个问题。因为创建一个角色，user信息也会跟着变化，所以这里采取创建一个角色成功后将该id直接加入
+    //加入redux进行保存以保持和后台同步而不是重新获取数据库user来更新redux
+    handleCreatePerson(person) {
         this.setState({
             loading: true
         })
-        axios.post('/persons')
-            .then(res => {
-                console.log(res)
-                if(res.state === 200){
-                    this.setState({
-                        loading: false
-                    })
-                    //console.log(person.name);
-                }
+        api({
+            url: '/persons',
+            method: 'post',
+            data: {
+                ...person
+            }
+        }).then(res => {
+            this.setState({
+                loading: false
             })
+            if (res.status === 200) {
+                //res.data
+                console.log('charactor create')
+                console.log(res.data)
+                this.props.actions.create_person(res.data)
+                //更新user
+                //set_user()
+                this.props.history.replace('/')
+            }
+        }).catch(err => {
+            this.setState({
+                loading: false
+            });
+            message.error(err);            
+        })
 
     }
     render () {
@@ -42,7 +62,7 @@ export default class Charactor extends React.Component {
                 </Row>
                 <Row style={{ margin: '10px 16px' }}>
                     <Col span={24} >
-                        <CharactorCard callback={this.handleCreatePerson}/>
+                        <CharactorCard callback={this.handleCreatePerson.bind(this)}/>
                     </Col>
                 </Row>
 
@@ -50,3 +70,18 @@ export default class Charactor extends React.Component {
         )
     }
 }
+
+function mapStateToProps (state) {
+    const { auth } = state;
+    return {
+        user: auth.user ? auth.user : null,
+    };
+}
+
+function mapDispatchToProps (dispatch) {
+    return {
+        actions: bindActionCreators(PersonActionCreators, dispatch)
+    }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Charactor))

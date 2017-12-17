@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
 import auth from './auth';
-import sidebar from './sidebar';
+import person from './person';
 import websocket from './websocket';
 const rootReducer = combineReducers({
     auth,
-    sidebar,
+    person,
     websocket,
 });
 

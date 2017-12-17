@@ -6,12 +6,14 @@ import Login from '../views/Login';
 import Signup from '../views/Signup';
 
 import WebsocketTest from '@/views/WebsocketTest'
+import Charactor from '@/views/Charactor';
 
 const routes = (
     <Switch>
         <Route path="/login" component={Login}/>
         <Route path="/signup" component={Signup}/>
         <Route path="/websocket" component={WebsocketTest} />
+        <Route path="/charactor" component={Charactor} />
         <Route path="/" component={Layout}/>
     </Switch>
 );

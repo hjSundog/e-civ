@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Select, Row, Col, Radio, Button } from 'antd'
-//import Iconfont from '../../components/Iconfont';
+import { Select, Row, Col, Radio, Button, Input, Tooltip } from 'antd'
+import NumericInput from '../../../components/NumericInput'
 import './index.less'
-//import { withRouter } from './C:/Users/Mistaker/AppData/Local/Microsoft/TypeScript/2.6/node_modules/@types/react-router';
 
 const Option = Select.Option
 const RadioButton = Radio.Button
@@ -12,78 +11,80 @@ const RadioGroup = Radio.Group
 
 const skins = ['black', 'yellow', 'white']
 
-const provinceData = ['Zhejiang', 'Jiangsu'];
-const cityData = {
-    Zhejiang: ['Hangzhou', 'Ningbo', 'Wenzhou'],
-    Jiangsu: ['Nanjing', 'Suzhou', 'Zhenjiang'],
-};
-
-const heightData = ['150']
+//先把属性写死，以后考虑属性通过属性传递来动态生成
 
 class CharactorCard extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            cities: cityData[provinceData[0]],
-            secondCity: cityData[provinceData[0]][0],
+            charactor: {
+                name: 'mddd',
+                meta: {
+                    age: 22,
+                    sex: 'female',
+                    skin: 'yellow',
+                    height: 170,
+                    weight: 70
+                }
+            }
         }
     }
 
     componentWillMount() {
     }
 
-    callback() {
-
+    handleSkinChange(value) {
+        const charactor = this.state.charactor
+        charactor.meta.skin = value
+        this.setState({
+            charactor
+        })
     }
-
-    handleChange() {
-
+    //提交创建的角色
+    handleSubmit(){
+        console.log(this.state.charactor)
+        this.props.callback(this.state.charactor);
     }
-
-    handleFocus() {
-
-    }
-
-    handleBlur() {
-
-    }
-
 
     handlFilterOption(input, option) {
         return option.props.children.toLowerCase()
             .indexOf(input.toLowerCase()) >= 0
     }
 
-    handleProvinceChange = (value) => {
+    handleHeightChange(value) {
+        const charactor = this.state.charactor
+        charactor.meta.height = value
         this.setState({
-            cities: cityData[value],
-            secondCity: cityData[value][0],
-        });
+            charactor
+        })
+    }
+    handleWeightChange(value) {
+        const charactor = this.state.charactor
+        charactor.meta.weight = value
+        this.setState({
+            charactor
+        })
     }
 
-    onSecondCityChange = (value) => {
+    handleName(e) {
+        const charactor = this.state.charactor
+        charactor.name = e.target.value.replace(/(^\s*)|(\s*$)/g, "")
         this.setState({
-            secondCity: value,
-        });
+            charactor
+        })
     }
-    handleHeightChange() {
 
+    handleSex(e){
+        const charactor = this.state.charactor
+        charactor.meta.sex = e.target.value.replace(/(^\s*)|(\s*$)/g, "")
+        this.setState({
+            charactor
+        })
     }
 
     render() {
         const skinsOptions = skins.map(skin => {
             return <Option key={skin}>{skin}</Option>
-        })
-
-        const cityOptions = this.state.cities.map(city => {
-            return <Option key={city}>{city}</Option>
-        })
-
-        const provinceOptions = provinceData.map(province => {
-            return <Option key={province}>{province}</Option>
-        })
-        const heigthOptions = heightData.map(height => {
-            return <Option key={height}>{height}</Option>
         })
 
         return (
@@ -93,6 +94,11 @@ class CharactorCard extends React.Component {
                         这里显示人物形象
                     </Col>
                     <Col span={8}>
+                        <Row>
+                            <Col>
+                                <Input placeholder="角色名" onChange={this.handleName.bind(this)} />
+                            </Col>
+                        </Row>
                         <Row >
                             <Col span={6}>肤色:</Col>
                             <Col span={18} >
@@ -101,10 +107,10 @@ class CharactorCard extends React.Component {
                                     showSearch
                                     placeholder="select your skin"
                                     optionFilterProp="children"
-                                    onChange={this.handleChange}
-                                    onFocus={this.handleFocus}
-                                    onBlur={this.handleBlur}
-                                    filterOption={this.handlFilterOption}>
+                                    onChange={this.handleSkinChange.bind(this)}
+                                    onFocus={this.handleSkinFocus}
+                                    onBlur={this.handleSkinBlur}
+                                    filterOption={this.handlSkinFilterOption}>
                                     {skinsOptions}
                                 </Select>
                             </Col>
@@ -112,31 +118,20 @@ class CharactorCard extends React.Component {
                         <Row>
                             <Col span={6}>身高:</Col>
                             <Col span={18}>
-                                <Select
-                                    mode="tags"
-                                    placeholder="Tags Mode"
-                                    onChange={this.handleHeightChange}
-                                >
-                                    {heigthOptions}
-                                </Select>
+                                <NumericInput style={{ width: 120 }} value={this.state.charactor.meta.height} onChange={this.handleHeightChange.bind(this)} />
                             </Col>
                         </Row>
                         <Row>
-                            <Col span={6}>城市：</Col>
-                            <Col span={18} >
-                                <Select defaultValue={provinceData[0]} onChange={this.handleProvinceChange}>
-                                    {provinceOptions}
-                                </Select>
-                                <Select value={this.state.secondCity} onChange={this.onSecondCityChange}>
-                                    {cityOptions}
-                                </Select>
+                            <Col span={6}>体重:</Col>
+                            <Col span={18}>
+                                <NumericInput style={{ width: 120 }} value={this.state.charactor.meta.weight} onChange={this.handleWeightChange.bind(this)} />
                             </Col>
                         </Row>
                     </Col>
                 </Row>
                 <Row justify="center" style={{ margin: '10px 16px' }}>
                     <Col span={24} style={{display:'flex',justifyContent:'center'}}>
-                        <RadioGroup defaultValue='男'>
+                        <RadioGroup defaultValue='男' onChange={this.handleSex.bind(this)}>
                             <RadioButton value="男">男</RadioButton>
                             <RadioButton value="女">女</RadioButton>
                         </RadioGroup>
@@ -144,7 +139,7 @@ class CharactorCard extends React.Component {
                 </Row>
                 <Row justify="center" style={{ margin: '0 16px' }}>
                     <Col span={24} style={{display:'flex',justifyContent:'center'}}>
-                        <Button type="primary" onClick={this.handleSubmit} loading={this.state.loading}>创建</Button>
+                        <Button type="primary" onClick={this.handleSubmit.bind(this)} loading={this.state.loading}>创建</Button>
                     </Col>
                 </Row>
             </div>
@@ -153,25 +148,10 @@ class CharactorCard extends React.Component {
 }
 
 CharactorCard.defaultProps = {
-    options: [{
-        sex: '男',
-        type: 'select'
-    },{
-        age: 18,
-        type: 'select'
-    },{
-        skin: 'yellow',
-        type: 'select'
-    }],
-    callback: function(){
-        return null
-    }
+    callback: () => {}
 }
 
 CharactorCard.propTypes = {
-    options: PropTypes.arrayOf(
-        PropTypes.object        
-    ),
     callback: PropTypes.func
 }
 
@@ -187,4 +167,3 @@ CharactorCard.propTypes = {
 // }
 
 export default CharactorCard
-//export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CharactorCard))

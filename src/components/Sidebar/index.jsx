@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import api from '../../api'
 import { Layout, Menu, Icon, Progress, Row, Col, Badge, Dropdown, Avatar, Popover, Card } from 'antd'
 import { Link } from 'react-router-dom'
-import * as SidebarActionCreators from '@/actions/sidebar'
+import * as PersonActionCreators from '@/actions/person'
 
 const SubMenu = Menu.SubMenu
 const { Meta } = Card;
@@ -58,13 +58,11 @@ class Sidebar extends React.Component {
       //         })
       //     }
       // }).catch(err => {
-      //     this.setState({
+      //     this.setState({update_person
       //         loading: false
       //     });
       //     throw new Error(err)
       // })
-
-      this.props.actions.reset()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -90,25 +88,29 @@ class Sidebar extends React.Component {
       this.props.actions.reset()
   }
   handleHealthUp() {
-      this.props.actions.change_state({
+      this.props.actions.update_person({
           health: this.props.person.conditions.health+10
       })
   }
 
   handleHealthDown() {
-      this.props.actions.change_state({
+      this.props.actions.update_person({
           health: this.props.person.conditions.health-10
       })
   }
   render () {
       const that = this
       const charactor = this.props.person
-      const statesItems = Object.entries(charactor.conditions).map(condition => {
-          return <div key={condition[0]}><span>{condition[0]}</span><Progress showInfo={false} percent={condition[1]}/></div>
-      })
-      const attributeItems = Object.entries(charactor.attributes).map(attribute => {
-          return <div key={attribute[0]}><span>{attribute[0]}</span><span>{attribute[1]}</span></div>
-      })
+      let statesItems = ''
+      let attributeItems = ''
+      if (charactor.conditions && charactor.attributes) {
+          statesItems = Object.entries(charactor.conditions).map(condition => {
+              return <div key={condition[0]}><span>{condition[0]}</span><Progress showInfo={false} percent={condition[1]}/></div>
+          })
+          attributeItems = Object.entries(charactor.attributes).map(attribute => {
+              return <div key={attribute[0]}><span>{attribute[0]}</span><span>{attribute[1]}</span></div>
+          }) 
+      }
       return (
           <Sider
               trigger={null}
@@ -150,33 +152,33 @@ class Sidebar extends React.Component {
   }
 }
 
-// Sidebar.defaultProps = {
-//     person: {
-//         name: '',
-//         person_id: null,
-//         attributes: {
-//             str: 1,
-//             dex: 1,
-//             con: 1,
-//             int: 1,
-//             wis: 1,
-//             cha: 1
-//         },
-//         items: [],
-//         des: '',
-//         conditions: {
-//             health: 100,
-//             maxHealth: 100,
-//             stamina: 100,
-//             maxStamina: 100
-//         },
-//         status: [],
-//         meta: {
-//             age: 0,
-//             sex: 'male'
-//         }
-//     }
-// }
+Sidebar.defaultProps = {
+    person: {
+        name: '',
+        person_id: null,
+        attributes: {
+            str: 1,
+            dex: 1,
+            con: 1,
+            int: 1,
+            wis: 1,
+            cha: 1
+        },
+        items: [],
+        des: '',
+        conditions: {
+            health: 100,
+            maxHealth: 100,
+            stamina: 100,
+            maxStamina: 100
+        },
+        status: [],
+        meta: {
+            age: 0,
+            sex: 'male'
+        }
+    }
+}
 
 Sidebar.propTypes = {
     person: PropTypes.object,
@@ -187,13 +189,13 @@ Sidebar.propTypes = {
 function mapStateToProps(state) {
 
     return {
-        person: state.sidebar
+        person: state.person
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators(SidebarActionCreators, dispatch) 
+        actions: bindActionCreators(PersonActionCreators, dispatch) 
     }
 }
 

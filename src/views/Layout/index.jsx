@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Layout, Badge , Row, Col} from 'antd';
+import {Layout, Badge , Row, Col, Spin, message} from 'antd';
 import { Route, Redirect, Switch } from 'react-router-dom';
 
 import { childRoutes } from '@/route'
@@ -16,6 +16,9 @@ import ChatWindow from '@/components/ChatWindow';
 import Websocket from '@/components/Websocket'
 import {add_message} from '@/actions/websocket';
 
+import {remove_user} from '@/actions/user';
+import { init_person } from '../../actions/person'
+import api from '../../api'
 import './index.less';
 
 const { Content } = Layout;
@@ -26,11 +29,37 @@ class App extends React.Component {
         this.state = {
             feedbackVisible: false,
             chatroomsVisible: false,
+            loading: true
         }
     }
-
     componentWillMount() {
-        const {actions} = this.props;
+        
+    }
+    async componentDidMount() {
+        const {actions, user, person} = this.props
+        // await api({
+        //     url: `/persons/${user.person_id}`,
+        //     method: 'get',
+        // }).then(res => {
+        //     this.setState({
+        //         loading: false
+        //     })
+        //     if (res.status !== 200) {
+        //         message.error(res.data.error);
+        //     }
+        //     if (res.status === 200) {
+        //         console.log('init person')
+        //         actions.init_person(res.data)
+        //     }
+        // }).catch(err => {
+        //     this.setState({
+        //         loading: false
+        //     });
+        //     message.error(err);            
+        // })
+        this.setState({
+            loading: false
+        })
     }
 
     handleFeedbackClick = () => {
@@ -59,6 +88,7 @@ class App extends React.Component {
 
         return (
             <Layout className="ant-layout-has-sider">
+                <Spin size="large" spinning={this.state.loading}></Spin>
                 <Layout>
                     <Header profile={user} logout={actions.remove_user} />
                     <Layout>
@@ -108,14 +138,18 @@ App.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-    const { user } = state;
+    const { auth } = state;
     return {
-        user: user ? user : null,
+        user: auth.user ? auth.user : null,
     };
 };
 
 function mapDispatchToProps(dispatch) {
+<<<<<<< HEAD
     return {actions: bindActionCreators({add_message}, dispatch)};
+=======
+    return {actions: bindActionCreators({remove_user, init_person}, dispatch)};
+>>>>>>> sidebar & router 接下来搞角色页的拦截器和更新角色的实现
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
