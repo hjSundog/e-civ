@@ -33,6 +33,15 @@ mock.onGet('/randomuser').reply((config) => {
     });
 });
 
+// 获取聊天室的广播站(频道)
+mock.onGet('/radioStation').reply(config => {
+    if (config.debug === true) {
+        return [200, require('./mock/radioStation') ];
+    } else {
+        return [404, {message: "当前位置没有广播站"} ];
+    }
+})
+
 mock.onPost('/persons').reply(config => {
     let postData = config.params;
     if(postData.name && postData.meta ) {

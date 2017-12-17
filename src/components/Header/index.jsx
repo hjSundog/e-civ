@@ -28,16 +28,15 @@ class commonHeader extends React.Component {
         this.state = {
             current: 'mail'
         }
-        this.handleLogOut = this.handleLogOut.bind(this)
     }
 
-    handleClick(e) {
+    handleClick = (e) => {
         console.log('click ', e);
         this.setState({
             current: e.key,
         });
     }
-    handleLogOut() {
+    handleLogOut = () => {
         const {remove_user} = this.props
         remove_user()
         this.props.history.replace('/login');

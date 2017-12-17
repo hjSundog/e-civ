@@ -13,7 +13,8 @@ import Footer from '@/components/Footer'
 import Iconfont from '@/components/Iconfont'
 import FeedbackModal from './FeedbackModal'
 import ChatWindow from '@/components/ChatWindow';
-import {remove_user} from '@/actions/user';
+import Websocket from '@/components/Websocket'
+import {add_message} from '@/actions/websocket';
 
 import './index.less';
 
@@ -46,6 +47,10 @@ class App extends React.Component {
         this.setState({
             chatroomsVisible: false,
         })
+    }
+    handleWebsocket = (message) => {
+        console.log(JSON.parse(message))
+        this.props.actions.add_message(JSON.parse(message));
     }
 
     render() {
@@ -90,6 +95,8 @@ class App extends React.Component {
                         onClose={this.handleChatroomsMini}
                         isOpen={this.state.chatroomsVisible}
                     />
+                    <Websocket url='ws://localhost:8089?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIiwibWV0YSI6eyJhZ2UiOjIyLCJzZXgiOiJtYWxlIn0sInBlcnNvbl9pZCI6bnVsbCwiaWF0IjoxNTEyMzc5OTc4LCJleHAiOjIyNjk3NjIzNzh9.grCzWUCxgijvOfgecQ-GUD0sssPHSY9bLRX2kYyLO_A'
+                        onMessage={this.handleWebsocket}/>
                 </div>
             </Layout>
         );
@@ -108,7 +115,7 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({remove_user}, dispatch)};
+    return {actions: bindActionCreators({add_message}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

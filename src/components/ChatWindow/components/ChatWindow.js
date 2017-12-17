@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Draggable from 'react-draggable'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom';
+
 import MessageList from './MessageList'
 import UserInput from './UserInput'
 import Header from './Header'
-import Websocket from '@/components/Websocket'
-
+import api from '@/api'
 
 /**
  * 聊天室可拖动窗口
@@ -22,10 +24,26 @@ class ChatWindow extends Component {
             messageList: [],
             // 异步请求广播站信息
             radioStation: {
-                logo_url: '',
-                channel: 'asd'
+                name: '加载中...',
+                img_url: ''
             }
+        }
+    }
 
+    componentWillReceiveProps(nextProps) {
+        // 打开聊天室时请求广播站信息
+        if(this.props.isOpen !== nextProps.isOpen && nextProps.isOpen === true) {
+            api({
+                url: '/radioStation',
+                method: 'get',
+                debug: true
+            }).then(({data}) => {
+                this.setState({
+                    radioStation: data
+                })
+            }).catch(err => {
+                console.log(err);
+            })
         }
     }
 
@@ -36,14 +54,6 @@ class ChatWindow extends Component {
 
     onMessageReceived = (message) => {
         this.setState({ messages: [...this.state.messages, message] });
-    }
-
-    renderWebsocket = () => {
-        const channel = this.state.radioStation.channel
-        return this.props.isOpen
-            ? <Websocket url={`ws://localhost:8089?channel=${channel}&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIiwibWV0YSI6eyJhZ2UiOjIyLCJzZXgiOiJtYWxlIn0sInBlcnNvbl9pZCI6bnVsbCwiaWF0IjoxNTEyMzc5OTc4LCJleHAiOjIyNjk3NjIzNzh9.grCzWUCxgijvOfgecQ-GUD0sssPHSY9bLRX2kYyLO_A`}
-                onMessage={this.onMessageReceived}/>
-            : null
     }
 
     render() {
@@ -73,8 +83,6 @@ class ChatWindow extends Component {
                         imageUrl={''}
                     />
                     <UserInput onSubmit={this.onUserInputSubmit}/>
-                    {this.renderWebsocket()}
-
                 </div>
             </Draggable>
         );
@@ -92,4 +100,10 @@ ChatWindow.propTypes = {
     onClose: PropTypes.func,
 };
 
-export default ChatWindow;
+function mapStateToProps(state) {
+    return {
+        websocket: state.websocket
+    }
+}
+
+export default withRouter(connect(mapStateToProps)(ChatWindow))
