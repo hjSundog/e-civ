@@ -40,10 +40,10 @@ mock.onGet('/radioStation').reply(config => {
     } else {
         return [404, {message: "当前位置没有广播站"} ];
     }
-mock.onGet(/\/users\/\d+/).reply(config => {
-    console.log('获取user角色')
-    console.log(config.url)
-    return [200, require('./mock/person')]
+// mock.onGet(/\/users\/\d+/).reply(config => {
+//     console.log('获取user角色')
+//     console.log(config.url)
+//     return [200, require('./mock/person')]
 })
 
 mock.onPost('/persons').reply(config => {
@@ -60,7 +60,5 @@ mock.onGet(/\/persons\/\w+/).reply(config => {
     console.log(config.url)
     return [200, require('./mock/person')]
 })
-
-
 
 export default mockAxios;

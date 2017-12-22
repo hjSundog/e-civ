@@ -33,7 +33,7 @@ class App extends React.Component {
         }
     }
     componentWillMount() {
-        
+
     }
     async componentDidMount() {
         const {actions, user, person} = this.props
@@ -55,7 +55,7 @@ class App extends React.Component {
         //     this.setState({
         //         loading: false
         //     });
-        //     message.error(err);            
+        //     message.error(err);
         // })
         this.setState({
             loading: false
@@ -145,11 +145,7 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-<<<<<<< HEAD
-    return {actions: bindActionCreators({add_message}, dispatch)};
-=======
-    return {actions: bindActionCreators({remove_user, init_person}, dispatch)};
->>>>>>> sidebar & router 接下来搞角色页的拦截器和更新角色的实现
+    return {actions: bindActionCreators({remove_user, add_message}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

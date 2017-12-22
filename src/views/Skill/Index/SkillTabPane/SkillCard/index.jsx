@@ -11,12 +11,15 @@ export default class SkillTabPane extends React.Component {
         super(props)
     }
 
+    handleClickDetail = () => {
+        this.props.onShowDetail()
+    }
     render() {
         const { skill } = this.props
         return (
             <div className="skill-card">
                 <Iconfont type={`skill-${skill.name}`}></Iconfont>
-                <Button>徒步旅行</Button>
+                <Button onClick={this.handleClickDetail}>徒步旅行</Button>
                 <Button className="use" disabled={true}>被动</Button>
                 <div className="skill-proficiency">
                     <span>level: 3</span>
@@ -30,5 +33,6 @@ export default class SkillTabPane extends React.Component {
 SkillTabPane.propTypes = {
     skill: PropTypes.shape({
         id: PropTypes.string
-    })
+    }),
+    onShowDetail: PropTypes.func
 };

@@ -12,7 +12,47 @@ export default class MailboxPage extends React.Component {
         super(props)
         this.state = {
             // 全部技能信息
-            skills: []
+            skills: [{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },{
+                name: 'walk'
+            },]
         }
     }
 
@@ -21,7 +61,7 @@ export default class MailboxPage extends React.Component {
     }
 
     render() {
-        const { skills } = this.props
+        const { skills } = this.state
         return (
             <div className="skill-page">
                 <div className="skill-content">
