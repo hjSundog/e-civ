@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 import './iconfont.less'
 
 const prefix = 'icon'
@@ -12,7 +11,7 @@ class Iconfont extends React.Component {
 
     render () {
         return (
-            <svg className={prefix}
+            <svg className={`${prefix} ${prefix}-${this.props.type}`}
                 aria-hidden="true"
                 onMouseEnter={this.props.onMouseEnter}
                 onMouseLeave={this.props.onMouseLeave}
@@ -24,8 +23,10 @@ class Iconfont extends React.Component {
         )
     }
 }
+
 Iconfont.propTypes = {
     type: PropTypes.string.isRequired,
+    className: PropTypes.string,
 }
 
 export default Iconfont;

@@ -38,6 +38,14 @@ export default class SkillTabPane extends React.Component {
             }
         })
     }
+    handleHideDetail = () => {
+        this.setState({
+            detail: {
+                detailVisible: false,
+                skill: null
+            }
+        })
+    }
 
     render() {
         const { nowSkills, detail } = this.state;
@@ -56,7 +64,7 @@ export default class SkillTabPane extends React.Component {
                     transitionAppear
                     transitionName="fade"
                 >
-                    <SkillDetialModal visible={detail.detailVisible} skill={detail.skill}></SkillDetialModal>
+                    <SkillDetialModal visible={detail.detailVisible} skill={detail.skill} onClose={this.handleHideDetail}></SkillDetialModal>
                 </Animate>
                 <Pagination defaultCurrent={1} total={this.props.skills.length} onChange={this.handlePageChange} />
             </div>
