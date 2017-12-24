@@ -19,6 +19,7 @@ class CharactorCard extends React.Component {
         this.state = {
             charactor: {
                 name: 'mddd',
+                des: '',
                 meta: {
                     age: 22,
                     sex: 'female',
@@ -73,6 +74,13 @@ class CharactorCard extends React.Component {
             charactor
         })
     }
+    handleDes(e) {
+        const charactor = this.state.charactor
+        charactor.des = e.target.value.replace(/(^\s*)|(\s*$)/g, "")
+        this.setState({
+            charactor
+        })
+    }
 
     handleSex(e){
         const charactor = this.state.charactor
@@ -96,7 +104,12 @@ class CharactorCard extends React.Component {
                     <Col span={8}>
                         <Row>
                             <Col>
-                                <Input placeholder="角色名" onChange={this.handleName.bind(this)} />
+                                <Input placeholder="昵称" onChange={this.handleName.bind(this)} />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Input placeholder="自我介绍" onChange={this.handleDes.bind(this)} />
                             </Col>
                         </Row>
                         <Row >

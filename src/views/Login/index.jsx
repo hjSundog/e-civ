@@ -49,7 +49,7 @@ class Login extends React.Component {
             if (res.status === 200)  {
                 message.success('Welcome ' + res.data.name)
                 this.props.set_user(res.data)
-                this.props.history.replace('/charactor')
+                this.props.history.replace('/')
             }
         }).catch(err => {
             this.setState({

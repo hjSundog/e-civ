@@ -6,6 +6,9 @@ const validate = function(history) {
     if (!isLoggedIn && history.location.pathname != "/login") {
         history.replace("/login");
     }
+    if(isLoggedIn && !JSON.parse(window.localStorage.getItem('user')).person_id) {
+        history.replace('/charactor');
+    }
 };
 
 /**

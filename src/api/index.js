@@ -61,4 +61,18 @@ mock.onGet(/\/persons\/\w+/).reply(config => {
     return [200, require('./mock/person')]
 })
 
+
+mock.onGet('/building').reply(config => {
+    const { position = {lat: 30.3,lng: 223.2} } = JSON.parse(config.data)
+    console.log('position '+ position)
+    const buildings = require('./mock/buillding')
+    const dest = buildings.find(building => {
+        return building.position.lat === position.lat && building.position.lng === position.lng
+    })
+    if(dest){
+        return [200,dest]
+    }else {
+        return [404, {message: "该坐标没有任何建筑"}]
+    }
+})
 export default mockAxios;

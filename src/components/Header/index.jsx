@@ -31,10 +31,17 @@ class commonHeader extends React.Component {
     }
 
     handleClick = (e) => {
-        console.log('click ', e);
+        //console.log('click ', e);
         this.setState({
             current: e.key,
         });
+        switch(e.key) {
+        case 'globalmap':
+            this.props.history.replace('/map')
+            break
+        default:
+            return
+        }
     }
     handleLogOut = () => {
         const {remove_user} = this.props

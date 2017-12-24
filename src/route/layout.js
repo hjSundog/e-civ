@@ -15,7 +15,7 @@ import Mailbox from '@/views/Mailbox/Index';
 import MailboxConversation from '@/views/Mailbox/Detail';
 
 import Skill from '@/views/Skill/Index';
-
+import Map from '@/views/Map'
 import Page2 from '@/views/Page2';
 import Donation from '@/views/Donation';
 
@@ -70,6 +70,10 @@ export const childRoutes = [
         'path': '/donation',
         'component': Donation
     },
+    {
+        'path': '/map',
+        'component': Map
+    }
 ];
 
 // "/"目录下路由

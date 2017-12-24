@@ -44,6 +44,12 @@ class Charactor extends React.Component {
                 this.props.actions.create_person(res.data)
                 //更新user
                 //set_user()
+                const user = JSON.parse(localStorage.getItem('user'));
+                localStorage.removeItem('user');
+                localStorage.setItem('user',JSON.stringify({
+                    ...user,
+                    person_id: 3
+                }))
                 this.props.history.replace('/')
             }
         }).catch(err => {
