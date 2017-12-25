@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 
 const validate = function(history) {
-    const isLoggedIn = !!window.localStorage.getItem("user");
+    const user = window.localStorage.getItem("user");
+    const isLoggedIn = !!user;
     if (!isLoggedIn && history.location.pathname != "/login") {
         history.replace("/login");
     }
