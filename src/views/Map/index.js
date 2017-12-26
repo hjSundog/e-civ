@@ -1,7 +1,10 @@
 import React from 'react';
+import MapPane from './MapPane'
 import api from '../../api'
 import './index.less'
-import { Button, message } from 'antd'
+import { Button, message, Tabs, Row, Col, Menu, Dropdown } from 'antd'
+
+const TabPane = Tabs.TabPane;
 
 class Map extends React.Component {
 
@@ -67,6 +70,21 @@ class Map extends React.Component {
 
     render() {
         const { visible, loading, building = {name: 'test', des: 'mdzz'} } = this.state;
+
+        const menu = (
+            <Menu>
+                <Menu.Item>
+                    <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">1st menu item</a>
+                </Menu.Item>
+                <Menu.Item>
+                    <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">2nd menu item</a>
+                </Menu.Item>
+                <Menu.Item>
+                    <a target="_blank" rel="noopener noreferrer" href="http://www.tmall.com/">3rd menu item</a>
+                </Menu.Item>
+            </Menu>
+        );
+
         return (
             <div id="global_map">
                 <div className="map">
@@ -77,26 +95,31 @@ class Map extends React.Component {
                         Click me!
                     </Button>
                 </div>
-                <div className="show_info" style={{display: visible?'':'none'}}>
+                <div className="pane" style={{display: visible?'flex':'none'}}>
                     <div className="mask"></div>
-                    <div className="info">
-                        <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514213554091&di=7275f7e3745ed593d05fc71e84d56b5d&imgtype=0&src=http%3A%2F%2Fpic31.nipic.com%2F20130718%2F12606377_200853832000_2.jpg" alt="建筑图片"/>
-                        <div>
-                            <span>{building.name}</span>
-                            <span>{building.des}</span>
-                            <span>{building.guild}</span>
-                            <span>{building.owner}</span>
-                        </div>
-                    </div>
-                    <div className="op">
-                        <div>疗伤</div>
-                        <div>维护</div>
-                        <div>其他什么鬼动作</div>
-                    </div>
-                    <div className="other">
-                        <Button type="primary" onClick={this.handleRefrsh.bind(this)}></Button>
-                    </div>
+                    <Row type='flex' justify="center" align="bottom">
+                        <Col span={16}>
+                            <Tabs tabPosition={'bottom'}>
+                                <TabPane tab="农田" key="1"><MapPane/></TabPane>
+                                <TabPane tab="医馆" key="2"><MapPane/></TabPane>
+                                <TabPane tab="作坊" key="3"><MapPane/></TabPane>
+                                <TabPane tab="马场" key="4"><MapPane/></TabPane>
+                                <TabPane tab="深林" key="5"><MapPane/></TabPane>
+                                <TabPane tab="水库" key="6"><MapPane/></TabPane>
+                                <TabPane tab="发电厂" key="7"><MapPane/></TabPane>
+                                <TabPane tab="实验室" key="8"><MapPane/></TabPane>
+                                <TabPane tab="地铁" key="9"><MapPane/></TabPane>
+                                <TabPane tab="停车场" key="10"><MapPane/></TabPane>
+                                <TabPane tab="池塘" key="11"><MapPane/></TabPane>
+                                <TabPane tab="油厂" key="12"><MapPane/></TabPane>
+                                <TabPane tab="煤矿" key="13"><MapPane/></TabPane>
+                                <TabPane tab="铁矿" key="14"><MapPane/></TabPane>
+
+                            </Tabs></Col>
+                    </Row>
                 </div>
+
+
 
             </div>
         );

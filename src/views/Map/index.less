@@ -3,36 +3,42 @@
     height: 100%;
 }
 
+
+
 #global_map{
     .all_screen;
-    position: relative;
     .map{
         .all_screen;
     }
 
-    .show_info{
-        .all_screen;
+    .pane{
         position: absolute;
         top: 0px;
         left: 0px;
         display: flex;
         align-items: center;
         justify-content: center;
+        height: 100%;
+        width: 100%;
 
         .mask{
-            .all_screen;
-            background: rgba(128, 128, 128, .6);            position: absolute;
+            background: rgba(128, 128, 128, .6);
+            width: 100%;
+            height: 100%;
+            position: absolute;
         }
-        .info{
-            z-index: 1;
-            img{
-                width: 200px;
-                height: 200px;
+
+        &>div{
+            width: 100%;
+            .ant-col-16{
+                min-width: 400px;
+                min-height: 600px;
             }
         }
+
+        .ant-tabs-nav .ant-tabs-tab{
+            height: inherit;
+        }
     }
-
-
-
 }
 
