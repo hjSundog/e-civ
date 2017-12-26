@@ -1,0 +1,38 @@
+.all_screen{
+    width: 100%;
+    height: 100%;
+}
+
+#global_map{
+    .all_screen;
+    position: relative;
+    .map{
+        .all_screen;
+    }
+
+    .show_info{
+        .all_screen;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .mask{
+            .all_screen;
+            background: rgba(128, 128, 128, .6);            position: absolute;
+        }
+        .info{
+            z-index: 1;
+            img{
+                width: 200px;
+                height: 200px;
+            }
+        }
+    }
+
+
+
+}
+

@@ -1,9 +1,7 @@
 import React from 'react';
 import api from '../../api'
 import './index.less'
-import { Button, message, Card } from 'antd'
-
-const { Meta } = Card;
+import { Button, message } from 'antd'
 
 class Map extends React.Component {
 
@@ -11,8 +9,27 @@ class Map extends React.Component {
         super(props);
         this.state = {
             loading: false,
-            position:{}
+            building:{},
+            visible: false
         }
+    }
+
+    handleError() {
+
+    }
+
+    handleCancel() {
+        this.setState({
+            visible: false
+        })
+    }
+
+    handleOk() {
+
+    }
+
+    handleRefrsh(){
+
     }
 
     handleClick(target) {
@@ -23,19 +40,18 @@ class Map extends React.Component {
             url: '/building',
             method: 'get',
             data: {
-                position: {
-                    lat: target===1?30.3:32.3,
-                    lng: target===1?223.2:124.3
-                }
+                id: target === 1?1:2
             }
         }).then(res => {
             this.setState({
                 loading: false
             })
+            console.log('hah');
             if(res.status === 200) {
                 console.log(res.data)
                 this.setState({
-                    position: res.data
+                    building: res.data,
+                    visible: true
                 })
             } else {
                 message.error('参数有误！' + res.data.message + ',参数为: '+ res.data.position)
@@ -50,24 +66,38 @@ class Map extends React.Component {
     }
 
     render() {
+        const { visible, loading, building = {name: 'test', des: 'mdzz'} } = this.state;
         return (
-            <div>
-                <Button type="primary" loading={this.state.loading} onClick={this.handleClick.bind(this,1)}>
-          Click me!
-                </Button>
-                <Button type="primary" loading={this.state.loading} onClick={this.handleClick.bind(this,2)}>
-          Click me!
-                </Button>
-                <Card
-                    hoverable
-                    style={{ width: 240 }}
-                    cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
-                >
-                    <Meta
-                        title={this.state.position.name}
-                        description={this.state.position.des}
-                    />
-                </Card>
+            <div id="global_map">
+                <div className="map">
+                    <Button type="primary" loading={loading} onClick={this.handleClick.bind(this,1)}>
+                        Click me!
+                    </Button>
+                    <Button type="primary" loading={loading} onClick={this.handleClick.bind(this,2)}>
+                        Click me!
+                    </Button>
+                </div>
+                <div className="show_info" style={{display: visible?'':'none'}}>
+                    <div className="mask"></div>
+                    <div className="info">
+                        <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514213554091&di=7275f7e3745ed593d05fc71e84d56b5d&imgtype=0&src=http%3A%2F%2Fpic31.nipic.com%2F20130718%2F12606377_200853832000_2.jpg" alt="建筑图片"/>
+                        <div>
+                            <span>{building.name}</span>
+                            <span>{building.des}</span>
+                            <span>{building.guild}</span>
+                            <span>{building.owner}</span>
+                        </div>
+                    </div>
+                    <div className="op">
+                        <div>疗伤</div>
+                        <div>维护</div>
+                        <div>其他什么鬼动作</div>
+                    </div>
+                    <div className="other">
+                        <Button type="primary" onClick={this.handleRefrsh.bind(this)}></Button>
+                    </div>
+                </div>
+
             </div>
         );
     }

@@ -63,12 +63,15 @@ mock.onGet(/\/persons\/\w+/).reply(config => {
 
 
 mock.onGet('/building').reply(config => {
-    const { position = {lat: 30.3,lng: 223.2} } = JSON.parse(config.data)
-    console.log('position '+ position)
+    const { id = 1 } = JSON.parse(config.data)
+    console.log('building '+ id)
     const buildings = require('./mock/buillding')
     const dest = buildings.find(building => {
-        return building.position.lat === position.lat && building.position.lng === position.lng
+        return building._id === id
     })
+
+    dest.guild === 1?dest.guild = 'sundog':'mdzz';
+    dest.owner === 3?dest.owner = 'fuck':'mmp';
     if(dest){
         return [200,dest]
     }else {
