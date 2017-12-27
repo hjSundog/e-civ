@@ -1,10 +1,12 @@
 import React from 'react';
 import MapPane from './MapPane'
+import DropDownTab from './DropDownTab'
 import api from '../../api'
 import './index.less'
 import { Button, message, Tabs, Row, Col, Menu, Dropdown } from 'antd'
 
 const TabPane = Tabs.TabPane;
+const SubMenu = Menu.SubMenu;
 
 class Map extends React.Component {
 
@@ -13,7 +15,7 @@ class Map extends React.Component {
         this.state = {
             loading: false,
             building:{},
-            visible: false
+            visible: false,
         }
     }
 
@@ -49,9 +51,7 @@ class Map extends React.Component {
             this.setState({
                 loading: false
             })
-            console.log('hah');
             if(res.status === 200) {
-                console.log(res.data)
                 this.setState({
                     building: res.data,
                     visible: true
@@ -68,23 +68,29 @@ class Map extends React.Component {
         })
     }
 
+    handleSwitchBuilding(target) {
+        this.setState({
+            target: target
+        })
+    }
+
     render() {
         const { visible, loading, building = {name: 'test', des: 'mdzz'} } = this.state;
-
-        const menu = (
-            <Menu>
-                <Menu.Item>
-                    <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">1st menu item</a>
-                </Menu.Item>
-                <Menu.Item>
-                    <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">2nd menu item</a>
-                </Menu.Item>
-                <Menu.Item>
-                    <a target="_blank" rel="noopener noreferrer" href="http://www.tmall.com/">3rd menu item</a>
-                </Menu.Item>
-            </Menu>
-        );
-
+        const data = [
+            {
+                name: '水稻田',
+                id: 5
+            },{
+                name: '麦田',
+                id: 4
+            },{
+                name: '土豆田',
+                id: 3
+            },{
+                name: '棉花田',
+                id: 2
+            }
+        ]
         return (
             <div id="global_map">
                 <div className="map">
@@ -100,7 +106,9 @@ class Map extends React.Component {
                     <Row type='flex' justify="center" align="bottom">
                         <Col span={16}>
                             <Tabs tabPosition={'bottom'}>
-                                <TabPane tab="农田" key="1"><MapPane/></TabPane>
+                                <TabPane tab={<DropDownTab type="农田"  data={data} cb={this.handleSwitchBuilding.bind(this)} position="bottomCenter"></DropDownTab>} key="1">
+                                    <MapPane target={this.state.target}/>
+                                </TabPane>
                                 <TabPane tab="医馆" key="2"><MapPane/></TabPane>
                                 <TabPane tab="作坊" key="3"><MapPane/></TabPane>
                                 <TabPane tab="马场" key="4"><MapPane/></TabPane>
@@ -114,13 +122,9 @@ class Map extends React.Component {
                                 <TabPane tab="油厂" key="12"><MapPane/></TabPane>
                                 <TabPane tab="煤矿" key="13"><MapPane/></TabPane>
                                 <TabPane tab="铁矿" key="14"><MapPane/></TabPane>
-
                             </Tabs></Col>
                     </Row>
                 </div>
-
-
-
             </div>
         );
     }

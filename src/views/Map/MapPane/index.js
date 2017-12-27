@@ -1,12 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types'
 import './index.less'
+import api from '../../../api'
 import { Button, message, Tabs, Row, Col, Card, Avatar } from 'antd'
 
 const TabPane = Tabs.TabPane;
 
 const gridStyle = {
-    width: '25%',
+    width: '80px',
     textAlign: 'center',
+    padding: '10px'
 };
 
 class MapPane extends React.Component {
@@ -18,6 +21,41 @@ class MapPane extends React.Component {
             building:{},
             visible: false
         }
+    }
+
+    //属性更改之后
+    componentWillReceiveProps(nextProps) {
+        if (nextProps === this.props.target) {
+            return;
+        }
+        //刷新界面信息
+        this.getBuildingInfo(nextProps.target);
+    }
+
+    async getBuildingInfo(target){
+        this.setState({
+            loading: true
+        })
+        api({
+            url: '/building',
+            method: 'get',
+            data: {
+                id: target
+            }
+        }).then(res => {
+            this.setState({
+                loading: false
+            })
+            if (res.status === 200) {
+                console.log('获取建筑信息成功');
+                console.log(res.data);
+            }
+        }).catch(err => {
+            this.setState({
+                loading: false
+            });
+            message.error(err);
+        })
     }
 
     handleError() {
@@ -39,7 +77,8 @@ class MapPane extends React.Component {
     }
 
     render() {
-        const { visible, building = {name: 'test', des: 'mdzz'} } = this.state;
+        const {target} = this.props;
+        console.log('现在你看到的是id为%d的建筑信息',target);
         return (
             <div>
                 <div className="show_info" >
@@ -58,7 +97,6 @@ class MapPane extends React.Component {
                                         <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
                                     </span>
                                 </div>
-
                                 <div className="earn">
                                     <p>收益：20Gold</p>
                                     <p>坐标：2 2</p>
@@ -88,20 +126,36 @@ class MapPane extends React.Component {
                         </div>
                     </div>
                     <div className="op">
-                        <Card title="操作">
+                        <Card>
                             <Card.Grid style={gridStyle}>疗伤</Card.Grid>
-                            <Card.Grid style={gridStyle}>新建一个医馆</Card.Grid>
-                            <Card.Grid style={gridStyle}>摧毁这个医馆</Card.Grid>
-                            <Card.Grid style={gridStyle}>设置收费</Card.Grid>
+                            <Card.Grid style={gridStyle}>新建</Card.Grid>
+                            <Card.Grid style={gridStyle}>卖出医馆</Card.Grid>
+                            <Card.Grid style={gridStyle}>租借医馆</Card.Grid>
+                            <Card.Grid style={gridStyle}>升级</Card.Grid>
+                            <Card.Grid style={gridStyle}>摧毁</Card.Grid>
+                            <Card.Grid style={gridStyle}>设置</Card.Grid>
                         </Card>
                     </div>
+                    <div className="similar">
+
+                    </div>
                     <div className="other">
+                        <Button type="primary" onClick={this.handleRefresh.bind(this)}>到这里去</Button>
+                        <Button type="primary" onClick={this.handleRefresh.bind(this)}>离开</Button>
                         <Button type="primary" onClick={this.handleRefresh.bind(this)}>报告错误</Button>
                     </div>
                 </div>
             </div>
         );
     }
+}
+
+MapPane.defaultProps = {
+    target: 0
+}
+
+MapPane.propTypes = {
+    target: PropTypes.number
 }
 
 export default MapPane;
