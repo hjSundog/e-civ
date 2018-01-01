@@ -1,5 +1,6 @@
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
+import tpl2entity from '@/api/mock/utils/tpl2entity'
 var normalAxios = axios.create();
 var mockAxios = axios.create();
 
@@ -56,6 +57,21 @@ mock.onPost('/persons').reply(config => {
 })
 
 
+mock.onGet('/persons/items').reply(config => {
+    const { id = 1} = JSON.parse(config.data)
+    const items = require('./mock/item').filter(item => {
+        return item.owner_id === id
+    }).map(item => {
+        return tpl2entity(item)
+    })
+
+    if(items.length>0) {
+        return [200, items]
+    } else {
+        return [404, {message: '没有任何物品'}]
+    }
+})
+
 mock.onGet(/\/persons\/\w+/).reply(config => {
     console.log(config.url)
     return [200, require('./mock/person')]
@@ -77,5 +93,26 @@ mock.onGet('/building').reply(config => {
     }else {
         return [404, {message: "该坐标没有任何建筑"}]
     }
+})
+
+mock.onGet('/items').reply(config => {
+    const {id = 1} = JSON.parse(config.data)
+
+    const items = require('./mock/item')
+    let dist = items.find(item => {
+        return item._id === id
+    })
+    dist = tpl2entity(dist)
+    if (dist) {
+        return [200, dist]
+    } else {
+        return [404, {message: "没找到该物品"}]
+    }
+})
+
+mock.onDelete('/items/').reply(config => {
+    const { id = 1} = JSON.parse(config.data);
+
+    return [200, {message: 'mdzz' + id}]
 })
 export default mockAxios;
