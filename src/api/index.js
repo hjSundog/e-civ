@@ -56,11 +56,11 @@ mock.onPost('/persons').reply(config => {
     }
 })
 
-
-mock.onGet('/persons/items').reply(config => {
-    const { id = 1} = JSON.parse(config.data)
+//获取角色物品
+mock.onGet(/\/persons\/\w+\/items/).reply(config => {
+    console.log(config)
     const items = require('./mock/item').filter(item => {
-        return item.owner_id === id
+        return item.owner_id === 1
     }).map(item => {
         return tpl2entity(item)
     })
@@ -94,7 +94,7 @@ mock.onGet('/building').reply(config => {
         return [404, {message: "该坐标没有任何建筑"}]
     }
 })
-
+//获取某个物品
 mock.onGet('/items').reply(config => {
     const {id = 1} = JSON.parse(config.data)
 

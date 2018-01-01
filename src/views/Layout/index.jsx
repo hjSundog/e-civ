@@ -33,33 +33,34 @@ class App extends React.Component {
         }
     }
     componentWillMount() {
+        const {actions, user, person} = this.props
+        this.setState({
+            loading: true
+        })
+        api({
+            url: `/persons/${user.person_id}`,
+            method: 'get',
+        }).then(res => {
+            this.setState({
+                loading: false
+            })
+            if (res.status !== 200) {
+                message.error(res.data.error);
+            }
+            if (res.status === 200) {
+                console.log('init person')
+                actions.init_person(res.data)
+            }
+        }).catch(err => {
+            this.setState({
+                loading: false
+            });
+            message.error(err);
+        })
 
     }
-    async componentDidMount() {
-        const {actions, user, person} = this.props
-        // await api({
-        //     url: `/persons/${user.person_id}`,
-        //     method: 'get',
-        // }).then(res => {
-        //     this.setState({
-        //         loading: false
-        //     })
-        //     if (res.status !== 200) {
-        //         message.error(res.data.error);
-        //     }
-        //     if (res.status === 200) {
-        //         console.log('init person')
-        //         actions.init_person(res.data)
-        //     }
-        // }).catch(err => {
-        //     this.setState({
-        //         loading: false
-        //     });
-        //     message.error(err);
-        // })
-        this.setState({
-            loading: false
-        })
+    componentDidMount() {
+
     }
 
     handleFeedbackClick = () => {
@@ -145,7 +146,7 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({remove_user, add_message}, dispatch)};
+    return {actions: bindActionCreators({remove_user, add_message, init_person}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

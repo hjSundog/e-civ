@@ -1,6 +1,7 @@
 import {
     SET_USER,
-    REMOVE_USER
+    REMOVE_USER,
+    UPDATE_USER
 } from '../actions/user';
 
 let user;
@@ -27,6 +28,16 @@ export default function auth(state = initialState, action = {}) {
             ...state,
             user: null
         }
+    case UPDATE_USER: {
+        const us = {
+            ...state.user,
+            ...action.payload.user
+        };
+        return {
+            ...state,
+            user: us
+        }
+    }
     default:
         return state;
     }

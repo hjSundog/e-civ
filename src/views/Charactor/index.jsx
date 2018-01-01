@@ -8,7 +8,7 @@ import './index.less'
 import api from '../../api'
 import { withRouter } from 'react-router'
 import * as PersonActionCreators from '@/actions/person'
-import { set_user } from '@/actions/user'
+import { update_user } from '@/actions/user'
 class Charactor extends React.Component {
 
     constructor (props) {
@@ -44,11 +44,15 @@ class Charactor extends React.Component {
                 this.props.actions.create_person(res.data)
                 //更新user
                 //set_user()
+
+                this.props.actions.update_user({
+                    person_id: res.data._id
+                })
                 const user = JSON.parse(localStorage.getItem('user'));
                 localStorage.removeItem('user');
                 localStorage.setItem('user',JSON.stringify({
                     ...user,
-                    person_id: 3
+                    person_id: res.data._id
                 }))
                 this.props.history.replace('/')
             }
@@ -86,7 +90,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
     return {
-        actions: bindActionCreators(PersonActionCreators, dispatch)
+        actions: bindActionCreators({...PersonActionCreators,update_user}, dispatch)
     }
 }
 

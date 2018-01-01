@@ -3,31 +3,41 @@ import { Row, Col, Card, message, Tabs, Spin } from 'antd';
 import PackagePane from './PackagePane'
 import api from '../../api'
 import './index.less'
+import * as PersonActionCreators from '../../actions/person'
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 const TabPane = Tabs.TabPane
 class Package extends React.Component {
-    constructor () {
-        super()
+    constructor (props) {
+        super(props)
         this.state = {
-            loading: false
+            loading: false,
+            items: props.items
         }
     }
     componentWillMount () {
         this.setState({
-            loading: true
+            loading: true,
         })
+        //获取物品
         api({
             method: 'get',
-            url: '/items',
-            data: {
-                id: 1
-            }
+            url: '/persons/1/items',
         }).then(res => {
             this.setState({
-                loading: true
+                loading: false
             })
             if (res.status === 200){
-                console.log(res.data)
+                const items = res.data.map(item=> {
+                    return {
+                        item: item,
+                        count: 1
+                    }
+                })
+                console.log(items)
+                this.setState({
+                    items: items
+                })
             } else {
                 console.log(res.message)
             }
@@ -39,13 +49,13 @@ class Package extends React.Component {
         })
     }
     render () {
-        const {data} = this.props
+        const {items} = this.state
         return (
             <div className="package" style={{ background: '#ECECEC', padding: '30px' }}>
                 <Spin spinning={this.state.loading}>
                     <Tabs tabPosition={'top'}>
                         <TabPane tab={'全部'} key='1'>
-                            <PackagePane/>
+                            <PackagePane items={items}/>
                         </TabPane>
                         <TabPane tab="食物" key="2"><PackagePane/></TabPane>
                         <TabPane tab="药水" key="3"><PackagePane/></TabPane>
@@ -62,11 +72,16 @@ class Package extends React.Component {
 }
 
 function mapStateToProps(state) {
-    return {}
+    const {items = []} = state
+    return {
+        items: items
+    }
 }
 
 function mapDispatchToProps(dispatch) {
-    return {}
+    return {
+        actions: bindActionCreators(PersonActionCreators,dispatch)
+    }
 }
 
 export default connect(mapStateToProps,mapDispatchToProps)(Package)
