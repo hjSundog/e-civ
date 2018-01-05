@@ -9,9 +9,10 @@ import {Card} from 'antd'
 import './index.less'
 
 const gridStyle = {
-    width: '80px',
+    width: '100px',
     textAlign: 'center',
-    padding: '10px'
+    padding: '2px',
+    height: '100px'
 };
 export default class PackagePane extends React.Component {
     constructor(props) {
@@ -51,6 +52,18 @@ export default class PackagePane extends React.Component {
         })
     }
 
+    handleItemDetail(target,e) {
+        console.log('enter');
+        e.target.nextSibling.style.display = 'block';
+        setTimeout(function() {
+
+        }, 1000);
+    }
+
+    handleItemDetailFade(e) {
+        e.target.nextSibling.style.display = 'none';
+    }
+
     render() {
         const { items } = this.props;
         const {detail } = this.state;
@@ -61,9 +74,12 @@ export default class PackagePane extends React.Component {
                         items.map((item, index) => {
                             return (<Card.Grid key={index} style={gridStyle} onClick={this.handleShowDetail}>
                                 <div>
-                                    <img src={item.item.icon} alt="item pic"/>
-                                    <span>{item.item.name}</span>
-                                    <span>{item.count}</span>
+                                    <img onMouseLeave={this.handleItemDetailFade} onMouseEnter={this.handleItemDetail.bind(this,item)} src={item.item.icon || 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1515077691938&di=e6b9bd7d635a7f64e76b024a040f0eff&imgtype=0&src=http%3A%2F%2Fimg.taopic.com%2Fuploads%2Fallimg%2F140619%2F234961-14061921140383.jpg'} alt="item pic"/>
+                                    <div className="item-info">
+                                        <span>{item.item.name}</span>
+                                        <span>{item.item.description}</span>
+                                    </div>
+                                    <span className="item-count">{'X '+item.count}</span>
                                 </div>
                             </Card.Grid>)
                         })

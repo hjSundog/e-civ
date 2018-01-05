@@ -1,23 +1,23 @@
 Arguments: 
-  G:\nodeJS\node.exe C:\Users\Mistaker\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js install
+  D:\开发软件\nodejs\node.exe C:\Users\admin\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add react-contextmenu
 
 PATH: 
-  C:\Users\Mistaker\bin;G:\Git\Git\mingw64\bin;G:\Git\Git\usr\local\bin;G:\Git\Git\usr\bin;G:\Git\Git\usr\bin;G:\Git\Git\mingw64\bin;G:\Git\Git\usr\bin;C:\Users\Mistaker\bin;G:\Environment\java\jdk\bin;G:\Environment\java\jdk\jre\bin;C:\ProgramData\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;G:\Git\Git\cmd;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit;C:\Program Files\Microsoft SQL Server\110\Tools\Binn;G:\Environment\xampp\php;C:\ProgramData\ComposerSetup\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;G:\Environment\python;G:\Environment\python\Scripts;G:\Environment\java\jdk;G:\AndroidStudio\SDK\tools;G:\AndroidStudio\SDK\platform-tools;G:\nodeJS;C:\Ruby23-x64\bin;C:\Users\Mistaker\AppData\Roaming\Composer\vendor\bin;C:\Users\Mistaker\AppData\Local\Microsoft\WindowsApps;C:\Users\Mistaker\AppData\Local\atom\bin;C:\Users\Mistaker\AppData\Roaming\npm;G:\VSCode\Microsoft VS Code\bin;G:\Git\Git\usr\bin\vendor_perl;G:\Git\Git\usr\bin\core_perl
+  C:\Users\admin\bin;D:\开发软件\Git\Git\mingw64\bin;D:\开发软件\Git\Git\usr\local\bin;D:\开发软件\Git\Git\usr\bin;D:\开发软件\Git\Git\usr\bin;D:\开发软件\Git\Git\mingw64\bin;D:\开发软件\Git\Git\usr\bin;C:\Users\admin\bin;C:\Users\admin\Desktop\sudo.vbs;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;发软件\nodejs;.;D:\开发软件\Git\Git\开发软件\Git\Git\cmd;D:\开发软件\Git\Git\cmd;D:\开发软件\nodejs;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit;C:\Ruby24-x64\bin;D:\开发软件\Microsoft VS Code\bin;C:\Users\admin\AppData\Roaming\npm;C:\Users\admin\AppData\Local\GitHubDesktop\bin;D:\开发软件\Git\Git\usr\bin\vendor_perl;D:\开发软件\Git\Git\usr\bin\core_perl
 
 Yarn version: 
-  1.0.0
+  1.3.2
 
 Node version: 
-  8.9.0
+  8.9.1
 
 Platform: 
   win32 x64
 
 npm manifest: 
   {
-    "name": "react-antd-admin",
-    "version": "0.2.0",
-    "description": "React Ant.Design Admin UI",
+    "name": "e-civ",
+    "version": "0.0.2",
+    "description": "A social online game",
     "main": "index.js",
     "scripts": {
       "test": "NODE_ENV=test mocha --require babel-register tests/.setup.js tests/**/*-test.js --compilers css:mocha-compiler.js",
@@ -27,19 +27,31 @@ npm manifest:
     },
     "repository": {
       "type": "git",
-      "url": "https://github.com/fireyy/react-antd-admin.git"
+      "url": "https://github.com/hjSundog/e-civ.git"
     },
-    "author": "fireyy",
+    "author": "hjSundog",
+    "contributors": [
+      {
+        "name": "liangyuyi",
+        "email": "443474713@qq.com",
+        "url": "http://lwio.me/"
+      }
+    ],
     "license": "MIT",
     "dependencies": {
-      "antd": "^2.8.0",
+      "antd": "^3.0.0",
       "axios": "^0.15.3",
+      "classnames": "^2.2.5",
+      "emoji-js": "^3.4.0",
       "g2-mobile": "2.1.13",
       "history": "^4.3.0",
       "lodash": "^4.16.4",
+      "normalize.css": "^7.0.0",
       "prop-types": "^15.5.10",
-      "react": "^15.6.0",
-      "react-dom": "^15.6.0",
+      "rc-animate": "^2.4.3",
+      "react": "^16.0.0",
+      "react-dom": "^16.0.0",
+      "react-draggable": "^3.0.4",
       "react-helmet": "^5.2.0",
       "react-redux": "^5.0.0",
       "react-router": "^4.1.0",
@@ -50,6 +62,7 @@ npm manifest:
     "devDependencies": {
       "axios-mock-adapter": "^1.7.1",
       "babel-core": "^6.25.0",
+      "babel-eslint": "^8.0.3",
       "babel-loader": "^7.1.0",
       "babel-plugin-import": "^1.2.1",
       "babel-plugin-lodash": "^3.2.11",
