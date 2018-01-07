@@ -1,0 +1,56 @@
+.Invitation {
+    width: 450px;
+    max-width: 500px;
+    .ant-card-body {
+        padding: 0px;
+        table {
+            text-align: center;
+            th {
+                text-align: center;
+            }
+            tbody {
+                .col-operation {
+                    &>span {
+                        display: flex;
+                        width: 100%;
+                        justify-content: space-around;
+                    }
+                    svg {
+                        font-size: 24px;
+                    }
+                }
+            }
+        }
+    }
+    .row-operation {
+        margin: 16px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+
+        &>button *{
+            width: 100%;
+            height: 100%;
+            background: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            border: none;
+        }
+
+        &>button{
+            .ant-menu-submenu-title{
+                color: white;
+                font-size: 18px;
+            }
+        }
+
+        &>button:disabled{
+            .ant-menu-submenu-title{
+                color: rgba(0, 0, 0, 0.25);
+            }
+        }
+
+    }
+}

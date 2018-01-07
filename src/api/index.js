@@ -58,7 +58,7 @@ mock.onPost('/persons').reply(config => {
 
 //获取角色物品
 mock.onGet(/\/persons\/\w+\/items/).reply(config => {
-    console.log(config)
+    //console.log(config)
     const items = require('./mock/item').filter(item => {
         return item.owner_id === 1
     }).map(item => {

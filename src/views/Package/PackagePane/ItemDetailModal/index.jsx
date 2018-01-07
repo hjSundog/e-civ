@@ -29,6 +29,9 @@ export default class ItemDetailModal extends React.Component {
         }
         if(this.props.item.name !== nextProps.item.name) {
             // 更新itemDetail
+            this.setState({
+                itemDetail: nextProps.item
+            })
         }
     }
 
@@ -38,7 +41,6 @@ export default class ItemDetailModal extends React.Component {
 
     render() {
         const { item, visible } = this.props
-        const { itemDetail } = this.state
         const style = {
             display: visible ? 'block' : 'none',
         };
@@ -53,7 +55,7 @@ export default class ItemDetailModal extends React.Component {
                         <h2>{item && item.name}</h2>
                     </div>
                     <div className="item-detail">
-                        <p>{itemDetail ? itemDetail : "加载中..."}</p>
+                        <p>{item ? item.description : "加载中..."}</p>
                     </div>
                 </section>
             </div>

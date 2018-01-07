@@ -34,6 +34,7 @@
     "prop-types": "^15.5.10",
     "rc-animate": "^2.4.3",
     "react": "^16.0.0",
+    "react-contextmenu": "^2.9.2",
     "react-dom": "^16.0.0",
     "react-draggable": "^3.0.4",
     "react-helmet": "^5.2.0",

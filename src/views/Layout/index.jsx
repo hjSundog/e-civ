@@ -13,6 +13,7 @@ import Footer from '@/components/Footer'
 import Iconfont from '@/components/Iconfont'
 import FeedbackModal from './FeedbackModal'
 import ChatWindow from '@/components/ChatWindow';
+import TradeWindow from '@/components/TradeWindow'
 import Websocket from '@/components/Websocket'
 import {add_message} from '@/actions/websocket';
 
@@ -29,11 +30,12 @@ class App extends React.Component {
         this.state = {
             feedbackVisible: false,
             chatroomsVisible: false,
+            tradeWindowVisible: false,
             loading: true
         }
     }
     componentWillMount() {
-        const {actions, user, person} = this.props
+        const {actions, user} = this.props
         this.setState({
             loading: true
         })
@@ -59,9 +61,7 @@ class App extends React.Component {
         })
 
     }
-    componentDidMount() {
 
-    }
 
     handleFeedbackClick = () => {
         this.setState({
@@ -73,19 +73,35 @@ class App extends React.Component {
             chatroomsVisible: !this.state.chatroomsVisible,
         })
     }
+
+    handleTradeClick = () => {
+        this.setState({
+            tradeWindowVisible: !this.state.tradeWindowVisible,
+        })
+    }
+
     handleChatroomsMini = () => {
         this.setState({
             chatroomsVisible: false,
         })
     }
+
+
     handleWebsocket = (message) => {
         console.log(JSON.parse(message))
         this.props.actions.add_message(JSON.parse(message));
     }
 
+    handleTradeWindowClose = () => {
+        this.setState({
+            tradeWindowVisible: false,
+        })
+    }
+
+
     render() {
         const {user, actions} = this.props;
-        const { feedbackVisible } = this.state
+        const { feedbackVisible, tradeWindowVisible } = this.state
 
         return (
             <Layout className="ant-layout-has-sider">
@@ -113,6 +129,14 @@ class App extends React.Component {
                             <p>聊天室</p>
                         </div>
                     </Badge>
+                    <div style={{backgroundColor: '#0f90ff', width: '45px'}}>
+                        <Badge count={1}>
+                            <div id="tradesaction" className="toolkit-item" onClick={this.handleTradeClick}>
+                                <Iconfont type="trade"></Iconfont>
+                                <p>交易所</p>
+                            </div>
+                        </Badge>
+                    </div>
                     <FeedbackModal
                         visible={feedbackVisible}
                         onCancel={this.handleFeedbackCancel}
@@ -126,6 +150,7 @@ class App extends React.Component {
                         onClose={this.handleChatroomsMini}
                         isOpen={this.state.chatroomsVisible}
                     />
+                    <TradeWindow onClose={this.handleTradeWindowClose} isOpen={tradeWindowVisible}/>
                     <Websocket url='ws://localhost:8089?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIiwibWV0YSI6eyJhZ2UiOjIyLCJzZXgiOiJtYWxlIn0sInBlcnNvbl9pZCI6bnVsbCwiaWF0IjoxNTEyMzc5OTc4LCJleHAiOjIyNjk3NjIzNzh9.grCzWUCxgijvOfgecQ-GUD0sssPHSY9bLRX2kYyLO_A'
                         onMessage={this.handleWebsocket}/>
                 </div>

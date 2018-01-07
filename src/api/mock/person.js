@@ -13,7 +13,7 @@ module.exports = {
     items: [],
     des: '我不是一个逗逼，真的',
     conditions: {
-        health: 100,
+        health: 10,
         maxHealth: 100,
         stamina: 100,
         maxStamina: 100

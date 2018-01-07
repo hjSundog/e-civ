@@ -34,7 +34,7 @@ class Package extends React.Component {
                         count: 1
                     }
                 })
-                console.log(items)
+                //console.log(items)
                 this.setState({
                     items: items
                 })
@@ -51,7 +51,7 @@ class Package extends React.Component {
     render () {
         const {items} = this.state
         return (
-            <div className="package" style={{ background: '#ECECEC', padding: '30px' }}>
+            <div className="package">
                 <Spin spinning={this.state.loading}>
                     <Tabs tabPosition={'top'}>
                         <TabPane tab={'全部'} key='1'>

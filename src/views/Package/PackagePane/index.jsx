@@ -3,6 +3,7 @@ import { Pagination } from 'antd'
 import PropTypes from 'prop-types'
 import Animate from 'rc-animate';
 import ItemDetailModal from './ItemDetailModal'
+import ItemContextMenu from './ItemContextMenu'
 import {Card} from 'antd'
 // import api from '../../api';
 
@@ -14,6 +15,27 @@ const gridStyle = {
     padding: '2px',
     height: '100px'
 };
+
+const testItem = {
+    description:"银闪闪的苹果，可以回复较多生命值",
+    details:{type: "Food", apply_count: 1},
+    icon: "",
+    name: "sliver apple",
+    owner_id: 1,
+    rarity: "fine",
+    type: "consumable",
+    vendor_value: 30,
+    _id: 1
+}
+
+const extraOp = [{
+    action: 'TEST',
+    action_name: '测试',
+    cb: function(item) {
+        console.log('这是测试菜单: ' + item.description);
+    }
+}]
+
 export default class PackagePane extends React.Component {
     constructor(props) {
         super(props)
@@ -35,7 +57,6 @@ export default class PackagePane extends React.Component {
     }
 
     handleShowDetail = (item) => {
-        console.log('show');
         this.setState({
             detail: {
                 detailVisible: true,
@@ -52,18 +73,6 @@ export default class PackagePane extends React.Component {
         })
     }
 
-    handleItemDetail(target,e) {
-        console.log('enter');
-        e.target.nextSibling.style.display = 'block';
-        setTimeout(function() {
-
-        }, 1000);
-    }
-
-    handleItemDetailFade(e) {
-        e.target.nextSibling.style.display = 'none';
-    }
-
     render() {
         const { items } = this.props;
         const {detail } = this.state;
@@ -72,18 +81,14 @@ export default class PackagePane extends React.Component {
                 <div className="item-cards">
                     <Card>{
                         items.map((item, index) => {
-                            return (<Card.Grid key={index} style={gridStyle} onClick={this.handleShowDetail}>
-                                <div>
-                                    <img onMouseLeave={this.handleItemDetailFade} onMouseEnter={this.handleItemDetail.bind(this,item)} src={item.item.icon || 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1515077691938&di=e6b9bd7d635a7f64e76b024a040f0eff&imgtype=0&src=http%3A%2F%2Fimg.taopic.com%2Fuploads%2Fallimg%2F140619%2F234961-14061921140383.jpg'} alt="item pic"/>
-                                    <div className="item-info">
-                                        <span>{item.item.name}</span>
-                                        <span>{item.item.description}</span>
-                                    </div>
-                                    <span className="item-count">{'X '+item.count}</span>
-                                </div>
+                            return (<Card.Grid key={index} style={gridStyle} >
+                                <ItemContextMenu id={item.item.name} cb={this.handleShowDetail.bind(this, item.item)} item={item.item} count={item.count}/>
                             </Card.Grid>)
-                        })
+                        })   
                     }
+                    <Card.Grid style={gridStyle} >
+                        <ItemContextMenu extraOp={extraOp} id='test' cb={this.handleShowDetail.bind(this, testItem)} item={testItem} count={3}/>
+                    </Card.Grid>
                     </Card>
                 </div>
                 <Animate
@@ -92,7 +97,7 @@ export default class PackagePane extends React.Component {
                     transitionAppear
                     transitionName="fade"
                 >
-                    <ItemDetailModal visible={detail.detailVisible} skill={detail.skill} onClose={this.handleHideDetail}></ItemDetailModal>
+                    <ItemDetailModal visible={detail.detailVisible} item={detail.item} onClose={this.handleHideDetail}></ItemDetailModal>
                 </Animate>
                 <Pagination defaultCurrent={1} total={this.props.items.length} onChange={this.handlePageChange} />
             </div>

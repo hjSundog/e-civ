@@ -10,7 +10,7 @@ const defaultEntity = {
     }
 }
 
-const defaultExtract = ['description', 'rarity', 'vendor_value']
+const defaultExtract = ['description', 'rarity', 'vendor_value', 'effect', 'recipe', 'ingredient']
 
 const defaultPath = '../ItemTpl/'
 
@@ -18,6 +18,16 @@ function toUpperCaseFirst(word) {
     const wa = word.split('');
     const rt = wa.splice(0,1)[0].toUpperCase()+wa.join('');
     return rt;
+}
+//省略指定的属性
+function omit(omit) {
+    const temp = [].concat(defaultExtract);
+    for(let t of omit) {
+        temp.splice(temp.findIndex((target) => {
+            return target === t
+        }),1)
+    }
+ 
 }
 
 export default function tpl2entity(part = defaultEntity,extract = defaultExtract) {
@@ -32,7 +42,6 @@ export default function tpl2entity(part = defaultEntity,extract = defaultExtract
     const dist = targets.filter(target => {
         return target.name === name
     })
-
     const t = extract.reduce((pre, cur) => {
         typeof pre[cur] === 'undefined'? pre[cur] = dist[0][cur]: pre
         return pre

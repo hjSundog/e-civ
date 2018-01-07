@@ -1,14 +1,14 @@
 Arguments: 
-  D:\开发软件\nodejs\node.exe C:\Users\admin\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add react-contextmenu
+  G:\nodeJS\node.exe C:\Users\Mistaker\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add react-contextmenu
 
 PATH: 
-  C:\Users\admin\bin;D:\开发软件\Git\Git\mingw64\bin;D:\开发软件\Git\Git\usr\local\bin;D:\开发软件\Git\Git\usr\bin;D:\开发软件\Git\Git\usr\bin;D:\开发软件\Git\Git\mingw64\bin;D:\开发软件\Git\Git\usr\bin;C:\Users\admin\bin;C:\Users\admin\Desktop\sudo.vbs;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;发软件\nodejs;.;D:\开发软件\Git\Git\开发软件\Git\Git\cmd;D:\开发软件\Git\Git\cmd;D:\开发软件\nodejs;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit;C:\Ruby24-x64\bin;D:\开发软件\Microsoft VS Code\bin;C:\Users\admin\AppData\Roaming\npm;C:\Users\admin\AppData\Local\GitHubDesktop\bin;D:\开发软件\Git\Git\usr\bin\vendor_perl;D:\开发软件\Git\Git\usr\bin\core_perl
+  C:\Users\Mistaker\bin;G:\Git\Git\mingw64\bin;G:\Git\Git\usr\local\bin;G:\Git\Git\usr\bin;G:\Git\Git\usr\bin;G:\Git\Git\mingw64\bin;G:\Git\Git\usr\bin;C:\Users\Mistaker\bin;G:\Environment\java\jdk\bin;G:\Environment\java\jdk\jre\bin;C:\ProgramData\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;G:\Git\Git\cmd;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit;C:\Program Files\Microsoft SQL Server\110\Tools\Binn;G:\Environment\xampp\php;C:\ProgramData\ComposerSetup\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;G:\Environment\python;G:\Environment\python\Scripts;G:\Environment\java\jdk;G:\AndroidStudio\SDK\tools;G:\AndroidStudio\SDK\platform-tools;G:\nodeJS;C:\Ruby23-x64\bin;C:\Users\Mistaker\AppData\Roaming\Composer\vendor\bin;C:\Users\Mistaker\AppData\Local\Microsoft\WindowsApps;C:\Users\Mistaker\AppData\Local\atom\bin;C:\Users\Mistaker\AppData\Roaming\npm;G:\VSCode\Microsoft VS Code\bin;G:\Git\Git\usr\bin\vendor_perl;G:\Git\Git\usr\bin\core_perl
 
 Yarn version: 
-  1.3.2
+  1.0.0
 
 Node version: 
-  8.9.1
+  8.9.0
 
 Platform: 
   win32 x64
