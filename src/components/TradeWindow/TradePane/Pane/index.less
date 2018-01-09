@@ -1,0 +1,72 @@
+#components-grid-demo-playground [class^="ant-col-"] {
+    background: transparent;
+    border: 0;
+  }
+  #components-grid-demo-playground [class^="ant-col-"] > div {
+    background: #00A0E9;
+    height: 120px;
+    line-height: 120px;
+    font-size: 13px;
+  }
+  #components-grid-demo-playground pre {
+    background: #f9f9f9;
+    border-radius: 6px;
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+
+
+  .TradeOfPane{
+    background: white;
+    margin-right: 2px;
+    padding: 0px 3px;
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .header{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        .icon{
+            position: absolute;
+            left: 10px;
+            cursor: pointer;
+        }
+    }
+
+    .trade-item-container{
+        overflow-y: auto;
+        flex-grow: 1;
+    }
+
+    .trade-item-extra{
+        height: 40px;
+    }
+
+    .paneItem{
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        background: #cccccc;
+        img{
+            width: 30px;
+            height: 30px;
+            max-height: 80px;
+            max-width: 80px;
+            background-size: 100% 100%;
+        }
+
+        span{
+            flex-grow: 1;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            margin-left: 5px;
+            font-size: 18px;
+            color: #332134;
+        }
+    }
+  }

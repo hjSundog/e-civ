@@ -1,0 +1,64 @@
+.TradePane{
+    display: flex;
+    flex-direction: column;
+    background: #1a5197;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    .Panes{
+        display: flex;
+        width: 100%;
+        flex-grow: 1;
+        min-width: 600px;
+        max-width: 1200px;
+        cursor: auto;
+        .paneContainer{
+            flex-grow: 2;
+            width: 0px;
+            display: flex;
+            flex-direction: column;
+            width: 0px;
+            .paneWrapper{
+                display: flex;
+                height: 100%;
+            }
+
+            .paneOp{
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                margin: 10px 20px;
+            }
+        }
+
+        .panePackage{
+            flex-grow: 1;
+            width: 0px;
+        }
+
+
+    }
+
+    .PaneHead{
+        width: 100%;
+        text-align: center;
+        color: white;
+        font-size: 20px;
+        background: #0f90ff;
+        position: relative;
+        padding: 4px;
+
+        span{
+            position: absolute;
+            right: 5px;
+            cursor: pointer;
+            display: flex;
+            height: 100%;
+            top: 0px;
+            align-items: center;
+            .icon{
+                font-size: 22px;
+            }
+        }
+    }
+}
