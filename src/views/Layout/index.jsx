@@ -40,7 +40,7 @@ class App extends React.Component {
             loading: true
         })
         api({
-            url: `/persons/${user.person_id}`,
+            url: `/persons/${user?user.person_id:1}`,
             method: 'get',
         }).then(res => {
             this.setState({
