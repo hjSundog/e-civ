@@ -41,6 +41,13 @@ class TradePane extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            width: 600,
+            height: 500,
+            x: 0,
+            y: 0
+        };
+        
     }
 
     handleCloseClick = () => {
@@ -58,30 +65,29 @@ class TradePane extends Component {
     }
 
 
+    handleResizeStart = (e, dir, ref, delta, position) => {
+
+    }
+
+    handleResize =  (e, dir, ref, delta, position) => {
+        if(dir === 'right' || dir === 'left'){
+            this.setState({
+                width: ref.offsetWidth,
+                height: ref.offsetHeight,
+                ...position,
+            });
+        }
+        return;
+    }
+
+    handleResizeStop = (e, dir, ref, delta, position) => {
+        
+    }
+
     render() {
         const {visible} = this.props;
-        // const layouts = [
-        //     {
-        //         i: 'my',
-        //         x: 0,
-        //         y: 0,
-        //         w: 4,
-        //         h: 4
-        //     },{
-        //         i: 'other',
-        //         x: 0,
-        //         y: 4,
-        //         w: 4,
-        //         h: 4,
-        //     },{
-        //         i: 'package',
-        //         x: 8,
-        //         y: 0,
-        //         w: 4,
-        //         h: 3
-        //     }
-        // ]
 
+        console.log('state width is:' + this.state.width);
         return (
             <Rnd
                 default={{
@@ -94,10 +100,10 @@ class TradePane extends Component {
                 minHeight = {200}
                 dragGrid = {[5, 5]}
                 resizeGrid = {[5, 5]}
-                onResize={()=> {}}
                 onDragStop={()=> {}}
-                onResizeStart={()=> {}}
-                onResizeStop={()=> {}}
+                onResizeStart={this.handleResizeStart}
+                onResize = {this.handleResize}
+                onResizeStop={this.handleResizeStop}
                 cancel=".Panes"
             >
                 <div className="TradePane" style={{display: visible?'flex':'none'}}>
@@ -118,7 +124,7 @@ class TradePane extends Component {
                                 <Button type="primary">取消交易</Button>
                             </div>
                         </div>
-                        <PanePackage className="PanePackage" title="背包" data={data} delete={this.handlePackageDelete} select={this.handlePackageSelect}/>
+                        <PanePackage width={this.state.width*3/5} className="PanePackage" title="背包" data={data} delete={this.handlePackageDelete} select={this.handlePackageSelect}/>
                     </div>
                 </div>
             </Rnd>
