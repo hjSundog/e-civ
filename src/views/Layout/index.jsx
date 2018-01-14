@@ -39,6 +39,10 @@ class App extends React.Component {
         this.setState({
             loading: true
         })
+        // actions.init_person(this.props.person);
+        // this.setState({
+        //     loading: false
+        // })
         api({
             url: `/persons/${user?user.person_id:1}`,
             method: 'get',
@@ -167,6 +171,7 @@ const mapStateToProps = (state) => {
     const { auth } = state;
     return {
         user: auth.user ? auth.user : null,
+        person: state.person
     };
 };
 

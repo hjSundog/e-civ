@@ -9,24 +9,28 @@ import {Layout, Badge , Row, Col, Spin, message, Button} from 'antd';
 import Pane from './Pane'
 import PanePackage from './PanePackage'
 import Iconfont from '@/components/Iconfont'
-
 import './index.less'
-
-
+import { DragDropContextProvider } from 'react-dnd'
+import HTML5Backend from 'react-dnd-html5-backend'
+import ItemTypes from './ItemTypes'
 const data = [
-    {
+    {   
+        id: 1,
         imgUrl: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
         value: 30
     },
     {
+        id: 2,
         imgUrl: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
         value: 10
     },
     {
+        id: 3,
         imgUrl: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
         value: 20
     },
     {
+        id: 4,
         imgUrl: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
         value: 90
     }
@@ -89,45 +93,47 @@ class TradePane extends Component {
 
         console.log('state width is:' + this.state.width);
         return (
-            <Rnd
-                default={{
-                    x: 0,
-                    y: 0,
-                }}
-                maxHeight = {700}
-                maxWidth = {1200}
-                minWidth = {600}
-                minHeight = {200}
-                dragGrid = {[5, 5]}
-                resizeGrid = {[5, 5]}
-                onDragStop={()=> {}}
-                onResizeStart={this.handleResizeStart}
-                onResize = {this.handleResize}
-                onResizeStop={this.handleResizeStop}
-                cancel=".Panes"
-            >
-                <div className="TradePane" style={{display: visible?'flex':'none'}}>
-                    <div className="PaneHead">交易窗口<span onClick={this.handleCloseClick}><Iconfont type="close"></Iconfont></span></div>
-                    {/* <ResponsiveReactGridLayout autoSize={true} onDrag={this.handleInnerDrag}  width={1500} verticalCompaact={false} compactType={"horizontal"} className="Panes" layouts={layouts} cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}>
+            <DragDropContextProvider backend={HTML5Backend}>
+                <Rnd
+                    default={{
+                        x: 0,
+                        y: 0,
+                    }}
+                    maxHeight = {700}
+                    maxWidth = {1200}
+                    minWidth = {800}
+                    minHeight = {200}
+                    dragGrid = {[5, 5]}
+                    resizeGrid = {[5, 5]}
+                    onDragStop={()=> {}}
+                    onResizeStart={this.handleResizeStart}
+                    onResize = {this.handleResize}
+                    onResizeStop={this.handleResizeStop}
+                    cancel=".Panes"
+                >
+                    <div className="TradePane" style={{display: visible?'flex':'none'}}>
+                        <div className="PaneHead">交易窗口<span onClick={this.handleCloseClick}><Iconfont type="close"></Iconfont></span></div>
+                        {/* <ResponsiveReactGridLayout autoSize={true} onDrag={this.handleInnerDrag}  width={1500} verticalCompaact={false} compactType={"horizontal"} className="Panes" layouts={layouts} cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}>
                         <div key="my"><Pane /></div>
                         <div key="other"><Pane /></div>
                         <div key="package">背包</div>
                     </ResponsiveReactGridLayout> */}
-                    <div className="Panes">
-                        <div className="paneContainer">
-                            <div className="paneWrapper">
-                                <Pane key="my"/>
-                                <Pane key="other"/>
+                        <div className="Panes">
+                            <div className="paneContainer">
+                                <div className="paneWrapper">
+                                    <Pane source={ItemTypes.DragItem} key="my"/>
+                                    <Pane source={ItemTypes.DragItemSelf} key="other" />
+                                </div>
+                                <div className="PaneOp">
+                                    <Button type="primary">确认交易</Button>
+                                    <Button type="primary">取消交易</Button>
+                                </div>
                             </div>
-                            <div className="PaneOp">
-                                <Button type="primary">确认交易</Button>
-                                <Button type="primary">取消交易</Button>
-                            </div>
+                            <PanePackage width={this.state.width*1/3} className="PanePackage" title="背包" data={data} delete={this.handlePackageDelete} select={this.handlePackageSelect}/>
                         </div>
-                        <PanePackage width={this.state.width*3/5} className="PanePackage" title="背包" data={data} delete={this.handlePackageDelete} select={this.handlePackageSelect}/>
                     </div>
-                </div>
-            </Rnd>
+                </Rnd>
+            </DragDropContextProvider>
         );
     }
 }
