@@ -10,11 +10,13 @@ import '@/../node_modules/react-resizable/css/styles.css'
 import './index.less'
 const Resizable = RResizable.Resizable
 // 拖拽功能考虑使用react-dnd来实现
-import DragItemWithTarget from '../DragItemWithTarget'
+import DragItem from '../DragItem'
+import Item from '../Item'
 import ItemTypes from '../ItemTypes'
 
 
 const ItemType = ItemTypes.DragItem
+const  DragItemWithTarget = DragItem(ItemType)(Item)
 
 const boxTarget = {
     canDrop() {
@@ -24,8 +26,16 @@ const boxTarget = {
         if (!monitor.didDrop()) {
             console.log('nested didn\'t drop')
         }
-        console.log('item ' + monitor.getItem().id + ' result ' + monitor.getDropResult());
-        props.addItem(monitor.getItem());
+        const targetItem = monitor.getItem();
+        //console.log('item ' + targetItem.id + ' result ' + monitor.getDropResult());
+        if(props.data.findIndex((item) => {
+            return item.id === targetItem.id
+        }) !== -1) {
+            //console.log('switch '+targetItem.id);
+            // props.switchItem()
+        } else {
+            props.addItem(monitor.getItem());
+        }
         return { name: 'YourWindow' }
     }
 }
@@ -38,47 +48,66 @@ class Pane extends Component {
         connectDropTarget: PropTypes.func.isRequired,
         isOver: PropTypes.bool.isRequired,
         canDrop: PropTypes.bool.isRequired,
+        colCountKey: PropTypes.number.isRequired,
+        colCounts: PropTypes.array.isRequired,
+        title: PropTypes.string
     };
 
     static defaultProps = {
         isDropTarget: false,
-        data: []
+        isOver: false,
+        canDrop: false,
+        data: [],
+        colCountKey: 0,
+        colCounts: [],
+        title: '交易窗口'
     }
 
-    colCounts = [];
 
     constructor(props) {
         super(props);
         this.state = {
-            colCountKey: 0,
+            colCountKey: this.props.colCountKey,
             items: this.props.data
         };
-        [1, 2, 3, 4].forEach((value, i) => { this.colCounts[i] = value; });
     }
 
     componentWillReceiveProps(props) {
-        console.log('change items'+props.data);
+        //console.log('change items'+props.data);
         this.setState({
-            items: props.data
+            items: props.data,
+            colCountKey: props.colCountKey,
+            colCounts: props.colCounts
         })
     }
 
     onColCountChange = () => {
-        console.log('click');
-        const colCountKey = (this.state.colCountKey + 1) % this.colCounts.length;
-        this.setState({ colCountKey });
+        this.props.onColCountChange();
     }
-    addItem = (item) => {
-        console.log('is heare')
-        this.setState({
-            items: [].concat(this.state.items).push(item)
-        }) 
-    }
+
+    // addItem = (item) => {
+    //     console.log('is heare')
+    //     this.setState({
+    //         items: this.state.items.spli
+    //     })
+    // }
 
     // 如果是目标区域，可以拖进新元素
     addItemIn = (position, newItem) => {
-        console.log('add new item ' + newItem.id + ' in ' + position);
-        this.addItem(newItem)
+        //console.log('add new item ' + newItem.id + ' in ' + position);
+        const items = [...this.state.items];
+        items.splice(position, 0, newItem)
+        this.setState({
+            items: items
+        })
+    }
+
+    swithcItem = (tIndex, dIndex, target, dist) => {
+        const items = [...this.state.items];
+        items[tIndex] = {...dist};
+        items[dIndex] = {...target}
+        //console.log('switch ' + target.id + ' to ' + dist.id)
+        this.props.changeState(items)
     }
 
     // 本组件内部元素移动
@@ -92,11 +121,13 @@ class Pane extends Component {
             return target.id === dist.id
         })
 
-        if (distIndex !== -1) {
-            console.log('src id is ' + src.id + ' dist id is ' + dist.id);
+        if (srcIndex === -1) {
+            //console.log('src id is ' + src.id + ' dist id is ' + dist.id + ' length is '+items.length);
+            this.addItemIn(distIndex, dist);
             return;
         }
-        //this.addItem(srcIndex, dist);
+        this.swithcItem(srcIndex, distIndex, src, dist);
+
     }
 
     // 悬浮
@@ -113,8 +144,7 @@ class Pane extends Component {
         const rows = [];
         let counter = 0;
         let cols = [];
-        console.log(data.length);
-        const colCount = this.colCounts[colCountKey];
+        const colCount = this.props.colCounts[colCountKey];
         for (let i = 0; i < Math.ceil(data.length / colCount); i++) {
             cols = [];
             for (let j = 0; j < colCount; j++) {
@@ -123,7 +153,7 @@ class Pane extends Component {
                 }
                 cols.push(
                     <Col key={j.toString()} span={24 / colCount}>
-                        <DragItemWithTarget target={ItemType} moveItem={this.moveItem} data={data[i * colCount]}>
+                        <DragItemWithTarget target={ItemType} moveItem={this.moveItem} data={data[i * colCount+j]}>
                             <div className="paneItem">
                                 <img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3880507419,2968712832&fm=27&gp=0.jpg" />
                                 <span>{data[i * colCount + j]['id']}</span>
@@ -158,25 +188,25 @@ class Pane extends Component {
 }
 
 // 基本结构
-function BaseVissel({ rows, onColCountChange }) {
+function BaseVissel({ rows, onColCountChange, title}) {
     return (
-        // <Resizable
-        //     axis = 'x'
-        //     handleSize = {[5, 5]}
-        //     width = {180}
-        //     height = {350}
-        // >
-        <div className="TradeOfPane">
-            <div style={{ padding: 10 }}>
-                <div className="header"><Iconfont type="clickable" onClick={onColCountChange}></Iconfont><span className="paneName">{'自己的交易窗口'}</span></div>
+        <Resizable
+            axis = 'x'
+            handleSize = {[5, 5]}
+            width = {180}
+            height = {350}
+        >
+            <div className="TradeOfPane">
+                <div style={{ padding: 10 }}>
+                    <div className="header"><Iconfont type="clickable" onClick={onColCountChange}></Iconfont><span className="paneName">{title}</span></div>
+                </div>
+                <div className="trade-item-container">{rows}</div>
+                <div className="trade-item-extra">
+                    <div>额外加价：100 Gold</div>
+                    <div>价值估算：210 Gold</div>
+                </div>
             </div>
-            <div className="trade-item-container">{rows}</div>
-            <div className="trade-item-extra">
-                <div>额外加价：100 Gold</div>
-                <div>价值估算：210 Gold</div>
-            </div>
-        </div>)
-    // </Resizable>)
+        </Resizable>)
 }
 
 
@@ -213,40 +243,51 @@ export default class DragPane extends Component{
 
     static propTypes = {
         source: PropTypes.string,
-        // addItem: PropTypes.func,
     }
 
     static defaultProps = {
         source: 'item'
     }
-    // 什么鬼啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊AA  啊啊啊 啊啊
-    // addItem = (item) => {
-    //     console.log('addItem');
-    //     this.setState({
-    //         data: [...self.state.data, item]
-    //     });
-    // }
+
+    colCounts = [];
+
 
     constructor(props) {
         super(props);
-        
+        [1, 2, 3, 4].forEach((value, i) => { this.colCounts[i] = value; });
         this.state = {
-            data: []
+            data: [],
+            colCountKey: 0
         }
     }
-    
+
+    addItem = (item) => {
+        this.setState({
+            data: [...this.state.data, item]
+        })
+    }
+
+    changeState = (newState)=> {
+        this.setState({
+            data: newState
+        })
+    }
+
+    onColCountChange = () => {
+        const colCountKey = (this.state.colCountKey + 1) % this.colCounts.length;
+        this.setState({ colCountKey });
+    }
+
     render () {
         const {source, ...rest} = this.props;
         const Wrapper = HOC(source, ...rest)
-        console.log('pane data'+ this.state.data)
         const self =  this;
         return (
-            <div>
-                <Wrapper {...rest} addItem={(item) => {
-                    self.setState({
-                        data: [...self.state.data, item]
-                    })
-                }} data={self.state.data}/>
+            <div style={{display: 'flex', flexGrow: 1}}>
+                <Wrapper colCountKey={this.state.colCountKey} colCounts={this.colCounts} onColCountChange={self.onColCountChange} {...rest}
+                    addItem={this.addItem}
+                    data={self.state.data}
+                    changeState={this.changeState}/>
             </div>
         )
     }

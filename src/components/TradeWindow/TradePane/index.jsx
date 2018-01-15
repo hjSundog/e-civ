@@ -14,7 +14,7 @@ import { DragDropContextProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import ItemTypes from './ItemTypes'
 const data = [
-    {   
+    {
         id: 1,
         imgUrl: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
         value: 30
@@ -51,7 +51,7 @@ class TradePane extends Component {
             x: 0,
             y: 0
         };
-        
+
     }
 
     handleCloseClick = () => {
@@ -85,13 +85,12 @@ class TradePane extends Component {
     }
 
     handleResizeStop = (e, dir, ref, delta, position) => {
-        
+
     }
 
     render() {
         const {visible} = this.props;
-
-        console.log('state width is:' + this.state.width);
+        //console.log('state width is:' + this.state.width);
         return (
             <DragDropContextProvider backend={HTML5Backend}>
                 <Rnd
@@ -113,16 +112,11 @@ class TradePane extends Component {
                 >
                     <div className="TradePane" style={{display: visible?'flex':'none'}}>
                         <div className="PaneHead">交易窗口<span onClick={this.handleCloseClick}><Iconfont type="close"></Iconfont></span></div>
-                        {/* <ResponsiveReactGridLayout autoSize={true} onDrag={this.handleInnerDrag}  width={1500} verticalCompaact={false} compactType={"horizontal"} className="Panes" layouts={layouts} cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}>
-                        <div key="my"><Pane /></div>
-                        <div key="other"><Pane /></div>
-                        <div key="package">背包</div>
-                    </ResponsiveReactGridLayout> */}
                         <div className="Panes">
                             <div className="paneContainer">
                                 <div className="paneWrapper">
-                                    <Pane source={ItemTypes.DragItem} key="my"/>
-                                    <Pane source={ItemTypes.DragItemSelf} key="other" />
+                                    <Pane title="自己的交易窗口" source={ItemTypes.DragItem} key="my"/>
+                                    <Pane title="别人的交易窗口" source={ItemTypes.DragItemSelf} key="other" />
                                 </div>
                                 <div className="PaneOp">
                                     <Button type="primary">确认交易</Button>

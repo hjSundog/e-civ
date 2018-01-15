@@ -5,12 +5,16 @@ import { connect } from 'react-redux';
 import { Layout, Badge, Spin, message, Row, Col, Slider, Pagination } from 'antd';
 import Iconfont from '@/components/Iconfont'
 import ReactGridLayout from 'react-grid-layout'
-import DragItemWithTarget from '../DragItemWithTarget'
 import '@/../node_modules/react-grid-layout/css/styles.css'
 import '@/../node_modules/react-resizable/css/styles.css'
 import './index.less'
+
 import ItemTypes from '../ItemTypes'
+import DragItem from '../DragItem'
+import Item from '../Item'
 const ItemType = ItemTypes.DragItem
+const DragPackageItem = DragItem(ItemType)(Item)
+
 // const WithProvider = ReactGridLayout.WidthProvider;
 const ResponsiveReactGridLayout = ReactGridLayout.Responsive
 class Pane extends Component {
@@ -74,7 +78,7 @@ class Pane extends Component {
     }
 
     moveItem = () => {
-        console.log('move item');
+        //console.log('move item');
     }
 
     generateLayouts = (cols) => {
@@ -115,7 +119,7 @@ class Pane extends Component {
         const self = this;
         return this.state.layouts[this.state.currentBreakpoint].map(function (l, i) {
             return (
-                <div key={i}><DragItemWithTarget target={ItemType} moveItem={self.moveItem} data={data[i]} /></div>
+                <div key={i}><DragPackageItem  moveItem={self.moveItem} data={data[i]} /></div>
             );
         });
     }
@@ -131,21 +135,21 @@ class Pane extends Component {
     };
 
     handleItemDragStop = (layout, oldItem, newItem, placeholder, e,  ele) => {
-        console.log('drag stop');
+        //console.log('drag stop');
     }
 
-    handleItemDragStart = (layout, oldItem, newItem, placeholder, e,  ele) => {
-        ele.addEventListener('mouseup', function(e) {
-            console.log('mouse up');
-        })
-    }
+    // handleItemDragStart = (layout, oldItem, newItem, placeholder, e,  ele) => {
+    //     ele.addEventListener('mouseup', function(e) {
+    //         console.log('mouse up');
+    //     })
+    // }
 
     handleItemDrag = (layout, oldItem, newItem, placeholder, e,  ele)  => {
-        // 为什么我松开鼠标还是出于拖拽状态？？
+        // 为什么我松开鼠标还是出于拖拽状态？？ 要死要死要死fffffffffffffffffffffffffffffuuuuuuuuuuuuuuuucccccccccccccccccckkkkkkkkkkkkk
         // ele.getAttribute('mouseup')?console.log('hh'):ele.addEventListener('mouseup', function(e) {
         //     console.log('mouse up');
         // })
-        console.log(e.type === 'mousemove'?'drag now':e.type);
+        //console.log(e.type === 'mousemove'?'drag now':e.type);
     }
 
     render() {
