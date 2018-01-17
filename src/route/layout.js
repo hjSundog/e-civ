@@ -19,7 +19,7 @@ import Map from '@/views/Map';
 import Package from '@/views/Package';
 import Page2 from '@/views/Page2';
 import Donation from '@/views/Donation';
-
+import Relationship from '@/views/Relationship';
 
 export const childRoutes = [
     {
@@ -78,6 +78,10 @@ export const childRoutes = [
     {
         'path': '/map',
         'component': Map
+    },
+    {
+        'path': '/relationship',
+        'component': Relationship
     }
 ];
 
