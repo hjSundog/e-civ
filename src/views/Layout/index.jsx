@@ -15,7 +15,7 @@ import FeedbackModal from './FeedbackModal'
 import ChatWindow from '@/components/ChatWindow';
 import TradeWindow from '@/components/TradeWindow'
 import Websocket from '@/components/Websocket'
-import {add_message} from '@/actions/websocket';
+import {add_message, add_invitation} from '@/actions/websocket';
 
 import {remove_user} from '@/actions/user';
 import { init_person } from '../../actions/person'
@@ -91,8 +91,22 @@ class App extends React.Component {
     }
 
     handleWebsocket = (message) => {
-        console.log(JSON.parse(message))
-        this.props.actions.add_message(JSON.parse(message));
+        message = JSON.parse(message)
+        if (message.type) {
+            switch (message.type) {
+            case 'INVATATION' :
+                this.props.actions.add_invitation(JSON.parse(message));
+                break
+            case 'RADIO':
+                break
+            default:
+            }
+            console.log(message)
+            this.props.actions.add_message(JSON.parse(message));
+            return
+        }
+        console.log('init type: ' + message)
+        return
     }
 
     handleTradeWindowClose = () => {
@@ -176,7 +190,7 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({remove_user, add_message, init_person}, dispatch)};
+    return {actions: bindActionCreators({remove_user, add_invitation, add_message, init_person}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

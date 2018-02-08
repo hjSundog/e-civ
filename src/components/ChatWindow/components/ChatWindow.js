@@ -21,7 +21,7 @@ class ChatWindow extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            messageList: [],
+            messages: [],
             // 异步请求广播站信息
             radioStation: {
                 name: '加载中...',
@@ -57,7 +57,7 @@ class ChatWindow extends Component {
     }
 
     render() {
-        let { messageList,radioStation } = this.state;
+        let { messages,radioStation } = this.state;
         let classList = [
             "sc-chat-window",
             (this.props.isOpen ? "opened" : "closed")
@@ -79,7 +79,7 @@ class ChatWindow extends Component {
                         onClose={this.props.onClose}
                     />
                     <MessageList
-                        messages={messageList}
+                        messages={messages}
                         imageUrl={''}
                     />
                     <UserInput onSubmit={this.onUserInputSubmit}/>
