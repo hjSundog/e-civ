@@ -4,6 +4,7 @@ import DropDownTab from './DropDownTab'
 import api from '../../api'
 import './index.less'
 import { Button, message, Tabs, Row, Col, Menu, Dropdown } from 'antd'
+import Globe, {GlobeOptions} from 'e-civ-planet';
 
 const TabPane = Tabs.TabPane;
 const SubMenu = Menu.SubMenu;
@@ -72,6 +73,16 @@ class Map extends React.Component {
         this.setState({
             target: target
         })
+    }
+
+    componentDidMount() {
+        console.log('md')
+        var options = new GlobeOptions();
+        options.satellite = true;
+        options.level = 2;
+        options.lonlat = 'auto';
+        var globe = Globe.getInstance(options);
+        globe.placeAt(document.querySelector('#global_map'));
     }
 
     render() {

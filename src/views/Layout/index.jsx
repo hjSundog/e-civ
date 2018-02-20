@@ -44,7 +44,7 @@ class App extends React.Component {
         //     loading: false
         // })
         api({
-            url: `/persons/${user?user.person_id:1}`,
+            url: `/persons/${user ? user.person_id : 1}`,
             method: 'get',
         }).then(res => {
             this.setState({
@@ -89,7 +89,6 @@ class App extends React.Component {
             chatroomsVisible: false,
         })
     }
-
 
     handleWebsocket = (message) => {
         console.log(JSON.parse(message))
@@ -156,7 +155,8 @@ class App extends React.Component {
                     />
                     <TradeWindow onClose={this.handleTradeWindowClose} isOpen={tradeWindowVisible}/>
                     <Websocket url='ws://localhost:8089?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIiwibWV0YSI6eyJhZ2UiOjIyLCJzZXgiOiJtYWxlIn0sInBlcnNvbl9pZCI6bnVsbCwiaWF0IjoxNTEyMzc5OTc4LCJleHAiOjIyNjk3NjIzNzh9.grCzWUCxgijvOfgecQ-GUD0sssPHSY9bLRX2kYyLO_A'
-                        onMessage={this.handleWebsocket}/>
+                        onMessage={this.handleWebsocket}
+                        debug={true}/>
                 </div>
             </Layout>
         );

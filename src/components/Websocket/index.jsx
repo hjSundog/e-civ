@@ -35,7 +35,6 @@ class Websocket extends React.Component {
         websocket.onmessage = (evt) => {
             this.props.onMessage(evt.data);
         };
-
         this.shouldReconnect = this.props.reconnect;
         websocket.onclose = () => {
             this.logging('Websocket disconnected');
