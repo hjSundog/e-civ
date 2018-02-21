@@ -92,21 +92,14 @@ class App extends React.Component {
 
     handleWebsocket = (message) => {
         message = JSON.parse(message)
-        if (message.type) {
-            switch (message.type) {
-            case 'INVATATION' :
-                this.props.actions.add_invitation(JSON.parse(message));
-                break
-            case 'RADIO':
-                break
-            default:
-            }
-            console.log(message)
-            this.props.actions.add_message(JSON.parse(message));
-            return
+        console.log(message.type === 'INVITATION')
+        if (message.type !== "INVITATION") {
+            console.log('there')
+            this.props.actions.add_invitation(message);
+        } else {
+            console.log('here')
+            this.props.actions.add_message(message);
         }
-        console.log('init type: ' + message)
-        return
     }
 
     handleTradeWindowClose = () => {

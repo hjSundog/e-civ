@@ -229,7 +229,7 @@ function HOC(source) {
             connectDropTarget: connect.dropTarget(),
             isOver: monitor.isOver(),
             canDrop: monitor.canDrop(),
-            isDropTarget: true,
+            isDropTarget: true, 
         }))(Pane)
         // return <Out {...rest} addItem={addItem} data={data}/>
     }

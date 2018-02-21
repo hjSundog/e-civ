@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import * as Test from './test'
 
 class Websocket extends React.Component {
 
@@ -29,6 +30,9 @@ class Websocket extends React.Component {
 
         websocket.onopen = () => {
             this.logging('Websocket connected');
+
+            Test.testStartInvitation();
+
             if (typeof this.props.onOpen === 'function') this.props.onOpen();
         };
 
