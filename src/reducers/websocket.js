@@ -1,6 +1,8 @@
 import {
     ADD_MESSAGE,
-    ADD_INVITATION
+    ADD_INVITATION,
+    CANCLE_INVITATION,
+    INIT_WEBSOCKET
 } from '../actions/websocket';
 
 const initialState = {
@@ -8,11 +10,19 @@ const initialState = {
     chatChannels: {
 
     },
-    invitations: []
+    invitations: [],
+    ws: {}
 };
 
 export default function websocket(state = initialState, action = {}) {
     switch (action.type) {
+    case INIT_WEBSOCKET: {
+        let rt = {
+            ...state,
+            ws: action.payload.data
+        }
+        return rt
+    }
     case ADD_INVITATION: 
         return {
             ...state, 
@@ -21,6 +31,17 @@ export default function websocket(state = initialState, action = {}) {
                 action.payload.data
             ]
         }
+    case CANCLE_INVITATION: {
+        const invitations = [...state.invitations]
+        const index = invitations.findIndex((invitation) => {
+            return invitation.from === action.payload.data.from
+        })
+        invitations.splice(index, 1)
+        return {
+            ...state,
+            invitations: invitations
+        }
+    }
     case ADD_MESSAGE:
         switch(action.payload.data.type) {
         case 'chat-joined':

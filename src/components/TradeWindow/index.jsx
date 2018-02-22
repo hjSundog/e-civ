@@ -29,16 +29,43 @@ class TradeWindow extends Component {
             })
         }
     }
-
+    // 接受邀请
     handleInvitationReceive = (target) => {
+        const {websocket, trasactions} = this.props
+        const to = trasactions[target].from
         console.log(target)
         this.setState({
             paneVisible: true
         })
+        // ws 通知另外一边
+        websocket.send(JSON.stringify({
+            from: 'admin',
+            to: to,
+            source: {
+                ...trasactions[target].source
+            },
+            type: 'INVITATION',
+            data: {
+                message: '我接受了你拉，来搞事情吧',
+                operation: 'receive'
+            }
+        }))
     }
-
+    // 拒绝邀请
     handleRefuse = (target) => {
         console.log(target)
+        // ws通知另外一边
+        const {websocket, trasactions} = this.props
+        const to = trasactions[target].from
+        websocket.send(JSON.stringify({
+            from: 'admin',
+            to: to,
+            type: 'INVITATION',
+            data: {
+                message: '我拒绝了你喔',
+                operation: 'refuse'
+            }
+        }))
     }
     // 关闭交易邀请窗口
     handleInvitationClose = () => {
@@ -63,12 +90,12 @@ class TradeWindow extends Component {
 
 
     render() {
-        const {trasactions, isOpen} = this.props;
+        const {trasactions, isOpen, websocket} = this.props;
         const {paneVisible, invitationVisible} = this.state;
         return (
             <div className="TradeWindow" style={{display: isOpen?'block':'none'}}>
-                <TradePane visible={paneVisible} onClose={this.handlePaneClose} />
-                <Invitation visible={invitationVisible} onClose={this.handleInvitationClose} onTradeOver={this.handleTradeOver} onReceive={this.handleInvitationReceive} onRefuse={this.handleRefuse} trasactions={trasactions}/>
+                <TradePane websocket={websocket} visible={paneVisible} onClose={this.handlePaneClose} />
+                <Invitation websocket={websocket} visible={invitationVisible} onClose={this.handleInvitationClose} onTradeOver={this.handleTradeOver} onReceive={this.handleInvitationReceive} onRefuse={this.handleRefuse} trasactions={trasactions}/>
             </div>
 
         );
@@ -103,4 +130,11 @@ TradeWindow.propTypes = {
     isOpen: PropTypes.bool
 };
 
-export default TradeWindow;
+function mapStateToProps(state) {
+    return {
+        trasactions: (state.websocket.invitations || []),
+        websocket: (state.websocket.ws)
+    }
+}
+
+export default connect(mapStateToProps)(TradeWindow);

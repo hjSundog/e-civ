@@ -30,10 +30,14 @@ class Websocket extends React.Component {
 
         websocket.onopen = () => {
             this.logging('Websocket connected');
-
+            if (typeof this.props.onOpen === 'function') {
+                this.props.onOpen(websocket);
+            }
             Test.testStartInvitation();
-
-            if (typeof this.props.onOpen === 'function') this.props.onOpen();
+            setTimeout(()=>{
+                console.log('test refuse invitation')
+                Test.testCancleInvitation()
+            }, 3000)
         };
 
         websocket.onmessage = (evt) => {

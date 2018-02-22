@@ -171,8 +171,7 @@ class Invitation extends Component {
         const data = trasactions.map((trasaction, index) => {
             return {
                 key: index,
-                name: trasaction.name,
-                level: trasaction.level,
+                ...trasaction.source
             }
         })
         return (
@@ -224,8 +223,11 @@ Invitation.propTypes = {
     onReceive: PropTypes.func,
     onTradeOver: PropTypes.func,
     trasactions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        level: PropTypes.number
+        from: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        source: {
+            invitor: PropTypes.string,
+            level: PropTypes.number
+        }
     }))
 };
 

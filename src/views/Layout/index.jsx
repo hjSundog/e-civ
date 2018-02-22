@@ -15,7 +15,7 @@ import FeedbackModal from './FeedbackModal'
 import ChatWindow from '@/components/ChatWindow';
 import TradeWindow from '@/components/TradeWindow'
 import Websocket from '@/components/Websocket'
-import {add_message, add_invitation} from '@/actions/websocket';
+import {add_message, add_invitation, init_websocket, cancle_invitation} from '@/actions/websocket';
 
 import {remove_user} from '@/actions/user';
 import { init_person } from '../../actions/person'
@@ -91,15 +91,28 @@ class App extends React.Component {
     }
 
     handleWebsocket = (message) => {
-        message = JSON.parse(message)
-        console.log(message.type === 'INVITATION')
-        if (message.type !== "INVITATION") {
-            console.log('there')
-            this.props.actions.add_invitation(message);
+        const tMessage = JSON.parse(message)
+        if (tMessage.type === "INVITATION") {
+            if(!tMessage.data) {
+                return
+            }
+            switch(tMessage.data.operation) {
+            case 'invite':
+                this.props.actions.add_invitation(tMessage);
+                break;
+            case 'cancle': 
+                this.props.actions.cancle_invitation(tMessage);
+                break;
+            default:
+                return 
+            }
         } else {
-            console.log('here')
-            this.props.actions.add_message(message);
+            this.props.actions.add_message(tMessage);
         }
+    }
+
+    handleOpenWebsocket = (ws) => {
+        this.props.actions.init_websocket(ws)
     }
 
     handleTradeWindowClose = () => {
@@ -163,6 +176,7 @@ class App extends React.Component {
                     <TradeWindow onClose={this.handleTradeWindowClose} isOpen={tradeWindowVisible}/>
                     <Websocket url='ws://localhost:8089?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIiwibWV0YSI6eyJhZ2UiOjIyLCJzZXgiOiJtYWxlIn0sInBlcnNvbl9pZCI6bnVsbCwiaWF0IjoxNTEyMzc5OTc4LCJleHAiOjIyNjk3NjIzNzh9.grCzWUCxgijvOfgecQ-GUD0sssPHSY9bLRX2kYyLO_A'
                         onMessage={this.handleWebsocket}
+                        onOpen = {this.handleOpenWebsocket}
                         debug={true}/>
                 </div>
             </Layout>
@@ -183,7 +197,7 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({remove_user, add_invitation, add_message, init_person}, dispatch)};
+    return {actions: bindActionCreators({remove_user, init_websocket, cancle_invitation, add_invitation, add_message, init_person}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
