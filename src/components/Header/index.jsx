@@ -39,6 +39,9 @@ class commonHeader extends React.Component {
         case 'globalmap':
             this.props.history.replace('/map')
             break
+        case 'relationship': 
+            this.props.history.replace('/relationship')
+            break
         default:
             return
         }
@@ -106,6 +109,9 @@ class commonHeader extends React.Component {
                             </SubMenu>
                             <Menu.Item key="alipay">
                                 <a href="https://ant.design" target="_blank" rel="noopener noreferrer">Navigation Four - Link</a>
+                            </Menu.Item>
+                            <Menu.Item key="relationship">
+                                我的关系
                             </Menu.Item>
                         </Menu>
                     </Col>

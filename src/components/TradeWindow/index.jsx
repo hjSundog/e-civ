@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
-import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import Invitation from './Invitation'
-import {Layout, Badge , Row, Col, Spin, message} from 'antd';
-import Header from '@/components/ChatWindow/components/Header';
 import TradePane from './TradePane'
 import  './style'
 import './index.less'
@@ -29,23 +26,44 @@ class TradeWindow extends Component {
             })
         }
     }
+    
+    // 取消邀请
+    handleCancle = (target) => {
+        const {websocket, trasactions} = this.props;
+        console.log('现在要取消id为' + trasactions[target].data.from + '的邀请')
+        websocket.send(JSON.stringify({
+            type: 'INVITATION',
+            source: 'person',
+            data: {
+                from: trasactions[target].data.from,
+                to: trasactions[target].data.to,
+                operation: 'cancle',
+                message: '我取消这个请求了哟~~'
+            },
+            created_at: new Date().toLocaleDateString()
+        })) 
+    }
+
+
     // 接受邀请
     handleInvitationReceive = (target) => {
-        const {websocket, trasactions} = this.props
-        const to = trasactions[target].from
+        const {websocket, invitations} = this.props;
+        const to = invitations[target].data.from;
+        const from = invitations[target].data.to;
         console.log(target)
         this.setState({
             paneVisible: true
         })
         // ws 通知另外一边
         websocket.send(JSON.stringify({
-            from: 'admin',
-            to: to,
-            source: {
-                ...trasactions[target].source
-            },
+            source: 'person',
             type: 'INVITATION',
             data: {
+                payload: {
+                    ...invitations[target].source
+                },
+                from: from,
+                to: to,
                 message: '我接受了你拉，来搞事情吧',
                 operation: 'receive'
             }
@@ -55,13 +73,15 @@ class TradeWindow extends Component {
     handleRefuse = (target) => {
         console.log(target)
         // ws通知另外一边
-        const {websocket, trasactions} = this.props
-        const to = trasactions[target].from
+        const {websocket, invitations} = this.props
+        const to = invitations[target].data.from
+        const from = invitations[target].data.to;
         websocket.send(JSON.stringify({
-            from: 'admin',
-            to: to,
+            source: 'person',
             type: 'INVITATION',
             data: {
+                from: from,
+                to: to,
                 message: '我拒绝了你喔',
                 operation: 'refuse'
             }
@@ -90,12 +110,12 @@ class TradeWindow extends Component {
 
 
     render() {
-        const {trasactions, isOpen, websocket} = this.props;
+        const {trasactions, invitations, isOpen, websocket, responseTradePane} = this.props;
         const {paneVisible, invitationVisible} = this.state;
         return (
             <div className="TradeWindow" style={{display: isOpen?'block':'none'}}>
-                <TradePane websocket={websocket} visible={paneVisible} onClose={this.handlePaneClose} />
-                <Invitation websocket={websocket} visible={invitationVisible} onClose={this.handleInvitationClose} onTradeOver={this.handleTradeOver} onReceive={this.handleInvitationReceive} onRefuse={this.handleRefuse} trasactions={trasactions}/>
+                <TradePane websocket={websocket} visible={responseTradePane || paneVisible} onClose={this.handlePaneClose} />
+                <Invitation websocket={websocket} visible={invitationVisible} onClose={this.handleInvitationClose} onTradeOver={this.handleTradeOver} onReceive={this.handleInvitationReceive} onRefuse={this.handleRefuse} onCancle={this.handleCancle} invitations={invitations} trasactions={trasactions}/>
             </div>
 
         );
@@ -104,36 +124,46 @@ class TradeWindow extends Component {
 
 
 TradeWindow.defaultProps = {
-    trasactions: [{
-        name: 'mdzz',
-        level: 3
-    }, {
-        name: 'fuck',
-        level: 4
-    }, {
-        name: 'monster',
-        level: 54
-    }, {
-        name: 'boss',
-        level: 999
-    }],
+    trasactions: [],
+    invitations: [],
     onClose: () => {},
-    isOpen: false
+    isOpen: false,
+    responseTradePane: false,
 };
 
 TradeWindow.propTypes = {
     onClose: PropTypes.func,
+    responseTradePane: PropTypes.bool,
     trasactions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        level: PropTypes.number
+        data: PropTypes.shape({
+            from: PropTypes.string,
+            to: PropTypes.string,
+            message: PropTypes.string,
+            payload: PropTypes.shape({
+                name: PropTypes.string,
+                level: PropTypes.number
+            })
+        })
+    })),
+    invitations: PropTypes.arrayOf(PropTypes.shape({
+        data: PropTypes.shape({
+            from: PropTypes.string,
+            to: PropTypes.string,
+            message: PropTypes.string,
+            payload: PropTypes.shape({
+                name: PropTypes.string,
+                level: PropTypes.number
+            })
+        })
     })),
     isOpen: PropTypes.bool
 };
 
 function mapStateToProps(state) {
     return {
-        trasactions: (state.websocket.invitations || []),
-        websocket: (state.websocket.ws)
+        trasactions: (state.websocket.trasactions),
+        invitations: (state.websocket.invitations),
+        websocket: (state.websocket.ws),
     }
 }
 

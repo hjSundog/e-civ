@@ -25,14 +25,15 @@ export function testStartInvitation() {
         ws.onopen = (function(i){
             return () => {
                 ws.send(JSON.stringify({
-                    from: names[i-1], // 以后使用auth.user.username
-                    source: {
-                        name: nvt,
-                        level: 10
-                    },
+                    source: 'person',
                     type: 'INVITATION',
-                    to: 'admin',
                     data: {
+                        payload: {
+                            name: nvt,
+                            level: 10
+                        },
+                        from: names[i-1], // 以后使用auth.user.username
+                        to: 'admin',
                         message: payloads[Math.floor(Math.random() * payloads.length)],
                         operation: 'invite'
                     },
@@ -44,7 +45,6 @@ export function testStartInvitation() {
 
         ws.onmessage = (message) => {
             const tMessage = JSON.parse(message.data);
-            console.log('mdzz')
             if (tMessage.type === "INVITATION") {
                 if(!tMessage.data) {
                     return
@@ -52,11 +52,11 @@ export function testStartInvitation() {
                 switch(tMessage.data.operation) {
                 case 'refuse':
                     // this.props.actions.add_invitation(tMessage);
-                    console.log(tMessage.data.message + tMessage.to)
+                    console.log(tMessage.data.message + tMessage.data.to)
                     break;
                 case 'receive': 
                     // this.props.actions.cancle_invitation(tMessage);
-                    console.log(tMessage.data.message + tMessage.to)
+                    console.log(tMessage.data.message + tMessage.data.to)
                     break;
                 default:
                     return 
@@ -74,10 +74,11 @@ export function testCancleInvitation() {
     const randomWS = TestWSs[randowWSIndex]
     console.log('现在要取消id为'+randomWS.id+'的邀请')
     randomWS.send(JSON.stringify({
-        from: randomWS.id,
         type: 'INVITATION',
-        to: 'admin',
+        source: 'person',
         data: {
+            from: randomWS.id,
+            to: 'admin',
             operation: 'cancle',
             message: '我取消这个请求了哟~~'
         },

@@ -40,9 +40,9 @@ class ReItem extends React.Component {
                     <span style={{marginRight: '10px'}}>{data.level}</span>
                 </div>
                 <div style={{flexGrow: 1,display: 'flex',justifyContent: 'space-around', maxWidth: '450px'}}>
-                    <Button type="primary" onClick={this.props.handleSendMessage}>通信</Button>
-                    <Button type="primary" onClick={this.props.handleTrade}>交易</Button>
-                    <Button type="primary" onClick={this.props.handleCheck}>查看</Button>
+                    <Button type="primary" onClick={this.handleSendMessage}>通信</Button>
+                    <Button type="primary" onClick={this.handleTrade}>交易</Button>
+                    <Button type="primary" onClick={this.handleCheck}>查看</Button>
                     <Button type="danger" onClick={this.handleDelete}>删除</Button>
                 </div>
             </div>

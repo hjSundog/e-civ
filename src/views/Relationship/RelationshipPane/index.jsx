@@ -1,10 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 import noop from '@/utils/noop'
 import ReItem from '../ReItem'
-import Animate from 'rc-animate';
 import {Pagination} from 'antd'
+import {bindActionCreators} from 'redux'
+import {connect} from 'react-redux'
+import {add_transaction, cancle_transaction} from '@/actions/websocket'
 const PAGESIZE = 8;
 
 class RelationPane extends React.Component {
@@ -25,13 +26,13 @@ class RelationPane extends React.Component {
             datas: props.datas
         })
     }
-
+    // 页码改变
     handlePageChange = (page) => {
         this.setState({
             currentPage: page
         })
     }
-
+    // 删除
     handleDelete = (target) => {
         const { type, datas } = this.props;
 
@@ -47,7 +48,31 @@ class RelationPane extends React.Component {
     }
 
     handleTrade = () => {
-
+        const {websocket, actions} = this.props;
+        const tData = {
+            source: 'person',
+            type: 'INVITATION',
+            data: {
+                from: 'admin',
+                to: 'guest',
+                payload: {
+                    name: 'admin',
+                    level: 22
+                },
+                operation: 'invite',
+                message: '来自admin的邀请'
+            },
+            created_at: new Date().toLocaleDateString()
+        };
+        console.log('交易啦交易啦');
+        // 更改状态
+        actions.add_transaction(tData)
+        // 发送交易信息
+        if (websocket) {
+            websocket.send(JSON.stringify(tData))
+        } else {
+            console.error('没有websocket服务。无法发送交易请求。')
+        }
     }
 
     render () {
@@ -72,6 +97,8 @@ class RelationPane extends React.Component {
 
 RelationPane.defaultProps = {
     datas: [],
+    add_transaction: noop,
+    cancle_transaction: noop,
     onDelete: noop
 };
 
@@ -81,8 +108,25 @@ RelationPane.propTypes = {
         level: PropTypes.number,
         avatarUrl: PropTypes.string
     })),
+    add_transaction: PropTypes.func,
+    cancle_transaction: PropTypes.func,
     onDelete: PropTypes.func
 };
 
+function mapStateToProps (state) {
+    return {
+        user: state.auth.user,
+        websocket: state.websocket.ws
+    }
+}
 
-export default RelationPane;
+function mapDispatchToProps (dispatch) {
+    return {
+        actions: bindActionCreators({
+            add_transaction,
+            cancle_transaction
+        }, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(RelationPane);

@@ -34,10 +34,10 @@ class Websocket extends React.Component {
                 this.props.onOpen(websocket);
             }
             Test.testStartInvitation();
-            setTimeout(()=>{
-                console.log('test refuse invitation')
-                Test.testCancleInvitation()
-            }, 3000)
+            // setTimeout(()=>{
+            //     console.log('test refuse invitation')
+            //     //Test.testCancleInvitation()
+            // }, 3000)
         };
 
         websocket.onmessage = (evt) => {

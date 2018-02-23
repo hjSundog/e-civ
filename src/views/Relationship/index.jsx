@@ -33,6 +33,12 @@ class Relationship extends React.Component {
                 level: Math.floor(Math.random()*50)
             }
         })
+        total.unshift({
+            name: 'guest',
+            id: 'key',
+            avatarUrl: '',
+            level: 999
+        })
         this.setState({
             relationship: {
                 total: total,

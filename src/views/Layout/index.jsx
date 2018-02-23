@@ -31,6 +31,7 @@ class App extends React.Component {
             feedbackVisible: false,
             chatroomsVisible: false,
             tradeWindowVisible: false,
+            responseTradePane: false,
             loading: true
         }
     }
@@ -103,6 +104,14 @@ class App extends React.Component {
             case 'cancle': 
                 this.props.actions.cancle_invitation(tMessage);
                 break;
+            case 'refuse':
+                break;
+            case 'receive':
+                // 打开交易窗口
+                this.setState({
+                    responseTradePane: true
+                })
+                break;
             default:
                 return 
             }
@@ -125,7 +134,10 @@ class App extends React.Component {
     render() {
         const {user, actions} = this.props;
         const { feedbackVisible, tradeWindowVisible } = this.state
+        const urlPrifx = 'ws://localhost:8089?token=';
+        const token = user['token']
 
+        const url = urlPrifx + token
         return (
             <Layout className="ant-layout-has-sider">
                 <Spin size="large" spinning={this.state.loading}></Spin>
@@ -173,8 +185,8 @@ class App extends React.Component {
                         onClose={this.handleChatroomsMini}
                         isOpen={this.state.chatroomsVisible}
                     />
-                    <TradeWindow onClose={this.handleTradeWindowClose} isOpen={tradeWindowVisible}/>
-                    <Websocket url='ws://localhost:8089?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIiwibWV0YSI6eyJhZ2UiOjIyLCJzZXgiOiJtYWxlIn0sInBlcnNvbl9pZCI6bnVsbCwiaWF0IjoxNTEyMzc5OTc4LCJleHAiOjIyNjk3NjIzNzh9.grCzWUCxgijvOfgecQ-GUD0sssPHSY9bLRX2kYyLO_A'
+                    <TradeWindow onClose={this.handleTradeWindowClose} isOpen={tradeWindowVisible} responseTradePane={this.state.responseTradePane}/>
+                    <Websocket url={url}
                         onMessage={this.handleWebsocket}
                         onOpen = {this.handleOpenWebsocket}
                         debug={true}/>

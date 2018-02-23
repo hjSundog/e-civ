@@ -22,6 +22,8 @@ const pagination = {
     },
 };
 
+const types = ['my', 'others']
+
 class Invitation extends Component {
     static propTypes = {
         className: PropTypes.string,
@@ -34,6 +36,7 @@ class Invitation extends Component {
             sortedInfo: null,
             selectedRowKeys: [],  // 这里配置默认勾选列
             loading: false,
+            type: types[1]
         }
     }
     // start = () => {
@@ -45,6 +48,10 @@ class Invitation extends Component {
     //             loading: false,
     //         });
     //     }, 1000);
+    // }
+
+    // componentWillReceiveProps(nextProps) {
+    //     if()
     // }
 
     onSelectChange = (selectedRowKeys) => {
@@ -89,6 +96,10 @@ class Invitation extends Component {
     }
 
     handleOperationFalse = (text, record) => () => {
+        if (this.state.type === 'my') {
+            this.props.onCancle(record.key)
+            return;
+        }
         this.props.onRefuse(record.key);
     }
 
@@ -115,8 +126,21 @@ class Invitation extends Component {
         this.props.onClose();
     }
 
+    // 更改状态
+    handleTypeChange = () => {
+        this.setState({
+            type : types[(types.findIndex((type) => {
+                return type === this.state.type
+            })+1)%types.length]
+        })
+    }
+
     render() {
-        let { sortedInfo, filteredInfo } = this.state;
+        const titles = {
+            my: '我的邀请',
+            others: '处理请求'
+        }
+        let { sortedInfo, filteredInfo, type } = this.state;
         sortedInfo = sortedInfo || {};
         filteredInfo = filteredInfo || {};
         const self = this;
@@ -131,7 +155,17 @@ class Invitation extends Component {
             key: 'level',
             sorter: (a, b) => a.level - b.level,
             sortOrder: sortedInfo.columnKey === 'level' && sortedInfo.order
-        }, {
+        }, type === 'my'?{
+            title: '操作',
+            key: 'operation',
+            className: 'col-operation',
+            render: (text, record) => (
+                <span style={{justifyContent: 'center'}}>
+                    <a href="#" onClick={this.handleOperationFalse(text, record)}><Iconfont type="refuse"></Iconfont></a>
+                    <span className="ant-divider"></span>
+                </span>
+            ),            
+        }:{
             title: '操作',
             key: 'operation',
             className: 'col-operation',
@@ -167,11 +201,12 @@ class Invitation extends Component {
         const hasSelected = selectedRowKeys.length > 0;
 
 
-        const {trasactions, visible} = this.props;
-        const data = trasactions.map((trasaction, index) => {
+        const {trasactions, invitations, visible} = this.props;
+        const targetDatas = this.state.type !== 'my'? invitations : trasactions 
+        const data = targetDatas.map((data, index) => {
             return {
                 key: index,
-                ...trasaction.source
+                ...data.data.payload
             }
         })
         return (
@@ -183,7 +218,7 @@ class Invitation extends Component {
                 onDrag={()=>{}}
                 onStop={()=>{}}>
                 <div className="Invitation" style={{display: visible?'block':'none'}}>
-                    <Card title="邀请交易" extra={<a onClick={this.handleClose}><Iconfont type="close"></Iconfont></a>}>
+                    <Card title={<a id="invitation-type-changer"  onClick={this.handleTypeChange} >{titles[type]}</a>} extra={<a onClick={this.handleClose}><Iconfont type="close"></Iconfont></a>}>
                         <div className="row-operation">
                             <Button type="primary" disabled={!hasSelected} loading={loading}
                             >
@@ -211,24 +246,40 @@ Invitation.defaultProps = {
     visible: false,
     trasactions: [],
     onReceive: () => {},
+    onCancle: () => {},     // 自己取消邀请
     onRefuse: () => {},
     onRefuseAll: () => {},
-    onTradeOver: () => {}
+    onTradeOver: () => {},
+    invitations: [],
 };
 
 Invitation.propTypes = {
     visible: PropTypes.bool,
+    onCancle: PropTypes.func,
     onRefuse: PropTypes.func,
     onRefuseAll: PropTypes.func,
     onReceive: PropTypes.func,
     onTradeOver: PropTypes.func,
+    // 发起的交易请求
+    invitations: PropTypes.arrayOf(PropTypes.shape({
+        data: PropTypes.shape({
+            from: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+            payload: PropTypes.shape({
+                name: PropTypes.string,
+                level: PropTypes.number
+            })
+        })
+    })),
+    // 收到的交易请求
     trasactions: PropTypes.arrayOf(PropTypes.shape({
-        from: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        source: {
-            invitor: PropTypes.string,
-            level: PropTypes.number
-        }
-    }))
+        data: PropTypes.shape({
+            from: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+            payload: PropTypes.shape({
+                name: PropTypes.string,
+                level: PropTypes.number
+            })
+        })
+    })),
 };
 
 export default Invitation;

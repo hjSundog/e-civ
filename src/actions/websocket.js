@@ -1,9 +1,11 @@
 export const ADD_MESSAGE = 'ADD_MESSAGE'
 export const ADD_INVITATION = 'ADD_INVITATION'
-export const CANCLE_INVITATION = 'CANCLE_INVITATION'
 export const INIT_WEBSOCKET = 'INIT_WEBSOCKET'
+export const CANCLE_INVITATION = 'CANCLE_INVITATION'
 export const REFUSE_INVITATION = 'REFUSE_INVITATION'
 export const RECEIVE_INVITATION = 'RECEIVE_INVITATION'
+export const ADD_TRANSACTION = 'ADD_TRANSACTION'
+export const CANCLE_TRANSACTION = 'CANCLE_TRANSACTION'
 export function add_message(data) {
     return {
         type: ADD_MESSAGE,
@@ -17,6 +19,25 @@ export function add_message(data) {
 export function add_invitation(data) {
     return {
         type: ADD_INVITATION,
+        payload: {
+            data
+        }
+    }
+}
+
+export function add_transaction(data) {
+    return {
+        type: ADD_TRANSACTION,
+        payload: {
+            data
+        }
+    }
+}
+
+
+export function cancle_transaction(data) {
+    return {
+        type: CANCLE_TRANSACTION,
         payload: {
             data
         }

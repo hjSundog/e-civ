@@ -9,8 +9,12 @@ var mock = new MockAdapter(mockAxios);
 
 mock.onPost('/users/login').reply(config => {
     let postData = config.params;
-    if (postData.username === 'admin' && postData.password === 'admin') {
-        return [200, require('./mock/user') ];
+    if ((postData.username === 'admin' && postData.password === 'admin') || (postData.username === 'guest' && postData.password === 'guest')) {
+        if (postData.username === 'admin') {
+            return [200, require('./mock/user')[0]];
+        } else {
+            return [200, require('./mock/user')[1]]
+        }
     } else {
         return [422, {message: "Incorrect user or password"} ];
     }

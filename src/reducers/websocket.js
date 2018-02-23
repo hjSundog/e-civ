@@ -2,7 +2,9 @@ import {
     ADD_MESSAGE,
     ADD_INVITATION,
     CANCLE_INVITATION,
-    INIT_WEBSOCKET
+    INIT_WEBSOCKET,
+    ADD_TRANSACTION,
+    CANCLE_TRANSACTION
 } from '../actions/websocket';
 
 const initialState = {
@@ -10,7 +12,8 @@ const initialState = {
     chatChannels: {
 
     },
-    invitations: [],
+    trasactions: [], // 原谅我不知道怎么取名: 自己发起的交易请求
+    invitations: [], // 接受到的交易请求
     ws: {}
 };
 
@@ -23,6 +26,14 @@ export default function websocket(state = initialState, action = {}) {
         }
         return rt
     }
+    case ADD_TRANSACTION:
+        return {
+            ...state,
+            trasactions: [
+                ...state.trasactions,
+                action.payload.data
+            ]
+        }
     case ADD_INVITATION: 
         return {
             ...state, 
@@ -41,6 +52,17 @@ export default function websocket(state = initialState, action = {}) {
             ...state,
             invitations: invitations
         }
+    }
+    case CANCLE_TRANSACTION: {
+        const trasactions = [...state.trasactions]
+        const index = trasactions.findIndex((trasaction) => {
+            return trasaction.from === action.payload.data.from
+        })
+        trasactions.splice(index, 1)
+        return {
+            ...state,
+            trasactions: trasactions
+        }  
     }
     case ADD_MESSAGE:
         switch(action.payload.data.type) {
