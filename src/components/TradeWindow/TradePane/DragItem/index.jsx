@@ -5,9 +5,7 @@ const boxSource = {
     beginDrag(props) {
         //console.log('drag box!');
         return {
-            id: props.data.id,
-            value: props.data.value,
-            url: props.data.imgUrl
+            ...props.data
         }
     },
 
@@ -16,7 +14,7 @@ const boxSource = {
         const dropResult = monitor.getDropResult()
         // 可以在readux中处理 先不这样
         if (dropResult) {
-            console.log(`You dropped ${item.id} into ${dropResult.name}!`) // eslint-disable-line no-alert
+            console.log(`You dropped ${item.name} into ${dropResult.name}!`)
         }
     },
 }

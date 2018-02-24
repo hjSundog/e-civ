@@ -1,9 +1,11 @@
 import React from 'react'
-import { Row, Col, Card, message, Tabs, Spin } from 'antd';
+import PropTypes from 'prop-types'
+import { message, Tabs, Spin } from 'antd';
 import PackagePane from './PackagePane'
 import api from '../../api'
 import './index.less'
-import * as PersonActionCreators from '../../actions/person'
+// import * as PersonActionCreators from '../../actions/person'
+import {init_package}  from '@/actions//items'
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 const TabPane = Tabs.TabPane
@@ -12,32 +14,43 @@ class Package extends React.Component {
         super(props)
         this.state = {
             loading: false,
-            items: props.items
         }
     }
     componentWillMount () {
+        if (hasInitialed) {
+            console.log('已经初始化背包了！！');
+            return
+        }
         this.setState({
             loading: true,
         })
         //获取物品
+        const {user, hasInitialed} = this.props;
+        const url = `/persons/${user.name}/items`
         api({
             method: 'get',
-            url: '/persons/1/items',
+            url: url,
         }).then(res => {
             this.setState({
                 loading: false
             })
             if (res.status === 200){
-                const items = res.data.map(item=> {
+                this.props.actions.init_package(res.data.map(item=> {
                     return {
                         item: item,
                         count: 1
                     }
-                })
-                //console.log(items)
-                this.setState({
-                    items: items
-                })
+                }));
+                // const items = res.data.map(item=> {
+                //     return {
+                //         item: item,
+                //         count: 1
+                //     }
+                // })
+                // //console.log(items)
+                // this.setState({
+                //     items: items
+                // })
             } else {
                 console.log(res.message)
             }
@@ -49,7 +62,7 @@ class Package extends React.Component {
         })
     }
     render () {
-        const {items} = this.state
+        const {items} = this.props
         return (
             <div className="package">
                 <Spin spinning={this.state.loading}>
@@ -71,16 +84,27 @@ class Package extends React.Component {
     }
 }
 
+Package.defaultProps = {
+    items: [],
+    hasInitialed: false,
+}
+
+Package.propTypes = {
+    items: PropTypes.array,
+    hasInitialed: PropTypes.bool
+}
+
 function mapStateToProps(state) {
-    const {items = []} = state
     return {
-        items: items
+        items: state.items.package,
+        user: state.auth.user,
+        hasInitialed: state.items.hasInitialed
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators(PersonActionCreators,dispatch)
+        actions: bindActionCreators({init_package},dispatch)
     }
 }
 

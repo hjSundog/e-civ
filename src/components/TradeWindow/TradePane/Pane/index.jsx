@@ -8,6 +8,7 @@ import RResizable from 'react-resizable'
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd'
 import '@/../node_modules/react-resizable/css/styles.css'
 import './index.less'
+import * as ItemsActionCreators from '@/actions/items'
 const Resizable = RResizable.Resizable
 // 拖拽功能考虑使用react-dnd来实现
 import DragItem from '../DragItem'
@@ -29,7 +30,7 @@ const boxTarget = {
         const targetItem = monitor.getItem();
         //console.log('item ' + targetItem.id + ' result ' + monitor.getDropResult());
         if(props.data.findIndex((item) => {
-            return item.id === targetItem.id
+            return item.name === targetItem.name
         }) !== -1) {
             //console.log('switch '+targetItem.id);
             // props.switchItem()
@@ -110,15 +111,16 @@ class Pane extends Component {
         this.props.changeState(items)
     }
 
-    // 本组件内部元素移动
+    // TODO: 最后根据数据结构来决定使用的属性判断
+    // 本组件内部元素移动 这里使用
     moveItem = (src, dist) => {
         const { items } = this.state;
         const srcIndex = items.findIndex((target) => {
-            return target.id === src.id;
+            return target._id === src._id;
         })
 
         const distIndex = items.findIndex((target) => {
-            return target.id === dist.id
+            return target._id === dist._id
         })
 
         if (srcIndex === -1) {
@@ -156,7 +158,7 @@ class Pane extends Component {
                         <DragItemWithTarget target={ItemType} moveItem={this.moveItem} data={data[i * colCount+j]}>
                             <div className="paneItem">
                                 <img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3880507419,2968712832&fm=27&gp=0.jpg" />
-                                <span>{data[i * colCount + j]['id']}</span>
+                                <span>{data[i * colCount + j]['name']}</span>
                             </div>
                         </DragItemWithTarget>
                     </Col>
@@ -179,10 +181,10 @@ class Pane extends Component {
         }
         return isDropTarget ? (
             connectDropTarget(
-                <div style={{flexGrow: 1, justifyContent:'stretch', backgroundColor }} className=""><BaseVissel onColCountChange={this.onColCountChange} rows={rows} {...this.props} /></div>
+                <div style={{flexGrow: 1, justifyContent:'stretch', display: 'flex', flexDirection: 'column', backgroundColor }} className=""><BaseVissel onColCountChange={this.onColCountChange} rows={rows} {...this.props} /></div>
             )
         ) : (
-            <div style={{flexGrow: 1,justifyContent:'stretch'}}><BaseVissel onColCountChange={this.onColCountChange} rows={rows} {...this.props} /></div>
+            <div style={{flexGrow: 1,justifyContent:'stretch', display: 'flex', flexDirection: 'column'}}><BaseVissel onColCountChange={this.onColCountChange} rows={rows} {...this.props} /></div>
         );
     }
 }
@@ -197,13 +199,13 @@ function BaseVissel({ rows, onColCountChange, title}) {
             height = {350}
         >
             <div className="TradeOfPane">
-                <div style={{ padding: 10 }}>
+                <div style={{ padding: 10, background: '#02e4ef' }}>
                     <div className="header"><Iconfont type="clickable" onClick={onColCountChange}></Iconfont><span className="paneName">{title}</span></div>
                 </div>
                 <div className="trade-item-container">{rows}</div>
                 <div className="trade-item-extra">
-                    <div>额外加价：100 Gold</div>
-                    <div>价值估算：210 Gold</div>
+                    <div><span className="extra-des">额外加价:</span><span className="extra-value">100 Gold</span></div>
+                    <div><span className="extra-des">价值估算:</span><span className="total-value">210 Gold</span></div>
                 </div>
             </div>
         </Resizable>)
@@ -223,7 +225,7 @@ const defaultFunc = {
 
 
 function HOC(source) {
-
+    // 保证有source属性的都是可以放置拖动元素的组件，其来源决定于source属性
     if (source) {
         return DropTarget(source, boxTarget, (connect, monitor) => ({
             connectDropTarget: connect.dropTarget(),
@@ -231,15 +233,13 @@ function HOC(source) {
             canDrop: monitor.canDrop(),
             isDropTarget: true, 
         }))(Pane)
-        // return <Out {...rest} addItem={addItem} data={data}/>
     }
-    // return <Pane {...defaultFunc} {...rest} />
     return Pane
 }
 
 
 
-export default class DragPane extends Component{
+class DragPane extends Component{
 
     static propTypes = {
         source: PropTypes.string,
@@ -256,15 +256,30 @@ export default class DragPane extends Component{
         super(props);
         [1, 2, 3, 4].forEach((value, i) => { this.colCounts[i] = value; });
         this.state = {
-            data: [],
+            data: this.props.data.payload,
+            extra: this.props.data.extra,
             colCountKey: 0
         }
     }
 
+    componentWillReceiveProps (nextProps) {
+        // if(this.props.source === '')
+        console.log('change data');
+        if(this.props.data !== nextProps.data) {
+            this.setState({
+                data: nextProps.data.payload,
+                extra: nextProps.data.extra
+            })
+        }
+    }
+
     addItem = (item) => {
-        this.setState({
-            data: [...this.state.data, item]
-        })
+        // this.setState({
+        //     data: [...this.state.data, item]
+        // })
+        // 这里add_from_items action
+        const {actions} = this.props;
+        actions.add_from_item(item)
     }
 
     changeState = (newState)=> {
@@ -284,7 +299,10 @@ export default class DragPane extends Component{
         const self =  this;
         return (
             <div style={{display: 'flex', flexGrow: 1}}>
-                <Wrapper colCountKey={this.state.colCountKey} colCounts={this.colCounts} onColCountChange={self.onColCountChange} {...rest}
+                <Wrapper colCountKey={this.state.colCountKey}
+                    colCounts={this.colCounts} 
+                    onColCountChange={self.onColCountChange} 
+                    {...rest}
                     addItem={this.addItem}
                     data={self.state.data}
                     changeState={this.changeState}/>
@@ -293,4 +311,10 @@ export default class DragPane extends Component{
     }
 }
 
-// export default DragPane
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({...ItemsActionCreators}, dispatch)
+    }
+}
+
+export default connect(null, mapDispatchToProps)(DragPane)

@@ -22,8 +22,8 @@ class Pane extends Component {
         className: PropTypes.string,
         title: PropTypes.string,
         data: PropTypes.arrayOf(PropTypes.shape({
-            imgUrl: PropTypes.string,
-            value: PropTypes.number
+            name: PropTypes.string,
+            vendor_value: PropTypes.number
         })),
         select: PropTypes.func,
         delete: PropTypes.func,
@@ -72,6 +72,15 @@ class Pane extends Component {
         };
         console.log(this.state.layouts);
     }
+
+    componentWillReceiveProps(nextProps) {
+        if(this.props.data !== nextProps.data) {
+            this.setState({
+                layouts: this.generateLayouts(this.props.cols)
+            })
+        }
+    }
+
     onLayoutChange = (layout) => {
         console.log('layout change');
         // this.props.onLayoutChange(layout);

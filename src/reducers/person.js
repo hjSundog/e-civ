@@ -5,8 +5,6 @@ import {
     INIT_PERSON,
     RESET_PERSON
 } from '../actions/person';
-import Page2 from '@/views/Page2';
-
 
 const initialState = {
     name: 'init person',

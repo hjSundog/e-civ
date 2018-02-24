@@ -16,7 +16,7 @@ import ChatWindow from '@/components/ChatWindow';
 import TradeWindow from '@/components/TradeWindow'
 import Websocket from '@/components/Websocket'
 import {add_message, add_invitation, init_websocket, cancle_invitation} from '@/actions/websocket';
-
+import {init_package} from '@/actions/items'
 import {remove_user} from '@/actions/user';
 import { init_person } from '../../actions/person'
 import api from '../../api'
@@ -44,6 +44,7 @@ class App extends React.Component {
         // this.setState({
         //     loading: false
         // })
+        // 初始化用户
         api({
             url: `/persons/${user ? user.person_id : 1}`,
             method: 'get',
@@ -63,6 +64,33 @@ class App extends React.Component {
                 loading: false
             });
             message.error(err);
+        })
+
+        // 初始化背包
+        const url = `/persons/${user.name}/items`
+        api({
+            method: 'get',
+            url: url,
+        }).then(res => {
+            this.setState({
+                loading: false
+            })
+            if (res.status === 200){
+                this.props.actions.init_package(res.data.map(item=> {
+                    return {
+                        item: item,
+                        count: 1
+                    }
+                }));
+
+            } else {
+                console.log(res.message)
+            }
+        }).catch(error => {
+            message.error(error)
+            this.setState({
+                loading: false
+            })
         })
 
     }
@@ -197,7 +225,11 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-    auth: PropTypes.object,
+    auth: PropTypes.shape({
+        user: PropTypes.shape({
+            name: PropTypes.string
+        })
+    }),
 };
 
 const mapStateToProps = (state) => {
@@ -209,7 +241,7 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({remove_user, init_websocket, cancle_invitation, add_invitation, add_message, init_person}, dispatch)};
+    return {actions: bindActionCreators({init_package, remove_user, init_websocket, cancle_invitation, add_invitation, add_message, init_person}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

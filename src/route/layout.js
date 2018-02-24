@@ -64,7 +64,7 @@ export const childRoutes = [
         'component': Skill
     },
     {
-        'path': '/package',
+        'path': '/items',
         'component': Package
     },
     {

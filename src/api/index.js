@@ -62,9 +62,11 @@ mock.onPost('/persons').reply(config => {
 
 //获取角色物品
 mock.onGet(/\/persons\/\w+\/items/).reply(config => {
-    //console.log(config)
+    const reg = /\/persons\/(\w+)\/items/;
+    const target = config.url.match(reg)[1];
+    console.log('config is: '+target)
     const items = require('./mock/item').filter(item => {
-        return item.owner_id === 1
+        return item.owner_id === target
     }).map(item => {
         return tpl2entity(item)
     })

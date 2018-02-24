@@ -161,7 +161,7 @@ class Invitation extends Component {
             className: 'col-operation',
             render: (text, record) => (
                 <span style={{justifyContent: 'center'}}>
-                    <a href="#" onClick={this.handleOperationFalse(text, record)}><Iconfont type="refuse"></Iconfont></a>
+                    <a href="javascript:void(0)" onClick={this.handleOperationFalse(text, record)}><Iconfont type="refuse"></Iconfont></a>
                     <span className="ant-divider"></span>
                 </span>
             ),            
@@ -171,9 +171,9 @@ class Invitation extends Component {
             className: 'col-operation',
             render: (text, record) => (
                 <span>
-                    <a href="#" onClick={this.handleOperationTrue(text, record)}><Iconfont type="recieve"></Iconfont></a>
+                    <a href="javascript:void(0)" onClick={this.handleOperationTrue(text, record)}><Iconfont type="recieve"></Iconfont></a>
                     <span className="ant-divider"></span>
-                    <a href="#" onClick={this.handleOperationFalse(text, record)}><Iconfont type="refuse"></Iconfont></a>
+                    <a href="javascript:void(0)" onClick={this.handleOperationFalse(text, record)}><Iconfont type="refuse"></Iconfont></a>
                     <span className="ant-divider"></span>
                 </span>
             ),

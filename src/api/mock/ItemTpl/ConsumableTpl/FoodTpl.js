@@ -44,4 +44,16 @@ module.exports = [{
     },
     description: '红彤彤的苹果，可以回复少量生命值',
     ingredient: ['sliver apple', 'gold apple']
+},{
+    _id: 3,
+    name: 'bad apple',
+    icon: '',
+    rarity: 'Basic',
+    level: 5,
+    vendor_value: 1,
+    effect: {
+        health: 2
+    },
+    description: '已经搁坏的苹果，回复极少的生命值',
+    ingredient: []
 }]
