@@ -16,18 +16,19 @@ class TradeWindow extends Component {
         this.state = {
             paneVisible: false,
             invitationVisible: true,
+            tradingWith: {},
         }
     }
 
     componentWillReceiveProps(nextProps) {
         if(this.props.isOpen !== nextProps.isOpen && nextProps.isOpen === true && !this.state.invitationVisible) {
             this.setState({
-                invitationVisible: true
+                invitationVisible: true,
             })
         }
     }
     
-    // 取消邀请
+    // 取消邀请,在我的邀请列表中如果对方没回应，一段时间可以取消该邀请
     handleCancle = (target) => {
         const {websocket, trasactions} = this.props;
         console.log('现在要取消id为' + trasactions[target].data.from + '的邀请')
@@ -45,14 +46,15 @@ class TradeWindow extends Component {
     }
 
 
-    // 接受邀请
+    // 接受邀请,在别人邀请列表中接受某个对象的邀请
     handleInvitationReceive = (target) => {
         const {websocket, invitations} = this.props;
         const to = invitations[target].data.from;
         const from = invitations[target].data.to;
         console.log(target)
         this.setState({
-            paneVisible: true
+            paneVisible: true,
+            tradingWith: invitations[target]
         })
         // ws 通知另外一边
         websocket.send(JSON.stringify({
@@ -69,9 +71,12 @@ class TradeWindow extends Component {
             }
         }))
     }
-    // 拒绝邀请
+    // 拒绝邀请，在别人邀请列表中拒绝某个对象的邀请
     handleRefuse = (target) => {
         console.log(target)
+        this.setState({
+            tradingWith: target
+        })
         // ws通知另外一边
         const {websocket, invitations} = this.props
         const to = invitations[target].data.from
@@ -110,12 +115,26 @@ class TradeWindow extends Component {
 
 
     render() {
-        const {trasactions, invitations, isOpen, websocket, responseTradePane} = this.props;
-        const {paneVisible, invitationVisible} = this.state;
+        const {trasactions, invitations, isOpen, websocket, responseTradePane, items} = this.props;
+        const {paneVisible, invitationVisible, tradingWith} = this.state;
         return (
             <div className="TradeWindow" style={{display: isOpen?'block':'none'}}>
-                <TradePane websocket={websocket} visible={responseTradePane || paneVisible} onClose={this.handlePaneClose} />
-                <Invitation websocket={websocket} visible={invitationVisible} onClose={this.handleInvitationClose} onTradeOver={this.handleTradeOver} onReceive={this.handleInvitationReceive} onRefuse={this.handleRefuse} onCancle={this.handleCancle} invitations={invitations} trasactions={trasactions}/>
+                <TradePane websocket={websocket} 
+                    visible={responseTradePane || paneVisible} 
+                    onClose={this.handlePaneClose} 
+                    items={items}
+                    target={tradingWith}
+                />
+                <Invitation websocket={websocket} 
+                    visible={invitationVisible} 
+                    onClose={this.handleInvitationClose} 
+                    onTradeOver={this.handleTradeOver} 
+                    onReceive={this.handleInvitationReceive} 
+                    onRefuse={this.handleRefuse} 
+                    onCancle={this.handleCancle} 
+                    invitations={invitations} 
+                    trasactions={trasactions}
+                />
             </div>
 
         );
@@ -156,6 +175,17 @@ TradeWindow.propTypes = {
             })
         })
     })),
+    items: PropTypes.shape({
+        fromItems: PropTypes.shape({
+            payload: PropTypes.array,
+            extra: PropTypes.array
+        }),
+        toItems: PropTypes.shape({
+            payload: PropTypes.array,
+            extra: PropTypes.array
+        }),
+        packageItems: PropTypes.array
+    }).isRequired,
     isOpen: PropTypes.bool
 };
 
@@ -163,6 +193,7 @@ function mapStateToProps(state) {
     return {
         trasactions: (state.websocket.trasactions),
         invitations: (state.websocket.invitations),
+        items: state.items,
         websocket: (state.websocket.ws),
     }
 }

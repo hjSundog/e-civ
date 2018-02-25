@@ -42,6 +42,30 @@ const ResponsiveReactGridLayout = ReactGridLayout.Responsive;
 class TradePane extends Component {
     static propTypes = {
         className: PropTypes.string,
+        visible: PropTypes.bool,
+        onClose: PropTypes.func,
+        websocket: PropTypes.object.isRequired,
+        tradingWith:PropTypes.shape({
+            data: PropTypes.shape({
+                from: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+                to: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+                payload: PropTypes.shape({
+                    name: PropTypes.string,
+                    level: PropTypes.number
+                })
+            })
+        }),
+        items: PropTypes.shape({
+            fromItems: PropTypes.shape({
+                payload: PropTypes.array,
+                extra: PropTypes.array
+            }),
+            toItems: PropTypes.shape({
+                payload: PropTypes.array,
+                extra: PropTypes.array
+            }),
+            packageItems: PropTypes.array
+        }).isRequired,
     };
 
     constructor(props) {
@@ -53,6 +77,14 @@ class TradePane extends Component {
             y: 0
         };
 
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.tradingWith !== nextProps) {
+            this.setState({
+                tradingWith: nextProps.tradingWith
+            })
+        }
     }
 
     handleCloseClick = () => {
@@ -89,8 +121,35 @@ class TradePane extends Component {
 
     }
 
+    // 处理交易
+    handleTradeReceive = () => {
+        console.log('receive trade')
+        const {websocket, tradingWith,items} = this.props;
+        const from = tradingWith.data.from;
+        const to = tradingWith.data.to;
+        websocket.send(JSON.stringify({
+            source: 'person',
+            type: 'INVITATION',
+            data: {
+                from: from,
+                to: to,
+                message: '我们开始了一场交fa易',
+                operation: 'trade',
+                items: [...items.fromItems.payload],
+                extra: [...items.fromItems.extra]
+            }
+        }))
+    }
+
+    // 取消这次交易
+    handleTradeCancle = () => {
+        console.log('cancle the trade')
+        this.handleCloseClick();
+    }
+
     render() {
         const {visible, items} = this.props;
+        const self = this;
         const packageItems = items.packageItems.map((item) => {
             return {
                 ...item.item
@@ -121,15 +180,28 @@ class TradePane extends Component {
                         <div className="Panes">
                             <div className="paneContainer">
                                 <div className="paneWrapper">
-                                    <Pane title="自己的交易窗口" source={ItemTypes.DragItem} data={items.fromItems} key="my"/>
-                                    <Pane title="别人的交易窗口" source={ItemTypes.DragItemSelf} data={items.toItems} key="other" />
+                                    <Pane title="自己的交易窗口" 
+                                        source={ItemTypes.DragItem} 
+                                        data={items.fromItems} key="my"
+                                    />
+                                    <Pane title="别人的交易窗口" 
+                                        source={ItemTypes.SideItem} 
+                                        data={items.toItems} key="other" 
+                                    />
                                 </div>
                                 <div className="PaneOp">
-                                    <Button type="primary">确认交易</Button>
-                                    <Button type="primary">取消交易</Button>
+                                    <Button type="primary" onClick={self.handleTradeReceive}>确认交易</Button>
+                                    <Button type="primary" onClick={self.handleTradeCancle}>取消交易</Button>
                                 </div>
                             </div>
-                            <PanePackage width={this.state.width*1/3} className="PanePackage" title="背包" data={packageItems} delete={this.handlePackageDelete} select={this.handlePackageSelect}/>
+                            <PanePackage 
+                                width={this.state.width*1/3} 
+                                className="PanePackage" 
+                                title="背包" 
+                                data={packageItems} 
+                                delete={this.handlePackageDelete} 
+                                select={this.handlePackageSelect}
+                            />
                         </div>
                     </div>
                 </Rnd>
@@ -142,6 +214,7 @@ class TradePane extends Component {
 TradePane.defaultProps = {
     visible: false,
     onClose: () => {},
+    websocket: {},
     items: {
         fromItems: {
             payload: [],
@@ -152,29 +225,18 @@ TradePane.defaultProps = {
             extra: []
         },
         packageItems: []
+    },
+    tradingWith: {
+        data: {
+            from: '',
+            to: '',
+            payload: {
+                name: '',
+                level: 0
+            }
+        }
     }
 };
 
-TradePane.propTypes = {
-    visible: PropTypes.bool,
-    onClose: PropTypes.func,
-    items: PropTypes.shape({
-        fromItems: PropTypes.shape({
-            payload: PropTypes.array,
-            extra: PropTypes.array
-        }),
-        toItems: PropTypes.shape({
-            payload: PropTypes.array,
-            extra: PropTypes.array
-        }),
-        packageItems: PropTypes.array
-    }).isRequired,
-};
 
-function mapStateToProps (state) {
-    return {
-        items: state.items
-    }
-}
-
-export default connect(mapStateToProps)(TradePane);
+export default (TradePane);

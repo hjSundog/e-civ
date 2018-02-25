@@ -2,10 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import noop from '@/utils/noop'
 import ReItem from '../ReItem'
-import {Pagination} from 'antd'
+import {Pagination, Input} from 'antd'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import {add_transaction, cancle_transaction} from '@/actions/websocket'
+import './index.less'
+const Search = Input.Search;
 const PAGESIZE = 8;
 
 class RelationPane extends React.Component {
@@ -87,7 +89,12 @@ class RelationPane extends React.Component {
         }, [])
         return (
             <div className='RelationPane'>
-                <div className="search">搜索框</div>
+                <Search
+                    placeholder="input search text"
+                    style={{ width: 300, maxHeight:40, minHeight: 25 }}
+                    onSearch={value => console.log(value)}
+                    enterButton
+                />
                 <div>{html}</div>
                 <Pagination pageSize={PAGESIZE} current={currentPage} total={datas.length} onChange={this.handlePageChange} hideOnSinglePage/>
             </div>

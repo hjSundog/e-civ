@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Layout, Badge, Spin, message, Row, Col, Slider } from 'antd';
+import { Layout, Badge, Spin, message, Row, Col, Slider, Input } from 'antd';
 import Iconfont from '@/components/Iconfont'
 import RResizable from 'react-resizable'
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd'
@@ -181,16 +181,20 @@ class Pane extends Component {
         }
         return isDropTarget ? (
             connectDropTarget(
-                <div style={{flexGrow: 1, justifyContent:'stretch', display: 'flex', flexDirection: 'column', backgroundColor }} className=""><BaseVissel onColCountChange={this.onColCountChange} rows={rows} {...this.props} /></div>
+                <div style={{flexGrow: 1, justifyContent:'stretch', display: 'flex', flexDirection: 'column', backgroundColor }} className="">
+                    <BaseVissel onColCountChange={this.onColCountChange} rows={rows} {...this.props} />
+                </div>
             )
         ) : (
-            <div style={{flexGrow: 1,justifyContent:'stretch', display: 'flex', flexDirection: 'column'}}><BaseVissel onColCountChange={this.onColCountChange} rows={rows} {...this.props} /></div>
+            <div style={{flexGrow: 1,justifyContent:'stretch', display: 'flex', flexDirection: 'column'}}>
+                <BaseVissel onColCountChange={this.onColCountChange} rows={rows} {...this.props} />
+            </div>
         );
     }
 }
 
 // 基本结构
-function BaseVissel({ rows, onColCountChange, title}) {
+function BaseVissel({ rows, onColCountChange, title, canEditable}) {
     return (
         <Resizable
             axis = 'x'
@@ -204,8 +208,17 @@ function BaseVissel({ rows, onColCountChange, title}) {
                 </div>
                 <div className="trade-item-container">{rows}</div>
                 <div className="trade-item-extra">
-                    <div><span className="extra-des">额外加价:</span><span className="extra-value">100 Gold</span></div>
-                    <div><span className="extra-des">价值估算:</span><span className="total-value">210 Gold</span></div>
+                    <div style={{display: 'flex'}}>
+                        <span className="extra-des">额外加价:</span>
+                        {canEditable?
+                            (<span className="extra-value"><Input placeholder="0 gold" /></span>)
+                            :(<span className="total-value">210 Gold</span>)
+                        }
+                    </div>
+                    <div>
+                        <span className="extra-des">价值估算:</span>
+                        <span className="total-value">210 Gold</span>
+                    </div>
                 </div>
             </div>
         </Resizable>)
@@ -231,7 +244,9 @@ function HOC(source) {
             connectDropTarget: connect.dropTarget(),
             isOver: monitor.isOver(),
             canDrop: monitor.canDrop(),
+            // 这里自定义属性
             isDropTarget: true, 
+            canEditable: source === ItemTypes.DragItem? true: false
         }))(Pane)
     }
     return Pane
