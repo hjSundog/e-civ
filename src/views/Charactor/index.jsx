@@ -60,7 +60,7 @@ class Charactor extends React.Component {
             this.setState({
                 loading: false
             });
-            message.error(err);            
+            message.error(err);
         })
 
     }
