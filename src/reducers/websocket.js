@@ -4,7 +4,8 @@ import {
     CANCLE_INVITATION,
     INIT_WEBSOCKET,
     ADD_TRANSACTION,
-    CANCLE_TRANSACTION
+    CANCLE_TRANSACTION,
+    CHANGE_TRADINGWITH
 } from '../actions/websocket';
 
 const initialState = {
@@ -14,7 +15,11 @@ const initialState = {
     },
     trasactions: [], // 原谅我不知道怎么取名: 自己发起的交易请求
     invitations: [], // 接受到的交易请求
-    ws: {}
+    ws: {},
+    tradingWith: {
+        from: '',
+        to: ''
+    }
 };
 
 export default function websocket(state = initialState, action = {}) {
@@ -25,6 +30,12 @@ export default function websocket(state = initialState, action = {}) {
             ws: action.payload.data
         }
         return rt
+    }
+    case CHANGE_TRADINGWITH: {
+        return {
+            ...state,
+            tradingWith: action.payload.data
+        }
     }
     case ADD_TRANSACTION:
         return {

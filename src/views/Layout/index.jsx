@@ -15,8 +15,8 @@ import FeedbackModal from './FeedbackModal'
 import ChatWindow from '@/components/ChatWindow';
 import TradeWindow from '@/components/TradeWindow'
 import Websocket from '@/components/Websocket'
-import {add_message, add_invitation, init_websocket, cancle_invitation} from '@/actions/websocket';
-import {init_package} from '@/actions/items'
+import {add_message, add_invitation, init_websocket, cancle_invitation, change_trade_target} from '@/actions/websocket';
+import {init_package, add_to_item, change_to_extra, add_package_items} from '@/actions/items'
 import {remove_user} from '@/actions/user';
 import { init_person } from '../../actions/person'
 import api from '../../api'
@@ -139,7 +139,24 @@ class App extends React.Component {
                 this.setState({
                     responseTradePane: true
                 })
+                // 设置交易对象
+                this.props.actions.change_trade_target({
+                    from: tMessage.data.to,
+                    to: tMessage.data.from
+                })
                 break;
+            case 'trading': {
+                if(tMessage.data.extra.length) {
+                    this.props.actions.change_to_extra(tMessage.data.extra)
+                }
+                this.props.actions.add_to_item(tMessage.data.items)
+                break;
+            }
+            case 'trade': {
+                this.props.actions.add_package_items(tMessage.data.items);
+                // 这里可以增加extra 现在不搞
+                break
+            }
             default:
                 return 
             }
@@ -241,7 +258,7 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({init_package, remove_user, init_websocket, cancle_invitation, add_invitation, add_message, init_person}, dispatch)};
+    return {actions: bindActionCreators({add_package_items, add_to_item, change_to_extra, change_trade_target, init_package, remove_user, init_websocket, cancle_invitation, add_invitation, add_message, init_person}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

@@ -68,15 +68,15 @@ class Pane extends Component {
         this.state = {
             currentBreakpoint: "xxs",
             mounted: false,
-            layouts: this.generateLayouts(this.props.cols)
+            layouts: this.generateLayouts(this.props.cols, this.props.data)
         };
-        console.log(this.state.layouts);
+        // console.log(this.state.layouts);
     }
 
     componentWillReceiveProps(nextProps) {
         if(this.props.data !== nextProps.data) {
             this.setState({
-                layouts: this.generateLayouts(this.props.cols)
+                layouts: this.generateLayouts(this.props.cols, nextProps.data)
             })
         }
     }
@@ -90,15 +90,15 @@ class Pane extends Component {
         //console.log('move item');
     }
 
-    generateLayouts = (cols) => {
+    generateLayouts = (cols, data) => {
+        const self = this;
         return Object.entries(cols).reduce((cols, newCol) => {
-            cols[newCol[0]] = this.generateLayout(newCol[1]);
+            cols[newCol[0]] = self.generateLayout(newCol[1], data);
             return cols;
         }, {})
     }
 
-    generateLayout = (col) => {
-        const { data } = this.props;
+    generateLayout = (col, data) => {
         return data.map((item, i) => {
             return {
                 i: i.toString(),

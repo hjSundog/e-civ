@@ -79,12 +79,22 @@ class TradePane extends Component {
 
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.props.tradingWith !== nextProps) {
-            this.setState({
-                tradingWith: nextProps.tradingWith
-            })
+    // componentWillReceiveProps(nextProps) {
+    //     if (this.props.tradingWith.from !== nextProps.tradingWith.from) {
+    //         this.setState({
+    //             tradingWith: nextProps.tradingWith
+    //         })
+    //     }
+    // }
+
+    shouldComponentUpdate(nextProps) {
+        if (this.props.tradingWith.from !== nextProps.tradingWith.from || this.props.visible !== nextProps.visible || this.props.items !== nextProps.items) {
+            //console.log('origin: '+this.props.visible+':next: '+nextProps.visible)
+            return true
         }
+
+
+        return false
     }
 
     handleCloseClick = () => {
@@ -121,12 +131,13 @@ class TradePane extends Component {
 
     }
 
-    // 处理交易
+    // 处理交易,敲板决定交易数据了，tradeWindow 的确认交易按钮
     handleTradeReceive = () => {
         console.log('receive trade')
         const {websocket, tradingWith,items} = this.props;
-        const from = tradingWith.data.from;
-        const to = tradingWith.data.to;
+        const from = tradingWith.from;
+        const to = tradingWith.to;
+        // 有回调就好了。。这里理想的认为都可达
         websocket.send(JSON.stringify({
             source: 'person',
             type: 'INVITATION',
@@ -139,6 +150,8 @@ class TradePane extends Component {
                 extra: [...items.fromItems.extra]
             }
         }))
+        // 删除本地背包的物品
+        // code here
     }
 
     // 取消这次交易
@@ -148,6 +161,7 @@ class TradePane extends Component {
     }
 
     render() {
+        //console.log('tradingWith: '+this.props.tradingWith)
         const {visible, items} = this.props;
         const self = this;
         const packageItems = items.packageItems.map((item) => {
@@ -227,14 +241,8 @@ TradePane.defaultProps = {
         packageItems: []
     },
     tradingWith: {
-        data: {
-            from: '',
-            to: '',
-            payload: {
-                name: '',
-                level: 0
-            }
-        }
+        from: '',
+        to: ''
     }
 };
 

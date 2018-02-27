@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux'
 import Invitation from './Invitation'
 import TradePane from './TradePane'
+import {change_trade_target} from '@/actions/websocket'
+import {empty_from_item, empty_to_item} from '@/actions/items'
 import  './style'
 import './index.less'
 
@@ -16,7 +19,6 @@ class TradeWindow extends Component {
         this.state = {
             paneVisible: false,
             invitationVisible: true,
-            tradingWith: {},
         }
     }
 
@@ -26,7 +28,21 @@ class TradeWindow extends Component {
                 invitationVisible: true,
             })
         }
+
+        if(nextProps.responseTradePane) {
+            this.setState({
+                paneVisible: true
+            })
+        }
     }
+
+    // shouldComponentUpdate(nextProps) {
+    //     // if(this.props.tradingWith.from !== nextProps.tradingWith.from) {
+    //     //     return true
+    //     // }
+
+    //     // return false
+    // }
     
     // 取消邀请,在我的邀请列表中如果对方没回应，一段时间可以取消该邀请
     handleCancle = (target) => {
@@ -46,15 +62,23 @@ class TradeWindow extends Component {
     }
 
 
-    // 接受邀请,在别人邀请列表中接受某个对象的邀请
+    // 接受邀请,在别人邀请列表中接受某个对象的邀请, 现在没做支持多开交易窗口
     handleInvitationReceive = (target) => {
-        const {websocket, invitations} = this.props;
+        const {websocket, invitations, actions} = this.props;
         const to = invitations[target].data.from;
         const from = invitations[target].data.to;
         console.log(target)
+        // action 改变交易对象
+        actions.change_trade_target({
+            from: from,
+            to: to
+        })
+        // 清空上次交易数据
+        actions.empty_from_item();
+        actions.empty_to_item()
+        // 状态设置
         this.setState({
             paneVisible: true,
-            tradingWith: invitations[target]
         })
         // ws 通知另外一边
         websocket.send(JSON.stringify({
@@ -74,9 +98,6 @@ class TradeWindow extends Component {
     // 拒绝邀请，在别人邀请列表中拒绝某个对象的邀请
     handleRefuse = (target) => {
         console.log(target)
-        this.setState({
-            tradingWith: target
-        })
         // ws通知另外一边
         const {websocket, invitations} = this.props
         const to = invitations[target].data.from
@@ -115,15 +136,15 @@ class TradeWindow extends Component {
 
 
     render() {
-        const {trasactions, invitations, isOpen, websocket, responseTradePane, items} = this.props;
-        const {paneVisible, invitationVisible, tradingWith} = this.state;
+        const {trasactions, invitations, isOpen, websocket, tradingWith, items} = this.props;
+        const {paneVisible, invitationVisible} = this.state;
         return (
             <div className="TradeWindow" style={{display: isOpen?'block':'none'}}>
                 <TradePane websocket={websocket} 
-                    visible={responseTradePane || paneVisible} 
+                    visible={paneVisible} 
                     onClose={this.handlePaneClose} 
                     items={items}
-                    target={tradingWith}
+                    tradingWith={tradingWith}
                 />
                 <Invitation websocket={websocket} 
                     visible={invitationVisible} 
@@ -186,7 +207,11 @@ TradeWindow.propTypes = {
         }),
         packageItems: PropTypes.array
     }).isRequired,
-    isOpen: PropTypes.bool
+    isOpen: PropTypes.bool,
+    tradingWith: PropTypes.shape({
+        from: PropTypes.string,
+        to: PropTypes.string
+    })
 };
 
 function mapStateToProps(state) {
@@ -195,7 +220,14 @@ function mapStateToProps(state) {
         invitations: (state.websocket.invitations),
         items: state.items,
         websocket: (state.websocket.ws),
+        tradingWith: state.websocket.tradingWith
     }
 }
 
-export default connect(mapStateToProps)(TradeWindow);
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({change_trade_target, empty_from_item, empty_to_item}, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TradeWindow);

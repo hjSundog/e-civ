@@ -35,6 +35,7 @@ const boxTarget = {
             //console.log('switch '+targetItem.id);
             // props.switchItem()
         } else {
+            
             props.addItem(monitor.getItem());
         }
         return { name: 'YourWindow' }
@@ -288,13 +289,31 @@ class DragPane extends Component{
         }
     }
 
+    // 改变额外加价
+    changeExtra = (newExtra) => {
+
+    }
+
     addItem = (item) => {
         // this.setState({
         //     data: [...this.state.data, item]
         // })
         // 这里add_from_items action
-        const {actions} = this.props;
+        const {actions, websocket, tradingWith} = this.props;
         actions.add_from_item(item)
+        console.log('will send %s to %s', tradingWith.from, tradingWith.to);
+        websocket.send(JSON.stringify({
+            type: 'INVITATION',
+            source: 'person',
+            data: {
+                ...tradingWith,
+                items: [...[item]],
+                extra: [],
+                operation: 'trading',
+                message: '收到新的变化了，哈哈哈'
+            },
+            created_at: new Date().toLocaleDateString()
+        }))
     }
 
     changeState = (newState)=> {
@@ -326,10 +345,17 @@ class DragPane extends Component{
     }
 }
 
+function mapStateToState(state){
+    return {
+        websocket: state.websocket.ws,
+        tradingWith: state.websocket.tradingWith
+    }
+}
+
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({...ItemsActionCreators}, dispatch)
     }
 }
 
-export default connect(null, mapDispatchToProps)(DragPane)
+export default connect(mapStateToState, mapDispatchToProps)(DragPane)
