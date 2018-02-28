@@ -1,7 +1,7 @@
 module.exports = {
     _id: 1,
     name: 'test',
-    person_id: null,
+    person_id: 'oier-133ao',
     attributes: {
         str: 1,
         dex: 1,

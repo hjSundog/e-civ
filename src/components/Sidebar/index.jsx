@@ -109,7 +109,7 @@ class Sidebar extends React.Component {
           })
           attributeItems = Object.entries(charactor.attributes).map(attribute => {
               return <div key={attribute[0]}><span>{attribute[0]}</span><span>{attribute[1]}</span></div>
-          }) 
+          })
       }
       return (
           <Sider
@@ -195,7 +195,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators(PersonActionCreators, dispatch) 
+        actions: bindActionCreators(PersonActionCreators, dispatch)
     }
 }
 

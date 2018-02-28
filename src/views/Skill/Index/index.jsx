@@ -7,52 +7,26 @@ import './index.less'
 
 const TabPane = Tabs.TabPane;
 
-export default class MailboxPage extends React.Component {
+class SkillPage extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             // 全部技能信息
             skills: [{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },{
-                name: 'walk'
-            },]
+                name: 'cultivate',
+                desc: '春种一粒粟，秋收万颗子。',
+                icon: 'skill-cultivate',
+                display: '种植',
+
+                type: 'life',
+                isPassive: false,
+                facts: [{
+                    text: '体力下降',
+                    type: 'AttributeAdjust',
+                    value: 20,
+                    target: 'health'
+                }]
+            }]
         }
     }
 
@@ -85,3 +59,5 @@ export default class MailboxPage extends React.Component {
         );
     }
 }
+
+export default SkillPage
