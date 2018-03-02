@@ -99,7 +99,7 @@ export function add_package_items(items) {
 export function sell_to_auction(items) {
      return {
          type: SELL_TO_AUCTION,
-         payload: items
+         payload: [items]
      }
  }
 

@@ -4,7 +4,9 @@ import PropTypes from 'prop-types'
 import Animate from 'rc-animate';
 import ItemDetailModal from '@/components/ItemDetailModal'
 import ItemContextMenu from '@/components/ItemContextMenu'
+import ItemChooser from '../ItemChooser'
 import {Card} from 'antd'
+
 // import api from '../../api';
 
 import './index.less'
@@ -34,6 +36,16 @@ const extraOp = [{
     cb: function(item) {
         console.log('这是测试菜单: ' + item.description);
     }
+}, {
+    action: 'AUCTION',
+    action_name: '拍卖',
+    cb: function(item) {
+        // actions here
+        const {actions, onAuctionChooser} = this.props;
+        onAuctionChooser(item);
+        // actions.sell_to_auction(item);
+        // console.log('拍卖啦'+item)
+    }
 }]
 
 export default class PackagePane extends React.Component {
@@ -46,6 +58,10 @@ export default class PackagePane extends React.Component {
                 detailVisible: false,
                 item: null,
             },
+            chooser: {
+                chooserVisible: false,
+                item: null
+            },
             items: props.items.slice(0,10)
         }
     }
@@ -55,7 +71,7 @@ export default class PackagePane extends React.Component {
             items: this.props.items.slice((page-1)*10, page*10)
         })
     }
-
+    // 显示详情窗口
     handleShowDetail = (item) => {
         this.setState({
             detail: {
@@ -64,6 +80,8 @@ export default class PackagePane extends React.Component {
             }
         })
     }
+
+    // 关闭详情窗口
     handleHideDetail = () => {
         this.setState({
             detail: {
@@ -72,22 +90,41 @@ export default class PackagePane extends React.Component {
             }
         })
     }
+    // 显示拍卖设置窗口
+    handleShowChooser = (item) => {
+        this.setState({
+            chooser: {
+                chooserVisible: true,
+                item: item
+            }
+        })
+    }
+
+    // 关闭拍卖设置窗口
+    handleHideChooser = () => {
+        this.setState({
+            chooser: {
+                chooserVisible: false,
+                item: null
+            }
+        })
+    }
 
     render() {
         const { items } = this.props;
-        const {detail } = this.state;
+        const {detail, chooser } = this.state;
         return (
             <div className="item-tab-pane">
                 <div className="item-cards">
                     <Card>{
                         items.map((item, index) => {
                             return (<Card.Grid key={index} style={gridStyle} >
-                                <ItemContextMenu id={item.item.name} cb={this.handleShowDetail.bind(this, item.item)} item={item.item} count={item.count}/>
+                                <ItemContextMenu id={item.item.name} onAuctionChooser={this.handleShowChooser} cb={this.handleShowDetail.bind(this, item.item)} item={item.item} count={item.count}/>
                             </Card.Grid>)
                         })   
                     }
                     <Card.Grid style={gridStyle} >
-                        <ItemContextMenu extraOp={extraOp} id='test' cb={this.handleShowDetail.bind(this, testItem)} item={testItem} count={3}/>
+                        <ItemContextMenu extraOp={extraOp} id='test' onAuctionChooser={this.handleShowChooser} cb={this.handleShowDetail.bind(this, testItem)} item={testItem} count={3}/>
                     </Card.Grid>
                     </Card>
                 </div>
@@ -97,7 +134,15 @@ export default class PackagePane extends React.Component {
                     transitionAppear
                     transitionName="fade"
                 >
-                    <ItemDetailModal visible={detail.detailVisible} item={detail.item} onClose={this.handleHideDetail}></ItemDetailModal>
+                    <ItemDetailModal key="detailModal" visible={detail.detailVisible} item={detail.item} onClose={this.handleHideDetail}></ItemDetailModal>
+                </Animate>
+                <Animate
+                    component=""
+                    showProp="visible"
+                    transitionAppear
+                    transitionName="fade"
+                >
+                    <ItemChooser key="chooserModal" visible={chooser.chooserVisible} item={chooser.item} onClose={this.handleHideChooser}/>
                 </Animate>
                 <Pagination defaultCurrent={1} total={this.props.items.length} onChange={this.handlePageChange} />
             </div>
