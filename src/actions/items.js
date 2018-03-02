@@ -18,6 +18,11 @@ export const REMOVE_PACKAGE_ITEM = 'REMOVE_PACAKGE_ITEM'
 export const REMOVE_PACKAGE_ITMES = 'REMOVE_PACAKGE_ITEMS'
 export const USE_ITEM = 'USE_ITEM'
 
+// 拍卖数据
+export const SELL_TO_AUCTION = 'SELL_TO_AUCTION'
+export const BUY_FROM_AUCTION = 'BUY_FROM_AUCTION'
+export const MAKING_BID = 'MAKING_BID'
+
 // from
 export function add_from_item(item) {
     return {
@@ -87,5 +92,27 @@ export function add_package_items(items) {
     return {
         type: ADD_PACKAGE_ITEMS,
         payload: items
+    }
+}
+
+// auction
+export function sell_to_auction(items) {
+     return {
+         type: SELL_TO_AUCTION,
+         payload: items
+     }
+ }
+
+ export function buy_from_auction(item) {
+    return {
+        type: BUY_FROM_AUCTION,
+        payload: item
+    }
+}
+
+export function making_bid (price) {
+    return {
+        type: MAKING_BID,
+        payload: price
     }
 }

@@ -2,8 +2,8 @@ import React from 'react'
 import { Pagination } from 'antd'
 import PropTypes from 'prop-types'
 import Animate from 'rc-animate';
-import ItemDetailModal from './ItemDetailModal'
-import ItemContextMenu from './ItemContextMenu'
+import ItemDetailModal from '@/components/ItemDetailModal'
+import ItemContextMenu from '@/components/ItemContextMenu'
 import {Card} from 'antd'
 // import api from '../../api';
 

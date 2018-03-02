@@ -18,10 +18,10 @@ const itemStyle = {
         position: 'relative'
     },
     abstractStyle: {
-        opacity: 0,
+        //opacity: 0,
+        display: 'none',
         position: 'fixed',
         background: '#f3f3f3',
-        display: 'flex',
         flexDirection: 'column',
         padding: '10px',
         fontSize: '16px',
@@ -116,22 +116,38 @@ class ItemContextMenu extends React.Component {
         return menuStyles;
     }
 
-    // 这个函数需要改进一下
-    handleItemDetail(e) {
-        //console.log('enter');
+    // 使用事件防抖来实现该功能
+    handleItemDetail = (e) => {
         const self = this;
         //可以调整位置
-        self.abs.style.opacity = 1;
-        self.abs.style.left = e.nativeEvent.clientX+'px';
-        self.abs.style.top = e.nativeEvent.clientY+'px';
-        //console.log(e.nativeEvent.clientX+'px' + ':' + e.nativeEvent.clientY+'px');
-    
+        self.abs.style.display = 'flex';
+        self.abs.style.left = e.clientX+'px';
+        self.abs.style.top = e.clientY+'px';
+        //console.log(e.clientX+'px' + ':' + e.clientY+'px');
     }
 
+    // 事件防抖
+    debounce = (fn, delay) => {
+        var delay = delay || 1000;
+        var that = this;
+        return function(){
+             var args = arguments;
+             if(that.timer){
+                 clearTimeout(that.timer); 
+             }
+             const pram = {
+                 clientX: args[0].nativeEvent.clientX,
+                 clientY: args[0].nativeEvent.clientY
+             }
+             that.timer = setTimeout(function(){
+                 that.timer = null;
+                  fn.call(that,pram); 
+             },delay)
+        } 
+    }
 
-
-    handleItemDetailFade() {
-        this.abs.style.opacity = 0;
+    handleItemDetailFade = () => {
+        this.abs.style.display = 'none';
         this.timer?clearTimeout(this.timer):null;
     }
 
@@ -141,6 +157,7 @@ class ItemContextMenu extends React.Component {
             'data-count': count,
             className: 'menu_action'
         };
+        const {isVisible} = this.state
         const self = this;
         // onMouseLeave={this.handleItemDetailFade.bind(this)} onMouseOver={this.handleItemDetail.bind(this)}
         return (
@@ -151,8 +168,8 @@ class ItemContextMenu extends React.Component {
                         holdToDisplay={1000}
                         collect={collect} attributes={attributes}>
                         <div style={itemStyle.outerStyle}>
-                            <img onClick={cb}  src={item.icon || 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1519471427785&di=e70781b51434dba6673f4191716104c3&imgtype=0&src=http%3A%2F%2Fpic35.photophoto.cn%2F20150601%2F0005018349076194_b.png'} alt="item pic"/>
-                            <div className="item-info" style={itemStyle.abstractStyle} ref={this.abstractRef.bind(this)}>
+                            <img onClick={cb} onMouseLeave={this.handleItemDetailFade} onMouseMove={this.debounce(this.handleItemDetail)}  src={item.icon || 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1519471427785&di=e70781b51434dba6673f4191716104c3&imgtype=0&src=http%3A%2F%2Fpic35.photophoto.cn%2F20150601%2F0005018349076194_b.png'} alt="item pic"/>
+                            <div className="item-info" style={isVisible? {...itemStyle.abstractStyle, display: 'flex'} :itemStyle.abstractStyle} ref={this.abstractRef.bind(this)}>
                                 <span>{item.name}</span>
                                 <span>{item.description}</span>
                             </div>
@@ -160,7 +177,7 @@ class ItemContextMenu extends React.Component {
                         </div>
                     </ContextMenuTrigger>
                 </div>
-
+ 
                 <ContextMenu id={id}>
                     <MenuItem onClick={this.handleClick.bind(this)} data={{ action: 'USE', item: item }}>使用</MenuItem>
                     {extraOp.length?extraOp.map((op, index) => {

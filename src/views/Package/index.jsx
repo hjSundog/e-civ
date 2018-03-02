@@ -17,6 +17,8 @@ class Package extends React.Component {
         }
     }
     componentWillMount () {
+        const {user, hasInitialed} = this.props;
+        const url = `/persons/${user.name}/items`
         if (hasInitialed) {
             console.log('已经初始化背包了！！');
             return
@@ -25,8 +27,7 @@ class Package extends React.Component {
             loading: true,
         })
         //获取物品
-        const {user, hasInitialed} = this.props;
-        const url = `/persons/${user.name}/items`
+
         api({
             method: 'get',
             url: url,
@@ -96,7 +97,7 @@ Package.propTypes = {
 
 function mapStateToProps(state) {
     return {
-        items: state.items.package,
+        items: state.items.packageItems,
         user: state.auth.user,
         hasInitialed: state.items.hasInitialed
     }

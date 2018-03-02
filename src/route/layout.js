@@ -20,6 +20,7 @@ import Package from '@/views/Package';
 import Page2 from '@/views/Page2';
 import Donation from '@/views/Donation';
 import Relationship from '@/views/Relationship';
+import Auction from '@/views/Auction';
 
 export const childRoutes = [
     {
@@ -82,6 +83,10 @@ export const childRoutes = [
     {
         'path': '/relationship',
         'component': Relationship
+    },
+    {
+        'path': '/auction',
+        'component': Auction
     }
 ];
 

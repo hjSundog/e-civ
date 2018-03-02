@@ -1,16 +1,23 @@
 import {
+    // from 
     ADD_FROM_ITEM,
     EMPTY_FROM_ITEM,
     DELETE_FROM_ITEM,
     DELETE_ALL_FROM_ITEMS,
     CHAGNE_FROM_EXTRA,
+    // to
     ADD_TO_ITEM,
     EMPTY_TO_ITEM,
     DELETE_TO_ITEM,
     DELETE_ALL_TO_ITEMS,
     CHAGNE_TO_EXTRA,
+    // package
     INIT_PACKAGE,
     ADD_PACKAGE_ITEMS,
+    // auction
+    SELL_TO_AUCTION,
+    BUY_FROM_AUCTION,
+    MAKING_BID,
 } from '../actions/items';
 
 
@@ -24,6 +31,10 @@ const initialState = {
         extra: []
     },
     packageItems: [],
+    auctionItems: {
+        sellItems: [],
+        makingBidItems: [],
+    },
     hasInitialed: false
 };
 
@@ -78,6 +89,24 @@ export default function auth(state = initialState, action = {}) {
             ...state,
             packageItems: [...state.packageItems, ...action.payload]
         }
+    case SELL_TO_AUCTION: {
+        return {
+            ...state,
+            auctionItems: {
+                ...state.auctionItems,
+                sellItems: [...state.auctionItems.sellItems, ...action.payload]
+            }
+        }
+    }
+    case MAKING_BID: {
+        return {
+            ...state,
+            auctionItems: {
+                ...state.auctionItems,
+                makingBidItems: [...state.auctionItems.makingBidItems, ...action.payload]
+            }
+        }
+    }
     default:
         return state;
     }
