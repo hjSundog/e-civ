@@ -51,6 +51,7 @@ function cloneObject(obj) {
     }
 }
 
+// 更改目标对象(pre)同提供对象(update)属性相同的值
 function personUpdateProxy(pre, update) {
     const rt = cloneObject(pre);
 

@@ -13,8 +13,12 @@ export default class ItemChooser extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            modal: 'relative',
-            itemDetail: {}
+            itemDetail: {},
+            startValue: null,
+            endOpen: false,
+            endValue: null,
+            price: 0,
+            count: 1,
         }
     }
 
@@ -24,14 +28,14 @@ export default class ItemChooser extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         // 第一次
-        if(!this.props.item) {
+        if (!this.props.item) {
             return;
         }
         // 关闭modal
-        if(!nextProps.item) {
+        if (!nextProps.item) {
             return;
         }
-        if(this.props.item.name !== nextProps.item.name) {
+        if (this.props.item.name !== nextProps.item.name) {
             // 更新itemDetail
             this.setState({
                 itemDetail: nextProps.item
@@ -45,11 +49,66 @@ export default class ItemChooser extends React.Component {
 
     // 发起拍卖请求
     handleSellAuction = () => {
-
+        // 拍卖设置属性获取
+        const {endValue, startValue, price, count} = this.state
+        const setting = {endValue, startValue, price, count}
+        typeof this.props.onSellToAuction === 'function' ? this.props.onSellToAuction(this.props.item, setting) : null;
     }
     // 取消拍卖请求
     handleCancleAuction = () => {
+        typeof this.props.onClose === 'function' ? this.props.onClose() : null;
+    }
 
+
+    disabledStartDate = (startValue) => {
+        const endValue = this.state.endValue;
+        if (!startValue || !endValue) {
+          return false;
+        }
+        return startValue.valueOf() > endValue.valueOf();
+      }
+    
+    disabledEndDate = (endValue) => {
+        const startValue = this.state.startValue;
+        if (!endValue || !startValue) {
+          return false;
+        }
+        return endValue.valueOf() <= startValue.valueOf();
+    }
+    
+    onChange = (field, value) => {
+        this.setState({
+          [field]: value,
+        });
+    }
+    
+    onStartChange = (value) => {
+        this.onChange('startValue', value);
+    }
+    
+    onEndChange = (value) => {
+        this.onChange('endValue', value);
+    }
+    
+    handleStartOpenChange = (open) => {
+        if (!open) {
+          this.setState({ endOpen: true });
+        }
+    }
+    
+    handleEndOpenChange = (open) => {
+        this.setState({ endOpen: open });
+    }
+    
+
+    // 价格改变
+    onPriceChange = (value) => {
+        this.setState({price: value})
+    }
+
+    // 数目改变
+    onCountChange = (value) => {
+        this.setState({count: value})
     }
 
     render() {
@@ -57,14 +116,15 @@ export default class ItemChooser extends React.Component {
         const style = {
             display: visible ? 'block' : 'none',
         };
+        const { startValue, endValue, endOpen } = this.state;
         return (
-            <Draggable        
-            axis="both"
-            defaultPosition={{x: -200, y: -0}}
-            grid={[5, 5]}
-            onStart={()=>{}}
-            onDrag={()=>{}}
-            onStop={()=>{}}>
+            <Draggable
+                axis="both"
+                defaultPosition={{ x: -200, y: -0 }}
+                grid={[5, 5]}
+                onStart={() => { }}
+                onDrag={() => { }}
+                onStop={() => { }}>
                 <div className="item-chooser-modal" style={style}>
                     <header>
                         <h1>拍卖设置</h1>
@@ -75,18 +135,29 @@ export default class ItemChooser extends React.Component {
                             <h2>拍卖物品: {item && item.name}</h2>
                         </div>
                         <div className="item-input">
-                            <div>数目:<InputNumber /></div>
-                            {this.state.modal === 'relative'?
-                                <div>拍卖时间:
-                                <InputGroup compact>
-                                    <Select defaultValue="am">
-                                        <Option value="am">上午</Option>
-                                         <Option value="fm">下午</Option>
-                                    </Select>
-                                    <InputNumber />
-                                </InputGroup></div> :
-                                <div>拍卖结束时间:<DatePicker />}</div>
-                            }
+                            <div>数目:<InputNumber onChange={this.onCountChange} min={1} defaultValue={1} /></div>
+                            <div className="item-time-picker">
+                                <DatePicker
+                                    disabledDate={this.disabledStartDate}
+                                    showTime
+                                    format="YYYY-MM-DD HH:mm:ss"
+                                    value={startValue}
+                                    placeholder="Start"
+                                    onChange={this.onStartChange}
+                                    onOpenChange={this.handleStartOpenChange}
+                                />
+                                <DatePicker
+                                    disabledDate={this.disabledEndDate}
+                                    showTime
+                                    format="YYYY-MM-DD HH:mm:ss"
+                                    value={endValue}
+                                    placeholder="End"
+                                    onChange={this.onEndChange}
+                                    open={endOpen}
+                                    onOpenChange={this.handleEndOpenChange}
+                                />
+                            </div>
+                            <div>起始价:<InputNumber min={0} defaultValue={0} onChange={this.onPriceChange} /></div>
                         </div>
                         <div className="item-op">
                             <Button onClick={this.handleSellAuction}>发布</Button>
@@ -100,12 +171,27 @@ export default class ItemChooser extends React.Component {
 }
 
 ItemChooser.defaultProps = {
-    onClose: () => {},
-};
+    onClose: () => { },
+    onSellToAuction: () => { },
+    visible: false,
+    item: {
+        description: "测试",
+        icon: "",
+        name: "默认数据",
+        rarity: "fine",
+        type: "consumable"
+    }
+}
 
 ItemChooser.propTypes = {
     item: PropTypes.shape({
-        id: PropTypes.string
+        description: PropTypes.string,
+        icon: PropTypes.string,
+        name: PropTypes.string,
+        rarity: PropTypes.string,
+        type: PropTypes.string
     }),
-    onClose: PropTypes.func
+    visible: PropTypes.bool,
+    onClose: PropTypes.func,
+    onSellToAuction: PropTypes.func,
 };

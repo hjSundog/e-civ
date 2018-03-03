@@ -13,29 +13,6 @@ import './index.less'
 import { DragDropContextProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import ItemTypes from './ItemTypes'
-// test data
-// const packageItems = [
-//     {
-//         id: 1,
-//         imgUrl: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
-//         value: 30
-//     },
-//     {
-//         id: 2,
-//         imgUrl: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
-//         value: 10
-//     },
-//     {
-//         id: 3,
-//         imgUrl: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
-//         value: 20
-//     },
-//     {
-//         id: 4,
-//         imgUrl: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
-//         value: 90
-//     }
-// ]
 
 const ResponsiveReactGridLayout = ReactGridLayout.Responsive;
 

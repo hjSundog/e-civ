@@ -7,6 +7,12 @@ import ItemContextMenu from '@/components/ItemContextMenu'
 import ItemChooser from '../ItemChooser'
 import {Card} from 'antd'
 
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import {update_person} from '@/actions/person'
+import {sell_to_auction} from '@/actions//items'
+
+
 // import api from '../../api';
 
 import './index.less'
@@ -31,24 +37,27 @@ const testItem = {
 }
 
 const extraOp = [{
+    action: 'USE',
+    action_name: '使用'
+},{
     action: 'TEST',
     action_name: '测试',
-    cb: function(item) {
-        console.log('这是测试菜单: ' + item.description);
-    }
 }, {
     action: 'AUCTION',
     action_name: '拍卖',
     cb: function(item) {
         // actions here
-        const {actions, onAuctionChooser} = this.props;
+        const {onAuctionChooser} = this.props;
         onAuctionChooser(item);
         // actions.sell_to_auction(item);
         // console.log('拍卖啦'+item)
     }
+},{
+    action: 'DROP',
+    action_name: '丢弃'
 }]
 
-export default class PackagePane extends React.Component {
+class PackagePane extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -60,7 +69,9 @@ export default class PackagePane extends React.Component {
             },
             chooser: {
                 chooserVisible: false,
-                item: null
+                item: null,
+                num: 1,
+                endTime: 0
             },
             items: props.items.slice(0,10)
         }
@@ -110,6 +121,85 @@ export default class PackagePane extends React.Component {
         })
     }
 
+    // 发起拍卖操作
+    handleSellToAuction = (item, setting) => {
+        const {actions, websocket, person} = this.props;
+        // 获取拍卖设置数据
+        const {endValue, startValue, price, count} = setting;
+        // 客户端拍卖操作
+        //actions.sell_to_auction(item);
+        console.log('哈哈拍卖：'+item.name+'啦')
+        // websocket 操作
+        // websocket.send(JSON.stringify({
+        //     source: 'person',
+        //     type: 'AUCTION',
+        //     data: {
+        //         from: person.name,
+        //         payload:{
+
+        //         },
+        //         startTime: startValue,
+        //         endTime: endValue,
+        //         item: item,
+        //         count: count,
+        //         price: price
+        //     },
+        //     created_at: new Date().toLocaleDateString()
+        // }))
+    }
+
+    // 右键菜单单击处理，USE和DROP是自带的，如果不使用自带的传递rebuild参数即可
+    handleContextMenuClick = (e, data, target) => {
+        const count = parseInt(target.getAttribute('data-count'), 10);
+        const {actions, person} = this.props
+        // 使用物品处理
+        if (data.action === 'USE') {
+            console.log('你使用这个物品了');
+            Object.entries(data.item.effect).forEach(function(ele) {
+                //递归寻找对象是否有这个属性
+                function recursion(target) {
+                    for(let key in target) {
+                        //建相等
+                        if(key === ele[0]) {
+                            //如果值为对象
+                            if(toString.call(target[key]).slice(8, -1) === 'Object') {
+                                //建相等,这里先简单的这样做，不考虑深度克隆的情况
+                                target[key] = {
+                                    ...target[key],
+                                    ...ele[1]
+                                }
+                            } else {          
+                                target[key] = target[key] + ele[1];
+                            }
+                        } else if(toString.call(target[key]).slice(8, -1) === 'Object') {             
+                            recursion(target[key])
+                        }
+
+                    }
+                }
+                recursion(person);
+            })
+
+            actions.update_person(person)
+        }
+
+        // 扔掉丢弃物品处理
+        if (data.action === 'DROP' && count > 0 ) {
+            console.log('你丢弃'+ data.item.name +'物品了')
+        }
+
+        // 测试
+        if (data.action === 'TEST') {
+            console.log('这是测试菜单: ' + data.item.description);
+        }
+
+        // 右键菜单拍卖
+        if (data.action === 'AUCTION') {
+            this.handleShowChooser(data.item);
+        }
+
+    }
+
     render() {
         const { items } = this.props;
         const {detail, chooser } = this.state;
@@ -119,12 +209,12 @@ export default class PackagePane extends React.Component {
                     <Card>{
                         items.map((item, index) => {
                             return (<Card.Grid key={index} style={gridStyle} >
-                                <ItemContextMenu id={item.item.name} onAuctionChooser={this.handleShowChooser} cb={this.handleShowDetail.bind(this, item.item)} item={item.item} count={item.count}/>
+                                <ItemContextMenu extraOp={extraOp}  onContextMenuClick={this.handleContextMenuClick} id={item.item.name} onClickMenu={this.handleShowDetail.bind(this, item.item)} item={item.item} count={item.count}/>
                             </Card.Grid>)
                         })   
                     }
                     <Card.Grid style={gridStyle} >
-                        <ItemContextMenu extraOp={extraOp} id='test' onAuctionChooser={this.handleShowChooser} cb={this.handleShowDetail.bind(this, testItem)} item={testItem} count={3}/>
+                        <ItemContextMenu extraOp={extraOp} id='test' onContextMenuClick={this.handleContextMenuClick} onClickMenu={this.handleShowDetail.bind(this, testItem)} item={testItem} count={3}/>
                     </Card.Grid>
                     </Card>
                 </div>
@@ -142,7 +232,7 @@ export default class PackagePane extends React.Component {
                     transitionAppear
                     transitionName="fade"
                 >
-                    <ItemChooser key="chooserModal" visible={chooser.chooserVisible} item={chooser.item} onClose={this.handleHideChooser}/>
+                    <ItemChooser key="chooserModal"  visible={chooser.chooserVisible} item={chooser.item} onSellToAuction={this.handleSellToAuction} onClose={this.handleHideChooser}/>
                 </Animate>
                 <Pagination defaultCurrent={1} total={this.props.items.length} onChange={this.handlePageChange} />
             </div>
@@ -160,3 +250,18 @@ PackagePane.propTypes = {
         count: PropTypes.number
     }))
 };
+
+function mapStateToProps(state) {
+    return {
+        person: state.person,
+        websocket: state.websocket
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({update_person, sell_to_auction}, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PackagePane)
