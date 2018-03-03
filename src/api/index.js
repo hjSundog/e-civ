@@ -78,6 +78,45 @@ mock.onGet(/\/persons\/\w+\/items/).reply(config => {
     }
 })
 
+mock.onGet(/\/persons\/[\w-]+\/skills/).reply(config => {
+    return [200, {
+        skills: [{
+            name: 'cultivate',
+            desc: '春种一粒粟，秋收万颗子。',
+            icon: 'skill-cultivate',
+            display: '种植',
+            level: 1,
+            EXP: 30.3, // 百分比
+            maxEXP: 100,
+
+            type: 'life',
+            isPassive: false,
+            facts: [{   // 这里只用于显示效果，实际操作以服务器返回为准
+                text: '体力下降',
+                type: 'AttributeAdjust',
+                value: 20,
+                target: 'health'
+            }, {
+                text: '熟练度提升',
+                type: 'SkillEXP',
+                value: 10,
+                target: 'cultivate'
+            }]
+        }, {
+            name: 'walk',
+            desc: '徒步旅行很惬意',
+            icon: 'skill-walk',
+            display: '徒步',
+            level: 1,
+            EXP: 10,
+            maxEXP: 100,
+
+            type: 'life',
+            isPassive: true
+        }]
+    }]
+})
+
 mock.onGet(/\/persons\/\w+/).reply(config => {
     console.log(config.url)
     return [200, require('./mock/person')]
@@ -127,7 +166,7 @@ mock.onPost(/\/skills\/\w+\/use/).reply(config => {
     const reg = /\/persons\/(\w+)\/items/;
 
     return [200, {
-        person: {
+        person: {   // 对person的影响，直接返回整个person对象。
             _id: 1,
             name: 'test',
             person_id: 'oier-133ao',
@@ -152,7 +191,30 @@ mock.onPost(/\/skills\/\w+\/use/).reply(config => {
                 age: 0,
                 sex: 'male'
             }
-        }
+        },
+        skills: [{  // 对skill的影响， 返回有变化的整个skill对象
+            name: 'cultivate',
+            desc: '春种一粒粟，秋收万颗子。',
+            icon: 'skill-cultivate',
+            display: '种植',
+            level: 1,
+            EXP: 60.3, // 百分比
+            maxEXP: 100,
+
+            type: 'life',
+            isPassive: false,
+            facts: [{   // 这里只用于显示效果，实际操作以服务器返回为准
+                text: '体力下降',
+                type: 'AttributeAdjust',
+                value: 20,
+                target: 'health'
+            }, {
+                text: '熟练度提升',
+                type: 'SkillEXP',
+                value: 10,
+                target: 'cultivate'
+            }]
+        }]
     }]
 })
 

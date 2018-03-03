@@ -43,7 +43,8 @@
         "no-mixed-operators": "warn",
         "react/forbid-prop-types": "warn",
         // 自定义
-        "no-console": "off"
+        "no-console": "off",
+        "no-debugger": "off"
     },
     "globals": {
         "module": true,

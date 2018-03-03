@@ -1,7 +1,11 @@
 import React from 'react'
-// import api from '../../api';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import api from '../../../api';
 import { Tabs } from 'antd';
 import SkillTabPane from './SkillTabPane'
+
+import * as SkillsActionCreators from '@/actions/skills'
 
 import './index.less'
 
@@ -11,23 +15,12 @@ class SkillPage extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            // 全部技能信息
-            skills: [{
-                name: 'cultivate',
-                desc: '春种一粒粟，秋收万颗子。',
-                icon: 'skill-cultivate',
-                display: '种植',
-
-                type: 'life',
-                isPassive: false,
-                facts: [{
-                    text: '体力下降',
-                    type: 'AttributeAdjust',
-                    value: 20,
-                    target: 'health'
-                }]
-            }]
+            loading: false,
         }
+        api.get('/persons/oier-133ao/skills').then((res) => {
+            console.log(res)
+            this.props.actions.update_skills(res.data.skills)
+        })
     }
 
     handleTabsChange = () => {
@@ -35,7 +28,7 @@ class SkillPage extends React.Component {
     }
 
     render() {
-        const { skills } = this.state
+        const { skills } = this.props
         return (
             <div className="skill-page">
                 <div className="skill-content">
@@ -60,4 +53,18 @@ class SkillPage extends React.Component {
     }
 }
 
-export default SkillPage
+function mapStateToProps(state) {
+    return {
+        skills: state.skills
+    }
+}
+
+function mapDispatchToProps (dispatch) {
+    return {
+        actions: bindActionCreators({
+            ...SkillsActionCreators
+        },  dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SkillPage)

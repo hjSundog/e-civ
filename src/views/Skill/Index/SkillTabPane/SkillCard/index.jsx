@@ -6,6 +6,7 @@ import { Button, Progress } from 'antd'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as PersonActionCreators from '@/actions/person'
+import * as SkillsActionCreators from '@/actions/skills'
 
 import api from '../../../../../api';
 
@@ -32,6 +33,9 @@ class SkillTabPane extends React.Component {
         this.props.actions.update_person({
             ...res.data.person
         })
+        this.props.actions.update_skills([
+            ...res.data.skills
+        ])
     }
     render() {
         const { skill } = this.props
@@ -41,8 +45,8 @@ class SkillTabPane extends React.Component {
                 <Button onClick={this.handleClickDetail}>{skill.display}</Button>
                 <Button className="use" disabled={skill.isPassive} onClick={this.handleUse}>{skill.isPassive ? '被动' : '使用'}</Button>
                 <div className="skill-proficiency">
-                    <span>level: 3</span>
-                    <Progress percent={40.3}></Progress>
+                    <span>level: {skill.level}</span>
+                    <Progress percent={skill.EXP * 100 / skill.maxEXP}></Progress>
                 </div>
             </div>
         );
@@ -65,7 +69,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps (dispatch) {
     return {
-        actions: bindActionCreators({...PersonActionCreators}, dispatch)
+        actions: bindActionCreators({
+            ...PersonActionCreators,
+            ...SkillsActionCreators
+        },  dispatch)
     }
 }
 

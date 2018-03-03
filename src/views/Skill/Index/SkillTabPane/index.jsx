@@ -23,6 +23,12 @@ export default class SkillTabPane extends React.Component {
         }
     }
 
+    componentWillReceiveProps(props) {
+        this.setState({
+            nowSkills: props.skills.slice(0, 10)
+        })
+    }
+
     handlePageChange = (page, pageSize) => {
         this.setState({
             nowSkills: this.props.skills.slice((page-1)*10, page*10)
