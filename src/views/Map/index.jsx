@@ -81,8 +81,16 @@ class Map extends React.Component {
         options.satellite = true;
         options.level = 2;
         options.lonlat = 'auto';
-        var globe = Globe.getInstance(options);
-        globe.placeAt(document.querySelector('#global_map'));
+        const globe = Globe.getInstance(options);
+        const container = document.querySelector('#global_map');
+        const content = document.querySelector('.ant-layout-content');
+        globe.placeAt(container);
+        globe.resize(content.clientWidth, content.clientHeight)
+        globe.updateUserLocation({
+            lon: 12.3,
+            lat: 30,
+            accuracy: 500,
+        })
     }
 
     render() {
@@ -104,7 +112,7 @@ class Map extends React.Component {
         ]
         return (
             <div id="global_map">
-                <div className="map">
+                <div className="map-controller">
                     <Button type="primary" loading={loading} onClick={this.handleClick.bind(this,1)}>
                         Click me!
                     </Button>
@@ -112,7 +120,7 @@ class Map extends React.Component {
                         Click me!
                     </Button>
                 </div>
-                <div className="pane" style={{display: visible?'flex':'none'}}>
+                {/* <div className="pane" style={{display: visible?'flex':'none'}}>
                     <div className="mask"></div>
                     <Row type='flex' justify="center" align="bottom">
                         <Col span={16}>
@@ -135,7 +143,7 @@ class Map extends React.Component {
                                 <TabPane tab="铁矿" key="14"><MapPane/></TabPane>
                             </Tabs></Col>
                     </Row>
-                </div>
+                </div> */}
             </div>
         );
     }
