@@ -68,6 +68,14 @@ class Map extends React.Component {
             message.error('参数有误！' + err.response.data.message)
         })
     }
+    handleGoCenter = () => {
+        const globe = Globe.getInstance();
+        globe.updateUserLocation({
+            lon: 12.3,
+            lat: 30,
+            accuracy: 500,
+        })
+    }
 
     handleSwitchBuilding(target) {
         this.setState({
@@ -90,7 +98,16 @@ class Map extends React.Component {
             lon: 12.3,
             lat: 30,
             accuracy: 500,
-        })
+        });
+        globe.showPositions([{
+            lon: 12.6,
+            lat: 30,
+            type: 'building',
+            meta: {
+                name: '矮山潭',
+                class: []
+            }
+        }])
     }
 
     render() {
@@ -118,6 +135,9 @@ class Map extends React.Component {
                     </Button>
                     <Button type="primary" loading={loading} onClick={this.handleClick.bind(this,2)}>
                         Click me!
+                    </Button>
+                    <Button type="primary" loading={loading} onClick={this.handleGoCenter}>
+                        我的位置
                     </Button>
                 </div>
                 {/* <div className="pane" style={{display: visible?'flex':'none'}}>
