@@ -52,6 +52,18 @@ export default class ItemChooser extends React.Component {
         // 拍卖设置属性获取
         const {endValue, startValue, price, count} = this.state
         const setting = {endValue, startValue, price, count}
+        if (!endValue) {
+            alert('请输入截止日期')
+            return;
+        }
+
+        if (!startValue) {
+            setting.startValue = Date.now()
+        } else {
+            setting.startValue = startValue.format('x');
+        }
+        // 转为时间戳
+        setting.endValue = endValue.format('x')
         typeof this.props.onSellToAuction === 'function' ? this.props.onSellToAuction(this.props.item, setting) : null;
     }
     // 取消拍卖请求

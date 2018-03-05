@@ -144,7 +144,7 @@ class PackagePane extends React.Component {
         //         count: count,
         //         price: price
         //     },
-        //     created_at: new Date().toLocaleDateString()
+        //     created_at: Date.now()
         // }))
     }
 
