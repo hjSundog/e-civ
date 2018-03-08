@@ -5,7 +5,7 @@ import AuctionPane from './AuctionPane'
 import api from '../../api'
 import './index.less'
 // import * as PersonActionCreators from '../../actions/person'
-import {init_package}  from '@/actions//items'
+import {init_auction}  from '@/actions//items'
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 const TabPane = Tabs.TabPane
@@ -18,40 +18,39 @@ class Package extends React.Component {
     }
     componentWillMount () {
         // const {user, hasInitialed} = this.props;
-        // const url = `/persons/${user.name}/items`
-        // if (hasInitialed) {
-        //     console.log('已经初始化背包了！！');
-        //     return
-        // }
-        // this.setState({
-        //     loading: true,
-        // })
-        // //获取物品
+        const url = `/items/auction`
+        this.setState({
+            loading: true,
+        })
+        //获取物品
 
-        // api({
-        //     method: 'get',
-        //     url: url,
-        // }).then(res => {
-        //     this.setState({
-        //         loading: false
-        //     })
-        //     if (res.status === 200){
-        //         this.props.actions.init_package(res.data.map(item=> {
-        //             return {
-        //                 item: item,
-        //                 count: 1
-        //             }
-        //         }));
-        //     } else {
-        //         console.log(res.message)
-        //     }
-        // }).catch(error => {
-        //     message.error(error)
-        //     this.setState({
-        //         loading: false
-        //     })
-        // })
+        api({
+            method: 'get',
+            url: url,
+        }).then(res => {
+            this.setState({
+                loading: false
+            })
+            if (res.status === 200){
+                this.props.actions.init_auction(res.data.map(item=> {
+                    return {
+                        item: item,
+                        count: 1
+                    }
+                }));
+            } else {
+                console.log(res.message)
+            }
+        }).catch(error => {
+            message.error(error)
+            this.setState({
+                loading: false
+            })
+        })
     }
+
+
+
     render () {
         const {items} = this.props
         return (
@@ -102,11 +101,39 @@ Package.propTypes = {
 }
 
 function mapStateToProps(state) {
+    const preItems = {
+        all: [],
+        food: [],
+        alcohol: [],
+        material: [],
+        weapon: [],
+        armor: [],
+        pets: [],
+        special: []
+    }
+    const tItems = state.items.auctionItems.totalItems.reduce((pre, cur) => {
+        Object.keys(pre).forEach(key => {
+            key = key.toUpperCase();
+            if(key === cur.item.type.toUpperCase() || key === cur.item.details.type.toUpperCase()) {
+                pre[key.toLowerCase()].push(cur)
+            }
+            if(key === 'ALL') {
+                pre[key.toLowerCase()].push(cur);
+            }
+        })
+        return pre;
+    }, preItems)
+
     return {
-        items: state.items.auctionItems,
+        items: tItems,
         user: state.auth.user,
     }
 }
 
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({init_auction}, dispatch)
+    }
+}
 
-export default connect(mapStateToProps)(Package)
+export default connect(mapStateToProps, mapDispatchToProps)(Package)

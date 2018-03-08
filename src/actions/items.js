@@ -22,6 +22,7 @@ export const USE_ITEM = 'USE_ITEM'
 export const SELL_TO_AUCTION = 'SELL_TO_AUCTION'
 export const BUY_FROM_AUCTION = 'BUY_FROM_AUCTION'
 export const MAKING_BID = 'MAKING_BID'
+export const INIT_AUCTION = 'INIT_AUCTION'
 
 // from
 export function add_from_item(item) {
@@ -96,6 +97,13 @@ export function add_package_items(items) {
 }
 
 // auction
+export function init_auction(items) {
+    return {
+        type: INIT_AUCTION,
+        payload: items
+    }
+}
+
 export function sell_to_auction(items) {
      return {
          type: SELL_TO_AUCTION,

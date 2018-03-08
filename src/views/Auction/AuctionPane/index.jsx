@@ -25,7 +25,7 @@ class AuctionPane extends React.Component {
 
     componentWillReceiveProps(props) {
         this.setState({
-            datas: props.datas
+            items: props.items
         })
     }
     // 页码改变
@@ -36,9 +36,9 @@ class AuctionPane extends React.Component {
     }
     // 删除
     handleDelete = (target) => {
-        const { type, datas } = this.props;
+        const { type, items } = this.props;
 
-        let ndx = datas.findIndex((data) => {
+        let ndx = items.findIndex((data) => {
             return data.id === target.id
         })
 
@@ -78,13 +78,13 @@ class AuctionPane extends React.Component {
     }
 
     render () {
-        const { datas } = this.props
+        const { items } = this.props
         const {currentPage} = this.state
 
-        let showDatas = datas.slice((currentPage-1)*PAGESIZE,currentPage*PAGESIZE)
+        let showDatas = items.slice((currentPage-1)*PAGESIZE,currentPage*PAGESIZE)
 
         const html = showDatas.reduce((arr, data) => {
-            arr.push(<AuctionItem onDelete={this.handleDelete} onSendMessage={this.handleSendMessage} onTrade={this.handleTrade} key={data.id} data={data} />)
+            arr.push(<AuctionItem key={data.item.name} onDelete={this.handleDelete} onSendMessage={this.handleSendMessage} onTrade={this.handleTrade} data={data} />)
             return arr;
         }, [])
         return (
@@ -96,24 +96,23 @@ class AuctionPane extends React.Component {
                     enterButton
                 />
                 <div>{html}</div>
-                <Pagination pageSize={PAGESIZE} current={currentPage} total={datas.length} onChange={this.handlePageChange} hideOnSinglePage/>
+                <Pagination pageSize={PAGESIZE} current={currentPage} total={items.length} onChange={this.handlePageChange} hideOnSinglePage/>
             </div>
         )
     }
 }
 
 AuctionPane.defaultProps = {
-    datas: [],
+    items: [],
     add_transaction: noop,
     cancle_transaction: noop,
     onDelete: noop
 };
 
 AuctionPane.propTypes = {
-    datas: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        level: PropTypes.number,
-        avatarUrl: PropTypes.string
+    items: PropTypes.arrayOf(PropTypes.shape({
+        item: PropTypes.object,
+        count: PropTypes.number,
     })),
     add_transaction: PropTypes.func,
     cancle_transaction: PropTypes.func,

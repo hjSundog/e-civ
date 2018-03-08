@@ -218,4 +218,19 @@ mock.onPost(/\/skills\/\w+\/use/).reply(config => {
     }]
 })
 
+
+mock.onGet('/items/auction').reply(config => {
+    //const {id = 1} = JSON.parse(config.data)
+
+    const items = require('./mock/auction')
+    const dist = items.map(item => {
+        return tpl2entity(item)
+    });
+    if (dist) {
+        return [200, dist]
+    } else {
+        return [404, {message: "没有拍卖物品"}]
+    }
+})
+
 export default mockAxios;

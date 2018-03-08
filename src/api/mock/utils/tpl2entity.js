@@ -11,7 +11,7 @@ const defaultEntity = {
 }
 
 const defaultExtract = ['description', 'rarity', 'vendor_value', 'effect', 'recipe', 'ingredient']
-
+const targets = require('../ItemTpl/ConsumableTpl/FoodTpl');
 const defaultPath = '../ItemTpl/'
 
 function toUpperCaseFirst(word) {
@@ -36,9 +36,6 @@ export default function tpl2entity(part = defaultEntity,extract = defaultExtract
 
     // const path = Path.normalize(`${defaultPath}/${toUpperCaseFirst(type)}Tpl/${toUpperCaseFirst(details.type)}Tpl`)
     
-
-    const targets = require('../ItemTpl/ConsumableTpl/FoodTpl');
-
     const dist = targets.filter(target => {
         return target.name === name
     })

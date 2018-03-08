@@ -15,6 +15,7 @@ import {
     INIT_PACKAGE,
     ADD_PACKAGE_ITEMS,
     // auction
+    INIT_AUCTION,
     SELL_TO_AUCTION,
     BUY_FROM_AUCTION,
     MAKING_BID,
@@ -34,6 +35,7 @@ const initialState = {
     auctionItems: {
         sellItems: [],
         makingBidItems: [],
+        totalItems: []
     },
     hasInitialed: false
 };
@@ -89,6 +91,15 @@ export default function auth(state = initialState, action = {}) {
             ...state,
             packageItems: [...state.packageItems, ...action.payload]
         }
+    case INIT_AUCTION: {
+        return {
+            ...state,
+            auctionItems: {
+                ...state.auctionItems,
+                totalItems: action.payload
+            }
+        }
+    }
     case SELL_TO_AUCTION: {
         return {
             ...state,

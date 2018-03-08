@@ -6,6 +6,8 @@ import {
     RESET_PERSON
 } from '../actions/person';
 
+import _ from 'lodash'
+
 const initialState = {
     name: 'init person',
     person_id: null,
@@ -51,7 +53,8 @@ function cloneObject(obj) {
     }
 }
 
-// 更改目标对象(pre)同提供对象(update)属性相同的值
+// 更改目标对象(pre)同提供对象(update)属性相同的值,不同层级也可以改变，
+// 查找属性顺序为逐层查找，如果最底层都没有这个属性，则将该属性加入顶层并赋值。
 function personUpdateProxy(pre, update) {
     const rt = cloneObject(pre);
 
@@ -93,7 +96,7 @@ export default function auth(state = initialState, action = {}) {
     case CREATE_PERSON:
         return {...state,...action.person}
     case UPDATE_PERSON:
-        return personUpdateProxy(state, action.person)
+        return _.assign(state, action.person)
     case DELETE_PERSON:
         return {}
     default:
