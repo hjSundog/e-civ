@@ -6,6 +6,8 @@ import './index.less'
 import { Button, message, Tabs, Row, Col, Menu, Dropdown } from 'antd'
 import Globe, {GlobeOptions} from 'e-civ-planet';
 
+import BuildingCard from './BuildingCard'
+
 const TabPane = Tabs.TabPane;
 const SubMenu = Menu.SubMenu;
 
@@ -15,7 +17,7 @@ class Map extends React.Component {
         super(props);
         this.state = {
             loading: false,
-            building:{},
+            building: null,
             visible: false,
         }
     }
@@ -108,10 +110,15 @@ class Map extends React.Component {
                 class: []
             }
         }])
+        globe.poiLayer.setPickListener((target) => {
+            this.setState({
+                building: target.attributes
+            })
+        })
     }
 
     render() {
-        const { visible, loading, building = {name: 'test', des: 'mdzz'} } = this.state;
+        const { loading, building } = this.state;
         const data = [
             {
                 name: '水稻田',
@@ -140,6 +147,7 @@ class Map extends React.Component {
                         我的位置
                     </Button>
                 </div>
+                <BuildingCard building={building}></BuildingCard>
                 {/* <div className="pane" style={{display: visible?'flex':'none'}}>
                     <div className="mask"></div>
                     <Row type='flex' justify="center" align="bottom">

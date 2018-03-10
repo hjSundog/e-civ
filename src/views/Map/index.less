@@ -1,18 +1,23 @@
-.all_screen{
+.all_screen {
     width: 100%;
     height: 100%;
 }
 
 
 
-#global_map{
+#global_map {
     .all_screen;
-    .map-controller{
+    .map-controller {
         width: 100%;
         position: absolute;
     }
+    .building-card {
+        position: absolute;
+        right: 100px;
+        top: 200px;
+    }
 
-    .pane{
+    .pane {
         position: absolute;
         top: 0px;
         left: 0px;
@@ -22,14 +27,14 @@
         height: 100%;
         width: 100%;
 
-        .mask{
+        .mask {
             background: rgba(128, 128, 128, .6);
             width: 100%;
             height: 100%;
             position: absolute;
         }
 
-        &>div{
+        & > div {
             width: 100%;
             .ant-col-16{
                 min-width: 400px;
@@ -37,7 +42,7 @@
             }
         }
 
-        .ant-tabs-nav .ant-tabs-tab{
+        .ant-tabs-nav .ant-tabs-tab {
             height: inherit;
         }
     }
