@@ -1,12 +1,14 @@
 import Solider from './Solider'
 
 export default class ThiefHead extends Solider {
+    static primarity = 3;
+    static SoldierName = "ThiefHead";
+
     constructor(cache) {
         super(cache);
         this.SoldierType = 'ThiefHead';
-        this.sprite = new PIXI.Sprite(PIXI.utils.TextureCache['ThiefHead.png']);
+        this.texture = cache['ThiefHead.png'];
+        this.init();
     }
 
-    static primarity = 3;
-    static SoldierName = "ThiefHead";
 }

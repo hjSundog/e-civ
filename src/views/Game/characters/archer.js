@@ -2,10 +2,13 @@ import Solider from './Solider'
 import * as PIXI from 'pixi.js'
 
 export default class Archer extends Solider {
+    static primarity = 0;
+
     constructor(cache) {
         super(cache);
-        this.sprite = new PIXI.Sprite(PIXI.utils.TextureCache['Archer.png']);
+        this.texture = cache['Archer.png'];
         this.SoldierType = 'Archer';
+        this.init();
     }
-    static primarity = 0;
+
 }

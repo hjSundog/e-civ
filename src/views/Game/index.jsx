@@ -5,6 +5,7 @@ import Soldiers from './characters'
 import * as PIXI from 'pixi.js'
 import './index.less'
 import noop from '@/utils/noop'
+import { arch } from 'os';
 
 // 想法，传入的参数应该是两个军队，每个军队数据对象包含兵种及每个兵种的数目，当然每个兵种都有最大值
 // 先100个为一组，
@@ -13,7 +14,7 @@ let Application = PIXI.Application,
     loader = PIXI.loader,
     resources = PIXI.loader.resources,
     Sprite = PIXI.Sprite,
-    Texture = PIXI.utils.Texture,
+    Texture = PIXI.Texture,
     Rectangle = PIXI.Rectangle,
     Container = PIXI.Container,
     Text = PIXI.Text,
@@ -99,11 +100,13 @@ class Game extends React.Component {
             'static/images/treasureHunter.json',
             'static/images/testCharacter.json'
         ], this.onProgress, () => {
-            // console.log(TextureCache);
-            // console.log(resources);
+            console.log(TextureCache);
+            console.log(resources);
+            const textures = resources['static/images/testCharacter.json'].textures;
+
             // 创建对象
             for (let enemy of this.enemyList) {
-                let enemys = this.createManageableSprite(enemy, TextureCache);
+                let enemys = this.createManageableSprite(enemy, textures);
                 if (enemys.length) {
                     this.battleGround.addToGroup(enemys, 'enemy');
                 } else {
@@ -112,7 +115,7 @@ class Game extends React.Component {
             }
 
             for (let me of this.myList) {
-                let mes = this.createManageableSprite(me, TextureCache);
+                let mes = this.createManageableSprite(me, textures);
                 if (mes.length) {
                     this.battleGround.addToGroup(mes, 'my');
                 } else {
@@ -134,7 +137,24 @@ class Game extends React.Component {
                 dropShadowDistance: 6,
             });
             this.message = new Text('start', style);
-            this.gameOverScene.addChild(this.message)
+            this.gameOverScene.addChild(this.message);
+
+            // test 
+            const texture = resources['static/images/treasureHunter.json'].textures;
+            //texture.frame = new Rectangle(0, 0, 48, 64);
+            const test = new Sprite(texture['blob.png']);
+
+            test.x = 200;
+            test.y = 100;
+            this.gameScene.addChild(test);
+            // another test
+            const anotherTexture = resources['static/images/testCharacter.json'].textures['Archer.png'];
+            //anotherTexture.frame = new Rectangle(0, 0, 48, 64);
+            const archer = new Sprite(anotherTexture);
+            archer.x = 200;
+            archer.y = 200;
+            this.gameScene.addChild(archer);
+        
         })
 
     }
@@ -161,7 +181,8 @@ class Game extends React.Component {
             for (let i=0;i<num;i++) {
                 let solider = new Soldiers[soldierType](cache);
                 // 加入容器
-                solider.addToScene(this.gameScene);
+                //solider.addToScene(this.gameScene);
+                this.gameScene.addChild(solider.sprite);
                 // 加入数组
                 rt.push(solider);
             }
@@ -173,12 +194,11 @@ class Game extends React.Component {
     }
 
     onProgress = (loader, resource) => {
-        //Display the file `url` currently being loaded
+
         console.log("loading: " + resource.url);
 
         //Display the percentage of files currently loaded
         console.log("progress: " + loader.progress + "%");
-
         //If you gave your files names as the first argument
         //of the `add` method, you can access them like this
         //console.log("loading: " + resource.name);
@@ -220,12 +240,16 @@ class Game extends React.Component {
         this.initGame();
     }
 
+    componentWillUnmount () {
+        PIXI.utils.clearTextureCache(); // ?
+        loader = loader.reset();
+    }
+
     callback() {
 
     }
 
     render () {
-
         return (
             <div ref={(node)=>this.wrapper = node}>
             </div>
