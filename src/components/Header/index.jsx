@@ -48,6 +48,9 @@ class commonHeader extends React.Component {
         case 'auction': 
             this.props.history.replace('/auction')
             break
+        case 'game':
+            this.props.history.replace('/game')
+            break;
         default:
             return
         }
@@ -124,6 +127,9 @@ class commonHeader extends React.Component {
                             </Menu.Item>
                             <Menu.Item key="auction">
                                 拍卖行
+                            </Menu.Item>
+                            <Menu.Item key="game">
+                                游戏
                             </Menu.Item>
                         </Menu>
                     </Col>

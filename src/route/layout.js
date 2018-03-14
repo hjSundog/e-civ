@@ -21,6 +21,7 @@ import Page2 from '@/views/Page2';
 import Donation from '@/views/Donation';
 import Relationship from '@/views/Relationship';
 import Auction from '@/views/Auction';
+import Game from '@/views/Game'
 
 export const childRoutes = [
     {
@@ -87,6 +88,10 @@ export const childRoutes = [
     {
         'path': '/auction',
         'component': Auction
+    },
+    {
+        'path': '/game',
+        'component': Game
     }
 ];
 
