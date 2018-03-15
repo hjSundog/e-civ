@@ -2,10 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import BattleGround from './BattleGround'
 import Soldiers from './characters'
+import _ from 'lodash';
 import * as PIXI from 'pixi.js'
 import './index.less'
 import noop from '@/utils/noop'
-import { arch } from 'os';
+import MakeAnimationLoop from './utils/MakeAnimationLoop'
 
 // 想法，传入的参数应该是两个军队，每个军队数据对象包含兵种及每个兵种的数目，当然每个兵种都有最大值
 // 先100个为一组，
@@ -48,63 +49,27 @@ class Game extends React.Component {
         this.wrapper.appendChild(this.app.view);
         this.gameScene = new Container();
         this.gameOverScene = new Container();
-        this.app.stage.addChild(this.gameScene);
-        this.app.stage.addChild(this.gameOverScene);
         this.gameScene.visible = true;
         this.gameOverScene.visible = false;
         this.battleGround = new BattleGround(800, 600);
         // 初始化资源
         this.initResource();
-        // loader.add([
-        //         'static/images/cat.png',
-        //         'static/images/treasureHunter.json'
-        //     ])
-        //     .on('progress', this.onProgress)
-        //     .load(() => {
-        //         let cat = new Sprite(resources['static/images/cat.png'].texture);
-        //         cat.x = 96;
-        //         cat.y = 96;
-        //         //Add the cat to the stage so you can see it
-        //         this.gameScene.addChild(cat);
-        //         let style = new TextStyle({
-        //             fontFamily: "Arial",
-        //             fontSize: 36,
-        //             fill: "white",
-        //             stroke: '#ff3300',
-        //             strokeThickness: 4,
-        //             dropShadow: true,
-        //             dropShadowColor: "#000000",
-        //             dropShadowBlur: 4,
-        //             dropShadowAngle: Math.PI / 6,
-        //             dropShadowDistance: 6,
-        //         });
-        //         this.message = new Text('start', style);
-        //         this.gameOverScene.addChild(this.message)
-        //         // 绑定事件
-        //         this.bindEvent();
-        //         // 运行
-        //         this.run();
-        //     })
     }
 
     initResource = () => {
         this.enemyList = this.props.enemy;
         this.myList = this.props.my;
-        // 加载需要的纹理
-        // const eneymySprites = this.enemyList.map(enemy => {
-        //     return ROOT_PATH + enemy.soldierType
-        // })
 
         this.definedLoad([
             'static/images/cat.png',
             'static/images/treasureHunter.json',
             'static/images/testCharacter.json'
         ], this.onProgress, () => {
-            console.log(TextureCache);
+            //console.log(TextureCache);
             console.log(resources);
-            const textures = resources['static/images/testCharacter.json'].textures;
+            const textures = resources['static/images/testCharacter.json'];
 
-            // 创建对象
+            //创建对象
             for (let enemy of this.enemyList) {
                 let enemys = this.createManageableSprite(enemy, textures);
                 if (enemys.length) {
@@ -139,22 +104,18 @@ class Game extends React.Component {
             this.message = new Text('start', style);
             this.gameOverScene.addChild(this.message);
 
-            // test 
-            const texture = resources['static/images/treasureHunter.json'].textures;
-            //texture.frame = new Rectangle(0, 0, 48, 64);
-            const test = new Sprite(texture['blob.png']);
 
-            test.x = 200;
-            test.y = 100;
-            this.gameScene.addChild(test);
-            // another test
-            const anotherTexture = resources['static/images/testCharacter.json'].textures['Archer.png'];
-            //anotherTexture.frame = new Rectangle(0, 0, 48, 64);
-            const archer = new Sprite(anotherTexture);
-            archer.x = 200;
-            archer.y = 200;
-            this.gameScene.addChild(archer);
-        
+            // test
+            let testTexture = _.cloneDeep(textures.textures['Archer.png']);
+            testTexture.frame = new Rectangle(0, 0, 48, 64);
+            let testSprite = new PIXI.Sprite(testTexture);
+            let mal = new MakeAnimationLoop(testSprite);
+            mal.loadFrames('static/images/testCharacter.json', 48, 64, 'Archer.png', _.cloneDeep(textures.textures['Archer.png']));
+            console.log(mal.frames.length);
+            testSprite.x = 700;
+            testSprite.y = 500;
+            this.gameScene.addChild(testSprite);
+            mal.animate();  
         })
 
     }
@@ -175,14 +136,15 @@ class Game extends React.Component {
 
     // 创建可管理精灵对象
     createManageableSprite = ({soldierType, count}, cache) => {
+        const textures = {...cache}
         let rt = [];
         if (Soldiers[soldierType]) {
             let num = Math.ceil(count / 100);
             for (let i=0;i<num;i++) {
                 let solider = new Soldiers[soldierType](cache);
                 // 加入容器
-                //solider.addToScene(this.gameScene);
-                this.gameScene.addChild(solider.sprite);
+                solider.addToScene(this.gameScene);
+                // this.gameScene.addChild(solider.sprite);
                 // 加入数组
                 rt.push(solider);
             }
@@ -238,6 +200,8 @@ class Game extends React.Component {
     componentDidMount () {
         // 初始化并开始游戏
         this.initGame();
+        this.app.stage.addChild(this.gameScene);
+        this.app.stage.addChild(this.gameOverScene);
     }
 
     componentWillUnmount () {

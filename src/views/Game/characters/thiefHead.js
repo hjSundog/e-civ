@@ -1,13 +1,12 @@
-import Solider from './Solider'
+import Soldier from './Soldier';
 
-export default class ThiefHead extends Solider {
+export default class ThiefHead extends Soldier {
     static primarity = 3;
     static SoldierName = "ThiefHead";
 
     constructor(cache) {
         super(cache);
         this.SoldierType = 'ThiefHead';
-        this.texture = cache['ThiefHead.png'];
         this.init();
     }
 
