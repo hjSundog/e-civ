@@ -109,13 +109,22 @@ class Game extends React.Component {
             let testTexture = _.cloneDeep(textures.textures['Archer.png']);
             testTexture.frame = new Rectangle(0, 0, 48, 64);
             let testSprite = new PIXI.Sprite(testTexture);
+            testSprite.buttonMode = true;
+            testSprite.interactive = true;
+
             let mal = new MakeAnimationLoop(testSprite);
-            mal.loadFrames('static/images/testCharacter.json', 48, 64, 'Archer.png', _.cloneDeep(textures.textures['Archer.png']));
+            mal.loadFrames('static/images/testCharacter.json', 48, 64, 'Archer.png', textures);
             console.log(mal.frames.length);
             testSprite.x = 700;
             testSprite.y = 500;
             this.gameScene.addChild(testSprite);
-            mal.animate();  
+            mal.directAnimationFrames({
+                start: 2,
+                end: 8
+            });  
+            testSprite.on('pointerdown', () => {
+                mal.isStop? mal.resume():mal.pause();
+            })
         })
 
     }

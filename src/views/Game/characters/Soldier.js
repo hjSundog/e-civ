@@ -53,10 +53,17 @@ class Solider {
         
     }
 
+
+    loadFrames() {
+        //this.MAL.loadFrames
+    }
+
     // 保存所有动作的贴图状态
     initActionState() {
         this.state = {
-            move: [],
+            move: {
+                
+            },
             attack: [],
             skill: [],
             die: []
@@ -92,6 +99,8 @@ class Solider {
         // 相应事件
         this.sprite.interactive = true;
         this.sprite.buttonMode = true;
+        // 动画管理对象
+        this.MAL = new MakeAnimationLoop(this.sprite);
         const that = this;
         this.sprite.on('pointerdown', () => {
             switch (that.direction) {
