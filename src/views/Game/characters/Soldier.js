@@ -17,8 +17,8 @@ class Solider {
     static primarity = 0;
     static SoldierType = 'Soldier';
 
-    constructor(cache) {
-        this.ROOT_PATH = 'static/images/';
+    // cache 为空时在loadFrames中指定帧来源，为对象
+    constructor(cache, ) {
         // 攻击范围
         this.attackArea = 1;
         // 移动速度
@@ -31,14 +31,15 @@ class Solider {
         // 物理穿透
         this.Penetration = 10;
         // 精灵图标
-        this.sprite = null;
-        this.cache = cache;
+        this.sprite = new PIXI.Sprite();
+        this.cache = cache?cache:null;
         // 方向
         this.direction = 'R';
         // 状态设置
         // 动作状态
-        this.animateState = ['MOVE', 'SKILL', 'DIE', 'ATTACK'];
-        this.nowActionState = 'MOVE';
+        this.animateState = {};
+
+        this.nowActionState = '';
         // 动作怔状态
         this.loopState = 0;
         this.maxLoopState = 4;
@@ -48,51 +49,80 @@ class Solider {
 
     }
 
-    // 针对每种行为制作其动画
-    makeActionAnimation(action, frameSource, special, texture) {
-        
+    // 针对每种行为制作其动画,子动画使用@链接,MOVE@UP
+    doAction(actionType) {
+        const actions = actionType.split('@');
+        const frames = actions.reduce((pre, next) => {
+            return pre[next];
+        }, this.animateState);
+        this.MAL.animate(frames);
     }
 
-
-    loadFrames() {
+    // 加载帧
+    // frames为路径数组或者路径或者undefined(此时必须制定src),
+    // 所以只有两种情况，frames有时srcID没有值, frames没有值时，srcID有值
+    loadFrames(actionType, rowNum = 1 , colNum = 1, frames, srcID) {
         //this.MAL.loadFrames
-    }
-
-    // 保存所有动作的贴图状态
-    initActionState() {
-        this.state = {
-            move: {
-                
-            },
-            attack: [],
-            skill: [],
-            die: []
+        const type = toString.call(frames).slice(8, -1);
+        if (frames) {
+            this.animateState[actionType] = {};
+            this.animateState[actionType]['base'] = this.MAL.loadFrames(frames, rowNum, colNum);
+        } else {
+            this.animateState[actionType] = {};
+            this.animateState[actionType]['base'] = this.MAL.loadFrames(this.cache, rowNum, colNum, srcID);
         }
+        return this;
     }
 
-    animate(state) {
-        switch(state) {
-            case 'MOVE':
-                break;
-            case 'SKILL':
-                break;
-            case 'DIE':
-                break;
-            case 'ATTACK':
-                break;
-            default:
-                return;
+    // state制定每个动作所需要的动画帧
+    setState(callback) {
+        const frames = this.MAL.getFrames();
+        const state = callback.call(this, frames, this.animateState);
+        const MAL = this.MAL;
+        function recurse(obj, dist, mapFunc) {
+            for (let key of Object.keys(obj)) {
+                let type = toString.call(obj[key]).slice(8, -1);
+                if (type === 'Object') {
+                    dist[key] = {...dist[key]};
+                    recurse(obj[key], dist[key], mapFunc);
+                } else {
+                    dist[key] = mapFunc(obj[key], dist.base);
+                }
+            }
         }
+        recurse(state, this.animateState, (val, base)=>{
+            let type = toString.call(val).slice(8, -1);
+            return MAL.getSequenceFrames([{
+                start: val[0],
+                end: val[1]
+            }], base);
+        })
+
+        console.log(this.animateState);
     }
 
-    changeSprite() {
-
-    }
-
-    init() {
-        this.fullTexture = _.cloneDeep(this.cache.textures[this.SoldierType+'.png']);
-        this.frame = _.cloneDeep(this.cache.data.frames[this.SoldierType+'.png']);
-        this.texture = this.judgeFrame(this.direction,  _.cloneDeep(this.fullTexture));
+    // 指定初始化帧，指定精灵位置，指定精灵交互情况,如果你有特定的初始帧可以在回调函数中
+    // 指定，否则输入帧序数，该初始化会在loadFrames之后进行
+    init(type, callback) {
+        this.SoldierType = type;
+        // fullTexture 保存该对象的所有texture源，可能是数组或者更大的texture对象
+        // 小texture数组，多个resource数组处理
+        if (toString.call(this.cache).slice(8, -1) === 'Array') {
+            this.fullTexture = [...this.cache.map(texture=>{
+                return texture.texture
+            })];
+            this.texture = this.fullTexture[0];
+        } else {        // 单个resource对象处理
+            if (this.cache.name.includes('.json')) {
+                this.fullTexture = _.cloneDeep(this.cache.textures[this.SoldierType+'.png']);
+                this.frame = _.cloneDeep(this.cache.data.frames[this.SoldierType+'.png']);
+                this.texture = this.judgeFrame(this.direction,  this.fullTexture);
+            } else {
+                this.fullTexture = this.cache.texture;
+                this.texture = this.cache.texture
+            }
+        }
+        // 初始化精灵
         this.sprite = new PIXI.Sprite(this.texture);
         this.sprite.x = Math.floor(Math.random() * 800);
         this.sprite.y = Math.floor(Math.random() * 600);
@@ -106,20 +136,26 @@ class Solider {
             switch (that.direction) {
                 case 'U':
                     that.turnTo('R');
+                    that.doAction('MOVE@RIGHT')
                     break;
                 case 'R':
                     that.turnTo('D');
+                    that.doAction('MOVE@DOWN')
                     break;
                 case 'D':
                     that.turnTo('L');
+                    that.doAction('MOVE@LEFT')
                     break;
                 case 'L':
                     that.turnTo('U');
+                    that.doAction('MOVE@UP')
                     break;
                 default:
                     return;
             }
         });
+
+        return this;
     }
     // 设置位置
     setPosition(x, y) {
@@ -173,13 +209,14 @@ class Solider {
     }
 
     judgeFrame(direction, texture) {
-        const width = texture.orig.width;
-        const height = texture.orig.height;
+        const distTexture = _.cloneDeep(texture);
+        const width = distTexture.orig.width;
+        const height = distTexture.orig.height;
         const wPiece = width / 4;
         const hPiece = height / 4;
-        texture.frame = this.createRectangle(direction, wPiece, hPiece);
-        texture._updateUvs();
-        return texture;
+        distTexture.frame = this.createRectangle(direction, wPiece, hPiece);
+        distTexture._updateUvs();
+        return distTexture;
     }
 }
 

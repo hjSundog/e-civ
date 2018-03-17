@@ -113,14 +113,14 @@ class Game extends React.Component {
             testSprite.interactive = true;
 
             let mal = new MakeAnimationLoop(testSprite);
-            mal.loadFrames('static/images/testCharacter.json', 48, 64, 'Archer.png', textures);
+            mal.loadFrames(textures, 4, 4, 'Archer.png');
             console.log(mal.frames.length);
-            testSprite.x = 700;
-            testSprite.y = 500;
+            testSprite.x = 400;
+            testSprite.y = 300;
             this.gameScene.addChild(testSprite);
             mal.directAnimationFrames({
-                start: 2,
-                end: 8
+                start: 8,
+                end: 11
             });  
             testSprite.on('pointerdown', () => {
                 mal.isStop? mal.resume():mal.pause();
@@ -145,7 +145,6 @@ class Game extends React.Component {
 
     // 创建可管理精灵对象
     createManageableSprite = ({soldierType, count}, cache) => {
-        const textures = {...cache}
         let rt = [];
         if (Soldiers[soldierType]) {
             let num = Math.ceil(count / 100);
