@@ -70,6 +70,39 @@ class Map extends React.Component {
             message.error('参数有误！' + err.response.data.message)
         })
     }
+
+    handleShowBuildings = () => {
+        const globe = Globe.getInstance();
+        globe.showPositions([{
+            lon: 12.6,
+            lat: 30,
+            type: 'building',
+            meta: {
+                name: '矮山潭',
+                class: []
+            }
+        }, {
+            lon: 12.9,
+            lat: 31,
+            type: 'building',
+            meta: {
+                name: '桂中',
+                class: []
+            }
+        }])
+    }
+
+    handleClearAll = () => {
+        const globe = Globe.getInstance();
+        globe.poiLayer.clearAll();
+    }
+
+    handleShowRoute = () => {
+        const globe = Globe.getInstance();
+        globe.routeLayer.test();
+        globe.routeLayer.addRouteByLonlats([[12.6, 30], [13, 30], [13, 30.2]], globe.routeLayer.camera.getResolution(), 5, [0, 255, 0]);
+    }
+
     handleGoCenter = () => {
         const globe = Globe.getInstance();
         globe.updateUserLocation({
@@ -109,8 +142,17 @@ class Map extends React.Component {
                 name: '矮山潭',
                 class: []
             }
+        }, {
+            lon: 12.9,
+            lat: 31,
+            type: 'building',
+            meta: {
+                name: '桂中',
+                class: []
+            }
         }])
         globe.poiLayer.setPickListener((target) => {
+            this.buildingCard.show()
             this.setState({
                 building: target.attributes
             })
@@ -140,14 +182,20 @@ class Map extends React.Component {
                     <Button type="primary" loading={loading} onClick={this.handleClick.bind(this,1)}>
                         Click me!
                     </Button>
-                    <Button type="primary" loading={loading} onClick={this.handleClick.bind(this,2)}>
-                        Click me!
+                    <Button type="primary" loading={loading} onClick={this.handleShowRoute}>
+                        展示路径
+                    </Button>
+                    <Button type="primary" loading={loading} onClick={this.handleShowBuildings}>
+                        附近的建筑物
+                    </Button>
+                    <Button type="primary" loading={loading} onClick={this.handleClearAll}>
+                        清除所有POIs
                     </Button>
                     <Button type="primary" loading={loading} onClick={this.handleGoCenter}>
                         我的位置
                     </Button>
                 </div>
-                <BuildingCard building={building}></BuildingCard>
+                <BuildingCard ref={(card) => { this.buildingCard = card; }} building={building}></BuildingCard>
                 {/* <div className="pane" style={{display: visible?'flex':'none'}}>
                     <div className="mask"></div>
                     <Row type='flex' justify="center" align="bottom">

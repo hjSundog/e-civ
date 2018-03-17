@@ -129,7 +129,7 @@ class App extends React.Component {
             case 'invite':
                 this.props.actions.add_invitation(tMessage);
                 break;
-            case 'cancle': 
+            case 'cancle':
                 this.props.actions.cancle_invitation(tMessage);
                 break;
             case 'refuse':
@@ -158,7 +158,7 @@ class App extends React.Component {
                 break
             }
             default:
-                return 
+                return
             }
         } else {
             this.props.actions.add_message(tMessage);
@@ -231,10 +231,10 @@ class App extends React.Component {
                         isOpen={this.state.chatroomsVisible}
                     />
                     <TradeWindow onClose={this.handleTradeWindowClose} isOpen={tradeWindowVisible} responseTradePane={this.state.responseTradePane}/>
-                    <Websocket url={url}
+                    {/* <Websocket url={url}
                         onMessage={this.handleWebsocket}
                         onOpen = {this.handleOpenWebsocket}
-                        debug={true}/>
+                        debug={true}/> */}
                 </div>
             </Layout>
         );

@@ -26,10 +26,9 @@ const tabList = [{
 const contentList = {
     info: (<div className="info">
         <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514213554091&di=7275f7e3745ed593d05fc71e84d56b5d&imgtype=0&src=http%3A%2F%2Fpic31.nipic.com%2F20130718%2F12606377_200853832000_2.jpg" alt="建筑图片"/>
-        <div className="info_holder">
-            <img src="https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1514291292&di=553867e010ae42dc355cf5dbc390e7d1&src=http://img.zcool.cn/community/0173cb5666920932f8754573b2f2b6.jpg@2o.jpg" alt="建筑图片"/>
-            <div className="detail_info">
-                <div className="base_info">
+        <div className="info-main">
+            <div className="info-detail">
+                <div className="base">
                     <span className="name">医馆</span>
                     <span>lv3</span>
                     <span className="guild">
@@ -39,20 +38,7 @@ const contentList = {
                         <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
                     </span>
                 </div>
-                <div className="earn">
-                    <p>收益：20Gold</p>
-                    <p>坐标：2 2</p>
-                </div>
-                <div className="target_info">
-                    <div className="material">
-                        <span>建筑所需：</span>
-                        <ul>
-                            <li>石料30单位</li>
-                            <li>铁50单位</li>
-                            <li>1000Gold</li>
-                            <li>5day</li>
-                        </ul>
-                    </div>
+                <div className="effect">
                     <div className="effect">
                         <span>效果：</span>
                         <ul>
@@ -67,7 +53,7 @@ const contentList = {
             </div>
         </div>
     </div>),
-    operation: (<div>
+    operation: (<div className="operation">
         <Card.Grid style={gridStyle}>疗伤</Card.Grid>
         <Card.Grid style={gridStyle}>新建</Card.Grid>
         <Card.Grid style={gridStyle}>卖出医馆</Card.Grid>
@@ -79,7 +65,6 @@ const contentList = {
     other: (<div className="other">
         <Button type="primary" >到这里去</Button>
         <Button type="primary" >离开</Button>
-        <Button type="primary" >报告错误</Button>
     </div>)
 };
 
@@ -88,13 +73,12 @@ class BuildingCard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            tabKey: 'tab1',
+            tabKey: 'info',
             loading: false,
             building:{},
             visible: false
         }
     }
-
     //属性更改之后
     componentWillReceiveProps(nextProps) {
         if (nextProps === this.props.target) {
@@ -103,6 +87,19 @@ class BuildingCard extends React.Component {
         //刷新界面信息
         // this.getBuildingInfo(nextProps.target);
     }
+
+    show = () => {
+        this.setState({
+            visible: true
+        })
+    }
+
+    hide = () => {
+        this.setState({
+            visible: false
+        })
+    }
+
 
     // async getBuildingInfo(target){
     //     this.setState({
@@ -135,11 +132,10 @@ class BuildingCard extends React.Component {
     }
 
     onTabChange = (key, type) => {
-        console.log(key, type);
         this.setState({ [type]: key });
     }
 
-    handleCancel() {
+    handleCancel = () => {
         this.setState({
             visible: false
         })
@@ -155,17 +151,19 @@ class BuildingCard extends React.Component {
 
     render() {
         const {building} = this.props;
-        console.log(building)
+        if(!this.state.visible) {
+            return null
+        }
         return (
             <div className="building-card">
                 <Card
                     style={{ width: '100%' }}
                     title={building && building.meta.name}
-                    extra={<a href="#">More</a>}
+                    extra={[<a className="building-more" key="more" href="#">More</a>,<a className="building-close" key="close" onClick={this.hide}>关闭</a>]}
                     tabList={tabList}
-                    onTabChange={(key) => { this.onTabChange(key, 'key'); }}
+                    onTabChange={(key) => { this.onTabChange(key, 'tabKey'); }}
                 >
-                    {contentList[this.state.key]}
+                    {contentList[this.state.tabKey]}
                 </Card>
             </div>
         );
