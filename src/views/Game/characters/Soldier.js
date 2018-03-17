@@ -51,11 +51,36 @@ class Solider {
 
     // 针对每种行为制作其动画,子动画使用@链接,MOVE@UP
     doAction(actionType) {
+        this.MAL.stop();
         const actions = actionType.split('@');
         const frames = actions.reduce((pre, next) => {
             return pre[next];
         }, this.animateState);
-        this.MAL.animate(frames);
+        const type = toString.call(frames).slice(8, -1);
+        type === 'Array'
+        ?this.MAL.animate(frames)
+        :this.MAL.changeFrame(frames);
+    }
+
+    // 改变当前精灵的贴图
+    // 可指定雪碧图中某个特定的帧
+    // 也可指定state中某个子帧集中某个特别的帧
+    changeFrame(actionType, id) {
+        const actions = actionType.split('@');
+        const frames = actions.reduce((pre, next) => {
+            return pre[next];
+        }, this.animateState);
+        // 做个输入参数的判断吧
+        const type = toString.call(frames).slice(8, -1);
+        if (type === 'Array') {
+            id?this.MAL.changeFrame(frames[id]):console.error('请输入指定的帧数id');
+        }
+
+        if (type === 'Object') {
+            frames instanceof PIXI.Texture?this.MAL.changeFrame(frames):console.error('请输入正确的行为参数');
+        }
+
+
     }
 
     // 加载帧
@@ -63,13 +88,21 @@ class Solider {
     // 所以只有两种情况，frames有时srcID没有值, frames没有值时，srcID有值
     loadFrames(actionType, rowNum = 1 , colNum = 1, frames, srcID) {
         //this.MAL.loadFrames
+        let loadedFrames;
         const type = toString.call(frames).slice(8, -1);
+        const actions = actionType.split('.');
         if (frames) {
-            this.animateState[actionType] = {};
-            this.animateState[actionType]['base'] = this.MAL.loadFrames(frames, rowNum, colNum);
+            loadedFrames = this.MAL.loadFrames(frames, rowNum, colNum);
+            actions.forEach(action=>{
+                this.animateState[action] = {};
+                this.animateState[action]['base'] = loadedFrames;
+            })
         } else {
-            this.animateState[actionType] = {};
-            this.animateState[actionType]['base'] = this.MAL.loadFrames(this.cache, rowNum, colNum, srcID);
+            loadedFrames = this.MAL.loadFrames(this.cache, rowNum, colNum, srcID);
+            actions.forEach(action=>{
+                this.animateState[action] = {};
+                this.animateState[action]['base'] = loadedFrames;
+            })
         }
         return this;
     }
@@ -77,7 +110,7 @@ class Solider {
     // state制定每个动作所需要的动画帧
     setState(callback) {
         const frames = this.MAL.getFrames();
-        const state = callback.call(this, frames, this.animateState);
+        const state = callback.call(this, this);
         const MAL = this.MAL;
         function recurse(obj, dist, mapFunc) {
             for (let key of Object.keys(obj)) {
@@ -92,63 +125,51 @@ class Solider {
         }
         recurse(state, this.animateState, (val, base)=>{
             let type = toString.call(val).slice(8, -1);
-            return MAL.getSequenceFrames([{
-                start: val[0],
-                end: val[1]
-            }], base);
+            let sequences = val;
+            if (type === 'Array') {
+                sequences = {
+                    start: val[0],
+                    end: val[1]
+                }
+                return MAL.getSequenceFrames([sequences], base);
+            }
+            return MAL.getSequenceFrames([sequences], base)[0];
         })
-
-        console.log(this.animateState);
+        // 初始化INIT
+        this.sprite.texture = this.animateState['INIT'];
+        //console.log(this.animateState);
     }
 
     // 指定初始化帧，指定精灵位置，指定精灵交互情况,如果你有特定的初始帧可以在回调函数中
     // 指定，否则输入帧序数，该初始化会在loadFrames之后进行
-    init(type, callback) {
-        this.SoldierType = type;
-        // fullTexture 保存该对象的所有texture源，可能是数组或者更大的texture对象
-        // 小texture数组，多个resource数组处理
-        if (toString.call(this.cache).slice(8, -1) === 'Array') {
-            this.fullTexture = [...this.cache.map(texture=>{
-                return texture.texture
-            })];
-            this.texture = this.fullTexture[0];
-        } else {        // 单个resource对象处理
-            if (this.cache.name.includes('.json')) {
-                this.fullTexture = _.cloneDeep(this.cache.textures[this.SoldierType+'.png']);
-                this.frame = _.cloneDeep(this.cache.data.frames[this.SoldierType+'.png']);
-                this.texture = this.judgeFrame(this.direction,  this.fullTexture);
-            } else {
-                this.fullTexture = this.cache.texture;
-                this.texture = this.cache.texture
-            }
-        }
-        // 初始化精灵
-        this.sprite = new PIXI.Sprite(this.texture);
-        this.sprite.x = Math.floor(Math.random() * 800);
-        this.sprite.y = Math.floor(Math.random() * 600);
-        // 相应事件
-        this.sprite.interactive = true;
-        this.sprite.buttonMode = true;
+    init(x, y, interactiveable, callback) {
         // 动画管理对象
         this.MAL = new MakeAnimationLoop(this.sprite);
+        // 初始化精灵
+        this.setPosition(x, y);
+        // 相应事件
+        if (interactiveable) {
+            this.sprite.interactive = true;
+            this.sprite.buttonMode = true;   
+        }
         const that = this;
         this.sprite.on('pointerdown', () => {
             switch (that.direction) {
                 case 'U':
+                    that.doAction('TURN@RIGHT')
                     that.turnTo('R');
-                    that.doAction('MOVE@RIGHT')
                     break;
                 case 'R':
+                    that.doAction('TURN@DOWN');
                     that.turnTo('D');
-                    that.doAction('MOVE@DOWN')
                     break;
                 case 'D':
+                    that.doAction('MOVE@LEFT');
                     that.turnTo('L');
-                    that.doAction('MOVE@LEFT')
                     break;
                 case 'L':
+                    that.doAction('MOVE@UP');
                     that.turnTo('U');
-                    that.doAction('MOVE@UP')
                     break;
                 default:
                     return;
@@ -158,19 +179,21 @@ class Solider {
         return this;
     }
     // 设置位置
-    setPosition(x, y) {
+    setPosition(x = 0, y = 0) {
         if (typeof x === 'object') {
-
+            this.sprite.x = x.x;
+            this.sprite.y = x.y;
         } else {
-
+            this.sprite.x = x;
+            this.sprite.y = y;
         }
     }
     // 转向
     turnTo(direction) {
         console.log('ture to: ' + direction);
         this.direction = direction;
-        this.changeFrame(this.direction, this.texture);
-        this.sprite.texture = this.texture;
+        // this.changeFrame(this.direction, this.texture);
+        // this.sprite.texture = this.texture;
         //this.sprite.texture.update();
     }
 
@@ -180,44 +203,44 @@ class Solider {
         scene.addChild ? scene.addChild(this.sprite) : console.error('加入的不是容器，请检查其类型');
     }
 
-    changeFrame(direction, texture){
-        const {height, width} = texture.frame
-        texture.frame = this.createRectangle(direction, width, height);
-        texture._updateUvs();
-    }
+    // changeFrame(direction, texture){
+    //     const {height, width} = texture.frame
+    //     texture.frame = this.createRectangle(direction, width, height);
+    //     texture._updateUvs();
+    // }
 
-    createRectangle(direction, width, height) {
-        let rectangle;
-        switch (direction) {
-            case 'R':
-                rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, this.frame.frame.y + height * 2, width, height)
-                break;
-            case 'L':
-                rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, this.frame.frame.y + height, width, height)
-                break;
-            case 'D':
-                rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, 0, width, height)
-                break;
-            case 'U':
-                rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, this.frame.frame.y + height * 3, width, height)
-                break;
-            default:
-                rectangle = new PIXI.Rectangle(0, 0, width, height)
-        }
+    // createRectangle(direction, width, height) {
+    //     let rectangle;
+    //     switch (direction) {
+    //         case 'R':
+    //             rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, this.frame.frame.y + height * 2, width, height)
+    //             break;
+    //         case 'L':
+    //             rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, this.frame.frame.y + height, width, height)
+    //             break;
+    //         case 'D':
+    //             rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, 0, width, height)
+    //             break;
+    //         case 'U':
+    //             rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, this.frame.frame.y + height * 3, width, height)
+    //             break;
+    //         default:
+    //             rectangle = new PIXI.Rectangle(0, 0, width, height)
+    //     }
 
-        return rectangle;
-    }
+    //     return rectangle;
+    // }
 
-    judgeFrame(direction, texture) {
-        const distTexture = _.cloneDeep(texture);
-        const width = distTexture.orig.width;
-        const height = distTexture.orig.height;
-        const wPiece = width / 4;
-        const hPiece = height / 4;
-        distTexture.frame = this.createRectangle(direction, wPiece, hPiece);
-        distTexture._updateUvs();
-        return distTexture;
-    }
+    // judgeFrame(direction, texture) {
+    //     const distTexture = _.cloneDeep(texture);
+    //     const width = distTexture.orig.width;
+    //     const height = distTexture.orig.height;
+    //     const wPiece = width / 4;
+    //     const hPiece = height / 4;
+    //     distTexture.frame = this.createRectangle(direction, wPiece, hPiece);
+    //     distTexture._updateUvs();
+    //     return distTexture;
+    // }
 }
 
 export default Solider

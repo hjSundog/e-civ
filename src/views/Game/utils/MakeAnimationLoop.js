@@ -203,6 +203,10 @@ export default class AnimationManager {
         }, once);
     }
 
+    changeFrame(frame) {
+        this.sprite.texture = frame;
+    }
+
     _animateReverse(frames, once) {
 
     }

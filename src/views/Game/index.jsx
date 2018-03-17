@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import BattleGround from './BattleGround'
+import BattleGround from './battleground'
 import Soldiers from './characters'
 import _ from 'lodash';
 import * as PIXI from 'pixi.js'
@@ -88,7 +88,6 @@ class Game extends React.Component {
                 }
             }
 
-
             let style = new TextStyle({
                 fontFamily: "Arial",
                 fontSize: 36,
@@ -103,28 +102,26 @@ class Game extends React.Component {
             });
             this.message = new Text('start', style);
             this.gameOverScene.addChild(this.message);
-
-
             // test
-            let testTexture = _.cloneDeep(textures.textures['Archer.png']);
-            testTexture.frame = new Rectangle(0, 0, 48, 64);
-            let testSprite = new PIXI.Sprite(testTexture);
-            testSprite.buttonMode = true;
-            testSprite.interactive = true;
+            // let testTexture = _.cloneDeep(textures.textures['Archer.png']);
+            // testTexture.frame = new Rectangle(0, 0, 48, 64);
+            // let testSprite = new PIXI.Sprite(testTexture);
+            // testSprite.buttonMode = true;
+            // testSprite.interactive = true;
 
-            let mal = new MakeAnimationLoop(testSprite);
-            mal.loadFrames(textures, 4, 4, 'Archer.png');
-            console.log(mal.frames.length);
-            testSprite.x = 400;
-            testSprite.y = 300;
-            this.gameScene.addChild(testSprite);
-            mal.directAnimationFrames({
-                start: 8,
-                end: 11
-            });  
-            testSprite.on('pointerdown', () => {
-                mal.isStop? mal.resume():mal.pause();
-            })
+            // let mal = new MakeAnimationLoop(testSprite);
+            // mal.loadFrames(textures, 4, 4, 'Archer.png');
+            // console.log(mal.frames.length);
+            // testSprite.x = 400;
+            // testSprite.y = 300;
+            // this.gameScene.addChild(testSprite);
+            // mal.directAnimationFrames({
+            //     start: 8,
+            //     end: 11
+            // });  
+            // testSprite.on('pointerdown', () => {
+            //     mal.isStop? mal.resume():mal.pause();
+            // })
         })
 
     }
