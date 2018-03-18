@@ -1,11 +1,11 @@
 import Soldier from './Soldier'
 import * as PIXI from 'pixi.js'
-
+import noop from '@/utils/noop.js';
+import { arch } from 'os';
 export default class Archer extends Soldier {
-    static primarity = 0;
-
     constructor(cache) {
         super(cache);
+        this.primarity = 0;
         this.SoldierType = "Archer";
         this.init(Math.floor(Math.random()*800), Math.floor(Math.random()*600),true,()=>{
             console.log('Archer');
@@ -32,7 +32,32 @@ export default class Archer extends Soldier {
                 },
                 'DEAD': [0, 2]
             }
+        });
+
+        this.setAction('MOVE@UP', (archer)=>{
+            typeof archer.moveUP === 'function'?archer.moveUP(4):console.log('不是一个方法');
+            //archer.moveUp();
         })
+
+
+        this.setAction({
+            name: ['MOVE@DOWN'],
+            callback: (archer) => {
+                archer.moveDown(4);
+            }
+        })
+
+        this.setAction([{
+            name: 'MOVE@LEFT',
+            callback: (archer) => {
+                archer.moveLeft(2);
+            }
+        },{
+            name: 'MOVE@RIGHT',
+            callback: (archer) => {
+                archer.moveRight(2);
+            }
+        }])
     }
 
 }

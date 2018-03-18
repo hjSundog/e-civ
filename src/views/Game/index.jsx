@@ -51,7 +51,7 @@ class Game extends React.Component {
         this.gameOverScene = new Container();
         this.gameScene.visible = true;
         this.gameOverScene.visible = false;
-        this.battleGround = new BattleGround(800, 600);
+        this.battleGround = new BattleGround(800, 600, {row: 5, col: 20}, this.gameScene);
         // 初始化资源
         this.initResource();
     }
@@ -102,6 +102,10 @@ class Game extends React.Component {
             });
             this.message = new Text('start', style);
             this.gameOverScene.addChild(this.message);
+
+            this.battleGround.initGroup('my');
+            this.battleGround.addGroupToScene(true);
+            this.battleGround.battle();
             // test
             // let testTexture = _.cloneDeep(textures.textures['Archer.png']);
             // testTexture.frame = new Rectangle(0, 0, 48, 64);
@@ -148,7 +152,7 @@ class Game extends React.Component {
             for (let i=0;i<num;i++) {
                 let solider = new Soldiers[soldierType](cache);
                 // 加入容器
-                solider.addToScene(this.gameScene);
+                // solider.addToScene(this.gameScene);
                 // this.gameScene.addChild(solider.sprite);
                 // 加入数组
                 rt.push(solider);

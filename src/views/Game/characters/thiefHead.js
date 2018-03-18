@@ -1,11 +1,9 @@
 import Soldier from './Soldier';
 
 export default class ThiefHead extends Soldier {
-    static primarity = 3;
-    static SoldierName = "ThiefHead";
-
     constructor(cache) {
         super(cache);
+        this.primarity = 3;
         this.SoldierType = "ThiefHead";
         this.init(Math.floor(Math.random()*800), Math.floor(Math.random()*600), true,()=>{
             console.log('ThiefHead');
@@ -33,6 +31,31 @@ export default class ThiefHead extends Soldier {
         })
         // 改变帧
         this.changeFrame('TURN@DOWN')
+
+        this.setAction('MOVE@UP', (archer)=>{
+            typeof archer.moveUP === 'function'?archer.moveUP(3):console.log('不是一个方法');
+            //archer.moveUp();
+        })
+
+
+        this.setAction({
+            name: ['MOVE@DOWN'],
+            callback: (archer) => {
+                archer.moveDown(3);
+            }
+        })
+
+        this.setAction([{
+            name: 'MOVE@LEFT',
+            callback: (archer) => {
+                archer.moveLeft(3);
+            }
+        },{
+            name: 'MOVE@RIGHT',
+            callback: (archer) => {
+                archer.moveRight(3);
+            }
+        }])
     }
 
 }

@@ -8,8 +8,7 @@
 import * as PIXI from 'pixi.js';
 import _ from 'lodash';
 import MakeAnimationLoop from '../utils/MakeAnimationLoop'
-
-
+import noop from '@/utils/noop.js';
 
 const Rectangle = PIXI.Rectangle;
 
@@ -37,8 +36,8 @@ class Solider {
         this.direction = 'R';
         // 状态设置
         // 动作状态
-        this.animateState = {};
-
+        this.animateState = {};     // 动画帧存储
+        this.actions = {}           // 动作效果回调函数存储
         this.nowActionState = '';
         // 动作怔状态
         this.loopState = 0;
@@ -49,17 +48,101 @@ class Solider {
 
     }
 
+    moveUP(pix = 1){
+        this.sprite.y -= pix;
+    }
+
+    moveDown(pix = 1) {
+        this.sprite.y += pix;
+    }
+
+    moveLeft(pix = 1) {
+        this.sprite.x += pix;
+    }
+
+    moveRight(pix = 1) {
+        this.sprite.x -= pix;
+    }
+
+    // 初始化动作函数
+    initAction(actionName) {
+        this.actions[actionName] = noop;
+    }
+
+    // 指定某个行为的回调函数 {name: ,callback}
+    // 指定一系列行为的回调
+    // 指定一系列行为各自的回调
+    setAction= (map, callback) => {
+        const type = toString.call(map).slice(8, -1) ;
+        if (type === 'Array') {
+            map.forEach(_map=>{
+                const _map_type = toString.call(_map.name).slice(8, -1);
+                if (_map_type === 'Array') {
+                    _map.name.forEach(name=>{
+                        this._setAction(name, _map.callback?_map.callback:noop);
+                    })
+                }
+
+                if (_map_type === 'String') {
+                    this._setAction(_map.name, _map.callback?_map.callback:noop);
+                }
+            })
+        }   
+
+        if (type === 'String') {
+            this._setAction(map, callback);
+        }
+
+        if (type === 'Object') {
+            const _type = toString.call(map.name).slice(8, -1);
+            if (_type === 'Array') {
+                map.name.forEach(name=>{
+                    this._setAction(name, map.callback?map.callback:noop);
+                })
+            }
+            if (_type === 'String') {
+                this._setAction(map.name, map.callback?map.callback:noop);
+            }
+        }
+        
+        return this;
+    }
+
+    // 以后考虑move,up而不是move@up
+    _setAction(name, callback) {
+        const actions = name.split('@');
+        let pointer = this.actions;
+        const length = actions.length;
+        for (let i=0;i<length-1;i++) {
+            pointer = pointer[actions[i]];
+        }
+        pointer[actions[length-1]] = callback;
+        return this;
+    }
+
     // 针对每种行为制作其动画,子动画使用@链接,MOVE@UP
-    doAction(actionType) {
+    doAction = (actionType) => {
         this.MAL.stop();
+        // action动画效果逻辑
         const actions = actionType.split('@');
+        // 占用的帧
         const frames = actions.reduce((pre, next) => {
             return pre[next];
         }, this.animateState);
+        // 调用的函数
+        const actionFunc = actions.reduce((pre, next) => {
+            return pre[next];
+        }, this.actions);
+
         const type = toString.call(frames).slice(8, -1);
         type === 'Array'
         ?this.MAL.animate(frames)
         :this.MAL.changeFrame(frames);
+        // action实际效果逻辑
+        // 这里做个适配吧
+        // MOVE@UP,(MOVE,UP)都可以，推荐MOVE@UP
+        // actionFunc(this);
+        actionFunc.call(this, this);
     }
 
     // 改变当前精灵的贴图
@@ -112,18 +195,21 @@ class Solider {
         const frames = this.MAL.getFrames();
         const state = callback.call(this, this);
         const MAL = this.MAL;
-        function recurse(obj, dist, mapFunc) {
+        function recurse(obj, dist, actions, mapFunc) {
             for (let key of Object.keys(obj)) {
                 let type = toString.call(obj[key]).slice(8, -1);
                 if (type === 'Object') {
                     dist[key] = {...dist[key]};
-                    recurse(obj[key], dist[key], mapFunc);
+                    actions[key] = {};
+                    recurse(obj[key], dist[key], actions[key], mapFunc);
                 } else {
+                    actions[key] = noop;
                     dist[key] = mapFunc(obj[key], dist.base);
                 }
             }
         }
-        recurse(state, this.animateState, (val, base)=>{
+        // 根据state(数据)映射到animateState(帧)和动作函数
+        recurse(state, this.animateState, this.actions, (val, base)=>{
             let type = toString.call(val).slice(8, -1);
             let sequences = val;
             if (type === 'Array') {
@@ -135,9 +221,11 @@ class Solider {
             }
             return MAL.getSequenceFrames([sequences], base)[0];
         })
+
+        // 初始化动作函数
         // 初始化INIT
         this.sprite.texture = this.animateState['INIT'];
-        //console.log(this.animateState);
+        console.log(this.animateState);
     }
 
     // 指定初始化帧，指定精灵位置，指定精灵交互情况,如果你有特定的初始帧可以在回调函数中
@@ -202,45 +290,6 @@ class Solider {
         console.log(this.SoldierType + '加入战场');
         scene.addChild ? scene.addChild(this.sprite) : console.error('加入的不是容器，请检查其类型');
     }
-
-    // changeFrame(direction, texture){
-    //     const {height, width} = texture.frame
-    //     texture.frame = this.createRectangle(direction, width, height);
-    //     texture._updateUvs();
-    // }
-
-    // createRectangle(direction, width, height) {
-    //     let rectangle;
-    //     switch (direction) {
-    //         case 'R':
-    //             rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, this.frame.frame.y + height * 2, width, height)
-    //             break;
-    //         case 'L':
-    //             rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, this.frame.frame.y + height, width, height)
-    //             break;
-    //         case 'D':
-    //             rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, 0, width, height)
-    //             break;
-    //         case 'U':
-    //             rectangle = new Rectangle(this.frame.frame.x + width * this.loopState, this.frame.frame.y + height * 3, width, height)
-    //             break;
-    //         default:
-    //             rectangle = new PIXI.Rectangle(0, 0, width, height)
-    //     }
-
-    //     return rectangle;
-    // }
-
-    // judgeFrame(direction, texture) {
-    //     const distTexture = _.cloneDeep(texture);
-    //     const width = distTexture.orig.width;
-    //     const height = distTexture.orig.height;
-    //     const wPiece = width / 4;
-    //     const hPiece = height / 4;
-    //     distTexture.frame = this.createRectangle(direction, wPiece, hPiece);
-    //     distTexture._updateUvs();
-    //     return distTexture;
-    // }
 }
 
 export default Solider
