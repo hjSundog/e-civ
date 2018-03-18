@@ -155,7 +155,7 @@ class Sidebar extends React.Component {
 Sidebar.defaultProps = {
     person: {
         name: '',
-        person_id: null,
+        id: null,
         attributes: {
             str: 1,
             dex: 1,

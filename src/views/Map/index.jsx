@@ -1,16 +1,20 @@
 import React from 'react';
-import MapPane from './MapPane'
-import DropDownTab from './DropDownTab'
 import api from '../../api'
 import './index.less'
-import { Button, message, Tabs, Row, Col, Menu, Dropdown } from 'antd'
+import { connect } from 'react-redux'
+import { Button, message } from 'antd'
 import Globe, {GlobeOptions} from 'e-civ-planet';
 
 import BuildingCard from './BuildingCard'
 
-const TabPane = Tabs.TabPane;
-const SubMenu = Menu.SubMenu;
 
+const mapStateToProps = (state) => {
+    return {
+        person: state.person
+    }
+}
+
+@connect(mapStateToProps)
 class Map extends React.Component {
 
     constructor(props) {
@@ -20,6 +24,8 @@ class Map extends React.Component {
             building: null,
             visible: false,
         }
+
+        this.globe = null;
     }
 
     handleError() {
@@ -72,8 +78,7 @@ class Map extends React.Component {
     }
 
     handleShowBuildings = () => {
-        const globe = Globe.getInstance();
-        globe.showPositions([{
+        this.globe.showPositions([{
             lon: 12.6,
             lat: 30,
             type: 'building',
@@ -93,19 +98,16 @@ class Map extends React.Component {
     }
 
     handleClearAll = () => {
-        const globe = Globe.getInstance();
-        globe.poiLayer.clearAll();
+        this.globe.poiLayer.clearAll();
     }
 
     handleShowRoute = () => {
-        const globe = Globe.getInstance();
-        globe.routeLayer.test();
-        globe.routeLayer.addRouteByLonlats([[12.6, 30], [13, 30], [13, 30.2]], globe.routeLayer.camera.getResolution(), 5, [0, 255, 0]);
+        this.globe.routeLayer.test();
+        this.globe.routeLayer.addRouteByLonlats([[12.6, 30], [13, 30], [13, 30.2]], this.globe.routeLayer.camera.getResolution(), 5, [0, 255, 0]);
     }
 
     handleGoCenter = () => {
-        const globe = Globe.getInstance();
-        globe.updateUserLocation({
+        this.globe.updateUserLocation({
             lon: 12.3,
             lat: 30,
             accuracy: 500,
@@ -118,23 +120,32 @@ class Map extends React.Component {
         })
     }
 
+    handleGo = (position) => {
+        const { position: personPosition } = this.props.person
+        debugger;
+        if(position.lon === personPosition.lon && position.lat === personPosition.lat ) {
+            message.info('兄弟，你已经到站了，别点了')
+        }
+        this.globe.routeLayer.addRouteByLonlats([[12.3, 30], [position.lon, position.lat]], this.globe.routeLayer.camera.getResolution(), 5, [0, 255, 0]);
+
+    }
+
     componentDidMount() {
-        console.log('md')
         var options = new GlobeOptions();
         options.satellite = true;
         options.level = 2;
         options.lonlat = 'auto';
-        const globe = Globe.getInstance(options);
+        this.globe = Globe.getInstance(options);
         const container = document.querySelector('#global_map');
         const content = document.querySelector('.ant-layout-content');
-        globe.placeAt(container);
-        globe.resize(content.clientWidth, content.clientHeight)
-        globe.updateUserLocation({
+        this.globe.placeAt(container);
+        this.globe.resize(content.clientWidth, content.clientHeight)
+        this.globe.updateUserLocation({
             lon: 12.3,
             lat: 30,
             accuracy: 500,
         });
-        globe.showPositions([{
+        this.globe.showPositions([{
             lon: 12.6,
             lat: 30,
             type: 'building',
@@ -151,7 +162,7 @@ class Map extends React.Component {
                 class: []
             }
         }])
-        globe.poiLayer.setPickListener((target) => {
+        this.globe.poiLayer.setPickListener((target) => {
             this.buildingCard.show()
             this.setState({
                 building: target.attributes
@@ -195,7 +206,11 @@ class Map extends React.Component {
                         我的位置
                     </Button>
                 </div>
-                <BuildingCard ref={(card) => { this.buildingCard = card; }} building={building}></BuildingCard>
+                <BuildingCard
+                    ref={(card) => { this.buildingCard = card; }}
+                    building={building}
+                    handleGo={this.handleGo}>
+                </BuildingCard>
                 {/* <div className="pane" style={{display: visible?'flex':'none'}}>
                     <div className="mask"></div>
                     <Row type='flex' justify="center" align="bottom">

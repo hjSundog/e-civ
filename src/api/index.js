@@ -169,7 +169,7 @@ mock.onPost(/\/skills\/\w+\/use/).reply(config => {
         person: {   // 对person的影响，直接返回整个person对象。
             _id: 1,
             name: 'test',
-            person_id: 'oier-133ao',
+            id: 'oier-133ao',
             attributes: {
                 str: 1,
                 dex: 1,

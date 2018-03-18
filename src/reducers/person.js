@@ -3,14 +3,15 @@ import {
     UPDATE_PERSON,
     DELETE_PERSON,
     INIT_PERSON,
-    RESET_PERSON
+    RESET_PERSON,
+    UPDATE_PERSON_POI, // 更新人物地理位置
 } from '../actions/person';
 
 import _ from 'lodash'
 
 const initialState = {
     name: 'init person',
-    person_id: null,
+    id: null,
     attributes: {
         str: 1,
         dex: 1,
@@ -31,61 +32,13 @@ const initialState = {
     meta: {
         age: 0,
         sex: 'male'
-    }
+    },
+    state: 'available',  // 暂定三个状态 available, moving, doing
+    position: {  // 当前经纬度位置
+        lon: 12.3,
+        lat: 30,
+    },
 };
-
-
-function cloneObject(obj) {
-    if(typeof obj === "object") {
-        if(Array.isArray(obj)) {
-            var newArr = [];
-            for(var i = 0; i < obj.length; i++) newArr.push(obj[i]);
-            return newArr;
-        } else {
-            var newObj = {};
-            for(var key in obj) {
-                newObj[key] = cloneObject(obj[key]);
-            }
-            return newObj;
-        }
-    } else {
-        return obj;
-    }
-}
-
-// 更改目标对象(pre)同提供对象(update)属性相同的值,不同层级也可以改变，
-// 查找属性顺序为逐层查找，如果最底层都没有这个属性，则将该属性加入顶层并赋值。
-function personUpdateProxy(pre, update) {
-    const rt = cloneObject(pre);
-
-    Object.entries(update).forEach(function(ele) {
-        //递归寻找对象是否有这个属性
-        function recursion(target) {
-            for(let key in target) {
-                //建相等
-                if(key === ele[0]) {
-                    //如果值为对象
-                    if(toString.call(target[key]).slice(8, -1) === 'Object') {
-                        //建相等,这里先简单的这样做，不考虑深度克隆的情况
-                        target[key] = {
-                            ...target[key],
-                            ...ele[1]
-                        }
-                    } else {          
-                        target[key] = ele[1];
-                    }
-                } else if(toString.call(target[key]).slice(8, -1) === 'Object') {             
-                    recursion(target[key])
-                }
-
-            }
-        }
-        recursion(rt);
-    })
-
-
-    return {...pre,...rt}
-}
 
 export default function auth(state = initialState, action = {}) {
     switch (action.type) {
@@ -99,6 +52,11 @@ export default function auth(state = initialState, action = {}) {
         return _.assign(state, action.person)
     case DELETE_PERSON:
         return {}
+    case UPDATE_PERSON_POI:
+        return {
+            ...state,
+            position: action.position
+        }
     default:
         return state;
     }

@@ -1,7 +1,7 @@
 module.exports = {
     _id: 1,
-    name: 'test',
-    person_id: 'oier-133ao',
+    name: 'init person',
+    id: 'asd-wfqasd',
     attributes: {
         str: 1,
         dex: 1,
@@ -11,9 +11,9 @@ module.exports = {
         cha: 1
     },
     items: [],
-    des: '我不是一个逗逼，真的',
+    des: '这里使用redux比较好吧',
     conditions: {
-        health: 10,
+        health: 100,
         maxHealth: 100,
         stamina: 100,
         maxStamina: 100
@@ -22,5 +22,10 @@ module.exports = {
     meta: {
         age: 0,
         sex: 'male'
-    }
+    },
+    state: 'available',  // 暂定三个状态 available, moving, doing
+    position: {  // 当前经纬度位置
+        lon: 12.3,
+        lat: 30,
+    },
 }

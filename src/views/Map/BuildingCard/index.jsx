@@ -23,51 +23,6 @@ const tabList = [{
     tab: '其他'
 }];
 
-const contentList = {
-    info: (<div className="info">
-        <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514213554091&di=7275f7e3745ed593d05fc71e84d56b5d&imgtype=0&src=http%3A%2F%2Fpic31.nipic.com%2F20130718%2F12606377_200853832000_2.jpg" alt="建筑图片"/>
-        <div className="info-main">
-            <div className="info-detail">
-                <div className="base">
-                    <span className="name">医馆</span>
-                    <span>lv3</span>
-                    <span className="guild">
-                        <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-                    </span>
-                    <span className="owner">
-                        <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-                    </span>
-                </div>
-                <div className="effect">
-                    <div className="effect">
-                        <span>效果：</span>
-                        <ul>
-                            <li>立即恢复50%生命值</li>
-                            <li>连续一天自然精力恢复加倍</li>
-                            <li>驱散烧伤，冰冻等debuff</li>
-                            <li>。。。</li>
-                        </ul>
-                    </div>
-                </div>
-                <span>治病救人的地方,如果你还没死，就可以在这里慢慢恢复你的生命值，级别越高恢复生命体力值就越快</span>
-            </div>
-        </div>
-    </div>),
-    operation: (<div className="operation">
-        <Card.Grid style={gridStyle}>疗伤</Card.Grid>
-        <Card.Grid style={gridStyle}>新建</Card.Grid>
-        <Card.Grid style={gridStyle}>卖出医馆</Card.Grid>
-        <Card.Grid style={gridStyle}>租借医馆</Card.Grid>
-        <Card.Grid style={gridStyle}>升级</Card.Grid>
-        <Card.Grid style={gridStyle}>摧毁</Card.Grid>
-        <Card.Grid style={gridStyle}>设置</Card.Grid>
-    </div>),
-    other: (<div className="other">
-        <Button type="primary" >到这里去</Button>
-        <Button type="primary" >离开</Button>
-    </div>)
-};
-
 class BuildingCard extends React.Component {
 
     constructor(props) {
@@ -78,6 +33,7 @@ class BuildingCard extends React.Component {
             building:{},
             visible: false
         }
+
     }
     //属性更改之后
     componentWillReceiveProps(nextProps) {
@@ -100,6 +56,11 @@ class BuildingCard extends React.Component {
         })
     }
 
+    // 从当前位置到Building
+    go = () => {
+        const {building} = this.props;
+        this.props.handleGo(building)
+    }
 
     // async getBuildingInfo(target){
     //     this.setState({
@@ -150,6 +111,51 @@ class BuildingCard extends React.Component {
     }
 
     render() {
+        const contentList = {
+            info: (<div className="info">
+                <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514213554091&di=7275f7e3745ed593d05fc71e84d56b5d&imgtype=0&src=http%3A%2F%2Fpic31.nipic.com%2F20130718%2F12606377_200853832000_2.jpg" alt="建筑图片"/>
+                <div className="info-main">
+                    <div className="info-detail">
+                        <div className="base">
+                            <span className="name">医馆</span>
+                            <span>lv3</span>
+                            <span className="guild">
+                                <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                            </span>
+                            <span className="owner">
+                                <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                            </span>
+                        </div>
+                        <div className="effect">
+                            <div className="effect">
+                                <span>效果：</span>
+                                <ul>
+                                    <li>立即恢复50%生命值</li>
+                                    <li>连续一天自然精力恢复加倍</li>
+                                    <li>驱散烧伤，冰冻等debuff</li>
+                                    <li>。。。</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <span>治病救人的地方,如果你还没死，就可以在这里慢慢恢复你的生命值，级别越高恢复生命体力值就越快</span>
+                    </div>
+                </div>
+            </div>),
+            operation: (<div className="operation">
+                <Card.Grid style={gridStyle}>疗伤</Card.Grid>
+                <Card.Grid style={gridStyle}>新建</Card.Grid>
+                <Card.Grid style={gridStyle}>卖出医馆</Card.Grid>
+                <Card.Grid style={gridStyle}>租借医馆</Card.Grid>
+                <Card.Grid style={gridStyle}>升级</Card.Grid>
+                <Card.Grid style={gridStyle}>摧毁</Card.Grid>
+                <Card.Grid style={gridStyle}>设置</Card.Grid>
+            </div>),
+            other: (<div className="other">
+                <Button type="primary" onClick={ this.go } >到这里去</Button>
+                <Button type="primary" >离开</Button>
+            </div>)
+        };
+
         const {building} = this.props;
         if(!this.state.visible) {
             return null
