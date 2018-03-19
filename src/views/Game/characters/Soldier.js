@@ -48,6 +48,8 @@ class Solider {
 
     }
 
+    
+
     moveUP(pix = 1){
         this.sprite.y -= pix;
     }

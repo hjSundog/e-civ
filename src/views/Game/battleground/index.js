@@ -161,16 +161,46 @@ export default class BattleGround {
     }
 
     // test
-    moveRandom(target) {
+    moveRandom = (target) => {
         const actionType = ['UP','DOWN','LEFT','RIGHT'];
         const prefix = 'MOVE';
         // target.doAction('MOVE@UP');
         setInterval(()=>{
-            target.doAction(`${prefix}@${actionType[Math.floor(Math.random()*4)]}`);
+            const bounds = this._boundLimit(target.sprite);
+            const avaliableDirection = actionType.filter(action => {
+                return !bounds.includes(action)
+            })
+            // console.log(avaliableDirection);
+            target.doAction(`${prefix}@${avaliableDirection[Math.floor(Math.random()*avaliableDirection.length)]}`);
         }, 2000);
         
     }
 
+    // 返回当前精灵的所处边界
+    _boundLimit(sprite) {
+        const  {x, y} = sprite;
+        const bounds = [];
+        if (x < 0) {
+            bounds.push('LEFT');
+        }
+
+        if (y < 0) {
+            bounds.push('UP');
+        }
+
+        if (x > this.x) {
+            bounds.push('RIGHT');
+        }
+
+        if (y > this.y) {
+            bounds.push('DOWN');
+        }
+
+        return bounds;
+    }
+
+
+    // TODO:
     makeChildrenActive(children) {
         // 便利每个孩子决定其行为
         if (this.judgeMove()) {
@@ -191,13 +221,23 @@ export default class BattleGround {
         console.log(this.children.length);
     }
 
-    addToGroup(children, groupName) {
-        this.children = [...this.children, ...children];
+    addToGroup = (children, groupName) => {
+        
+        // 将每个对象的战场对象注册为本对象
+        children.forEach(child=>{
+            child.BattleGround = this;
+        })
+        children.reduce((target, child) => {
+            target.push(child);
+            return target;
+        }, this.children);
+        
         return this.groups[groupName] ? this.groups[groupName] = [...this.groups[groupName], ...children] : this.groups[groupName] = [...children];
     }
 
     // 加入对象
     addChild(child) {
+        child.BattleGround = this;
         this.children.push(child);
     }
 

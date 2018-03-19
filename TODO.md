@@ -6,6 +6,10 @@ Mailbox内的PublishModal的收件人可以添加Autocomplete优化体验
 5. Canvas+WebGL AI自动战斗系统。
 
 
+1. soldier随机循环触发各个事件，然后通知battleground进行仲裁，决定确切触发那个事件。
+
+TODO: 就是完善事件动作循环判定。
+
+
 Questions: 
 1. 拍卖的时候将拍卖数据通过websocket发送到服务器端时，客户端怎么保证该数据不会丢失，比如如果客户端一直保持该数据可用，万一进行其他操作将该数据占用了，如果客户端将该数据枷锁，如果服务器不响应该数据怎么解锁？？
-2. 
