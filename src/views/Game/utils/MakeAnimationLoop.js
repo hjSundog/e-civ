@@ -190,7 +190,7 @@ export default class AnimationManager {
     }
 
     // 根据传入帧产生动画
-    _animate(frames, once) {
+    _animate = (frames, callback, once) => {
         // 重置帧状态
         this.currentFrame = 0;
         this.isStop = false;
@@ -200,6 +200,7 @@ export default class AnimationManager {
         this.loop(() => {
             this.sprite.texture = this.cacheFrames[this.currentFrame];
             this.currentFrame = (this.currentFrame + 1) % this.cacheFrames.length;
+            callback.call(this.owner, this.owner);
         }, once);
     }
 
@@ -207,16 +208,19 @@ export default class AnimationManager {
         this.sprite.texture = frame;
     }
 
-    _animateReverse(frames, once) {
+    // 逆向帧动画
+    _animateReverse(frames, callback, once) {
 
     }
 
-    animateOnce(frames) {
-        this._animate(frames, true);
+    // 只动画一次
+    animateOnce(frames, callback) {
+        this._animate(frames, callback, true);
     }
 
-    animate(frames) {
-        this._animate(frames);
+    // frames and action
+    animate(frames, callback) {
+        this._animate(frames, callback);
     }
 
     pause() {

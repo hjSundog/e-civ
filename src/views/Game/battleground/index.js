@@ -167,7 +167,7 @@ export default class BattleGround {
         // target.doAction('MOVE@UP');
         setInterval(()=>{
             target.doAction(`${prefix}@${actionType[Math.floor(Math.random()*4)]}`);
-        }, 1/6);
+        }, 2000);
         
     }
 

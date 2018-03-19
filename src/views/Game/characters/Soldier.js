@@ -57,11 +57,11 @@ class Solider {
     }
 
     moveLeft(pix = 1) {
-        this.sprite.x += pix;
+        this.sprite.x -= pix;
     }
 
     moveRight(pix = 1) {
-        this.sprite.x -= pix;
+        this.sprite.x += pix;
     }
 
     // 初始化动作函数
@@ -104,9 +104,10 @@ class Solider {
                 this._setAction(map.name, map.callback?map.callback:noop);
             }
         }
-        
         return this;
     }
+
+
 
     // 以后考虑move,up而不是move@up
     _setAction(name, callback) {
@@ -136,13 +137,13 @@ class Solider {
 
         const type = toString.call(frames).slice(8, -1);
         type === 'Array'
-        ?this.MAL.animate(frames)
-        :this.MAL.changeFrame(frames);
+        ?this.MAL.animate(frames, actionFunc)
+        :this.MAL.changeFrame(frames, actionFunc);
         // action实际效果逻辑
         // 这里做个适配吧
         // MOVE@UP,(MOVE,UP)都可以，推荐MOVE@UP
         // actionFunc(this);
-        actionFunc.call(this, this);
+        // actionFunc.call(this, this);
     }
 
     // 改变当前精灵的贴图
@@ -233,6 +234,7 @@ class Solider {
     init(x, y, interactiveable, callback) {
         // 动画管理对象
         this.MAL = new MakeAnimationLoop(this.sprite);
+        this.MAL.owner = this;
         // 初始化精灵
         this.setPosition(x, y);
         // 相应事件
