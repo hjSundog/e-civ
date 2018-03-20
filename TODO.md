@@ -6,8 +6,8 @@ Mailbox内的PublishModal的收件人可以添加Autocomplete优化体验
 5. Canvas+WebGL AI自动战斗系统。
 
 
-1. soldier随机循环触发各个事件，然后通知battleground进行仲裁，决定确切触发那个事件。
-
+1. soldier循环触发各个事件，然后通知battleground进行仲裁，决定确切触发那个事件。扩展性较强，但是battleground负担极大
+2. 还有一种方式是全靠battleground决定触发什么事件，然后通知该对象即可.但是battleground不可能知道soldier的行为，扩展性较差
 TODO: 就是完善事件动作循环判定。
 
 

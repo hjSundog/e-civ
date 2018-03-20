@@ -37,7 +37,8 @@ class Solider {
         // 状态设置
         // 动作状态
         this.animateState = {};     // 动画帧存储
-        this.actions = {}           // 动作效果回调函数存储
+        this.actions = {};          // 动作效果回调函数存储
+        this.actionTypes = [];      // 注册的动作类型存储
         this.nowActionState = '';
         // 动作怔状态
         this.loopState = 0;
@@ -71,6 +72,7 @@ class Solider {
         this.actions[actionName] = noop;
     }
 
+    // 注册行为函数
     // 指定某个行为的回调函数 {name: ,callback}
     // 指定一系列行为的回调
     // 指定一系列行为各自的回调
@@ -113,6 +115,9 @@ class Solider {
 
     // 以后考虑move,up而不是move@up
     _setAction(name, callback) {
+        // 注册该动作
+        this.actionTypes.push(name);
+        // 注册其函数
         const actions = name.split('@');
         let pointer = this.actions;
         const length = actions.length;
@@ -122,6 +127,26 @@ class Solider {
         pointer[actions[length-1]] = callback;
         return this;
     }
+
+    // 人物运动循环，激活人物
+    active = () => {
+        // 死循环的尝试所有动作，并根据
+        if (!this.MAL) {
+            return console.error('该对象没有加载到MakeAnimationLoop对象上')
+        }
+
+        if (!this.BattleGround) {
+            return console.error('该对象没有加载到BattleGround对象上')
+        }
+        // 时间可能存在一点问题，存在补足或者缺失问题.
+        setInterval(()=>{
+            this.actionTypes.forEach(type=>{
+                // this.BattleGround.makeChildrenActive(type);
+                this.doAction(type);   
+            })
+        }, 1000/this.MAL.fps)
+    }
+
 
     // 针对每种行为制作其动画,子动画使用@链接,MOVE@UP
     doAction = (actionType) => {
@@ -165,9 +190,8 @@ class Solider {
         if (type === 'Object') {
             frames instanceof PIXI.Texture?this.MAL.changeFrame(frames):console.error('请输入正确的行为参数');
         }
-
-
     }
+
 
     // 加载帧
     // frames为路径数组或者路径或者undefined(此时必须制定src),

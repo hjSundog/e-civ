@@ -3,6 +3,7 @@
 // 仲裁各个对象的行为和状态，类似于一个管理器
 import _ from 'lodash';
 import * as PIXI from 'pixi.js';
+import DC from '../utils/DetectCollision';
 
 export default class BattleGround {
     constructor(x = 800, y = 600, layout = { col: 30, row: 40 }, scene = new PIXI.Container()) {
@@ -15,6 +16,7 @@ export default class BattleGround {
             x: 1,
             y: 1
         };
+        this.bump = new Bump(PIXI);
         // 每格单位所占长宽
         this.resize(x, y);
     }
@@ -92,7 +94,6 @@ export default class BattleGround {
                     temp = 1;
                 }
             }
-        
         } else {
             // 从左到右放置
             for (let i=0;i<length;i++) {
@@ -104,9 +105,7 @@ export default class BattleGround {
             }
 
         }
-
         return last;
-
     }
 
     // 将组对象加入场景。fittable是否保持缩放
@@ -125,6 +124,8 @@ export default class BattleGround {
         //this.makeChildrenActive();
         this.children.forEach(child=>{
             this.moveRandom(child);
+            // 每个人物激活
+            // child.active();
         });
         console.log('battle start');
     }
@@ -173,8 +174,10 @@ export default class BattleGround {
             // console.log(avaliableDirection);
             target.doAction(`${prefix}@${avaliableDirection[Math.floor(Math.random()*avaliableDirection.length)]}`);
         }, 2000);
-        
     }
+
+    // 碰撞检测
+
 
     // 返回当前精灵的所处边界
     _boundLimit(sprite) {
@@ -201,21 +204,21 @@ export default class BattleGround {
 
 
     // TODO:
-    makeChildrenActive(children) {
+    makeChildrenActive(child) {
         // 便利每个孩子决定其行为
-        if (this.judgeMove()) {
+        if (this.judgeMove(child)) {
             return this.judgeMove();
         }
 
-        if (this.judgeAttack()) {
+        if (this.judgeAttack(child)) {
             return this.judgeAttack();
         }
 
-        if (this.judgeSkill()) {
+        if (this.judgeSkill(child)) {
             return this.judgeSkill();
         }
 
-        if (this.judgeLiveState()) {
+        if (this.judgeLiveState(child)) {
             return this.judgeLiveState();
         }
         console.log(this.children.length);
