@@ -6,6 +6,7 @@ export default class Archer extends Soldier {
     constructor(cache) {
         super(cache);
         this.primarity = 0;
+        this.attackArea = 3;
         this.SoldierType = "Archer";
         this.init(Math.floor(Math.random()*800), Math.floor(Math.random()*600),true,()=>{
             console.log('Archer');
@@ -14,6 +15,7 @@ export default class Archer extends Soldier {
         // 以4*4加载帧图形
         this.loadFrames('INIT.MOVE.TURN', 4 , 4, null, 'Archer.png'); // 已经传入了frames组
         this.loadFrames('DEAD', 4, 3, null, 'Archer_dead.png');
+        this.loadFrames('ATTACK', 4, 4, null, 'Archer_melee.png')
         //this.initActionState()
         this.setState((archer)=>{
             return {
@@ -30,12 +32,18 @@ export default class Archer extends Soldier {
                     'LEFT': [4, 7],
                     'RIGHT': [8, 11]
                 },
+                'ATTACK': {
+                    'UP':[12, 15],
+                    'DOWN': [0, 3],
+                    'LEFT': [4, 7],
+                    'RIGHT': [8, 11]       
+                },
                 'DEAD': [0, 2]
             }
         });
 
         this.setAction('MOVE@UP', (archer)=>{
-            typeof archer.moveUP === 'function'?archer.moveUP(4):console.log('不是一个方法');
+            typeof archer.moveUP === 'function'?archer.moveUP():console.log('不是一个方法');
             //archer.moveUp();
         })
 
@@ -43,19 +51,19 @@ export default class Archer extends Soldier {
         this.setAction({
             name: ['MOVE@DOWN'],
             callback: (archer) => {
-                archer.moveDown(4);
+                archer.moveDown();
             }
         })
 
         this.setAction([{
             name: 'MOVE@LEFT',
             callback: (archer) => {
-                archer.moveLeft(2);
+                archer.moveLeft();
             }
         },{
             name: 'MOVE@RIGHT',
             callback: (archer) => {
-                archer.moveRight(2);
+                archer.moveRight();
             }
         }])
     }

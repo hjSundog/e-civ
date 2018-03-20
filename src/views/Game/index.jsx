@@ -233,6 +233,14 @@ class Game extends React.Component {
 
 
 Game.defaultProps = {
+    // my: [{
+    //     soldierType: 'Archer',
+    //     count: 80,
+    // }],
+    // enemy: [{
+    //     soldierType: 'ThiefHead',
+    //     count: 80,
+    // }],
     enemy: [{
         soldierType: 'Archer',
         count: 400

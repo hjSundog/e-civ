@@ -21,8 +21,8 @@ class Solider {
         // 攻击范围
         this.attackArea = 1;
         // 移动速度
-        this.speedX = 1;
-        this.speedY = 1;
+        this.speedX = 10;
+        this.speedY = 10;
         // 攻击力
         this.ATK = 10;
         // 防御力
@@ -33,39 +33,108 @@ class Solider {
         this.sprite = new PIXI.Sprite();
         this.cache = cache?cache:null;
         // 方向
-        this.direction = 'R';
+        this.direction = 'RIGHT';
         // 状态设置
         // 动作状态
         this.animateState = {};     // 动画帧存储
         this.actions = {};          // 动作效果回调函数存储
-        this.actionTypes = [];      // 注册的动作类型存储
+        this.actionTypes = ['MOVE@UP', 'MOVE@DOWN', 'MOVE@LEFT', 'MOVE@RIGHT'];      // 注册的动作类型存储
+        this.steps = [];            // 该对象从开始到最后经历的动作集合
+        this.maxStepLength = 50;    // 默认最多的步骤为50步
+        this.lastStep = '';         // 上一步
         this.nowActionState = '';
         // 动作怔状态
         this.loopState = 0;
         this.maxLoopState = 4;
+        // 是否存活
+        this.isLive = true;
+        // 组名
+        this.group = '';
+        // 敌人
+        this.enemy = null;
     }
 
-    setAnimateState() {
+    // 受到攻击
+    attacked = (enemy) => {
 
     }
 
+    // 攻击 
+    attack = (enemy) => {
+        this.doAction('ATTACK@'+this.direction);
+        console.log(this.SoldierType+' attack the '+enemy.SoldierType);
+    }
+
+    getResult = () => {
+
+    }
+
+    getLiveState(){
+        return this.isLive;
+    }
+
+    die() {
+        this.isLive = false;
+        this.sprite.destroy();
+        // 移除战场
+        this.BattleGround.removeChild(this);
+    }
+
+    initSpeed() {
+        this.speedX = 10;
+        this.speedY = 10;
+    }
+
+    setSpeed(x, y) {
+        if (typeof x === 'object') {
+            this.speedX = x.vx;
+            this.speedY = x.vy;
+        } else {
+            this.speedX = x;
+            this.speedY = y;
+        }
+    }
+
+    setSpeedX(vx) {
+        this.speedX = vx;
+    }
+
+    setSpeedY(vy) {
+        this.speedY = vy;
+    }
     
-
-    moveUP(pix = 1){
-        this.sprite.y -= pix;
+    moveUP(pix){
+        if (pix) {
+            this.setSpeed(this.speedX, pix);
+        }
+        this.sprite.y -= this.speedY;
+        this.direction = 'UP';
     }
 
-    moveDown(pix = 1) {
-        this.sprite.y += pix;
+    moveDown(pix) {
+        if (pix) {
+            this.setSpeed(this.speedX, pix);
+        }
+        this.sprite.y += this.speedY;
+        this.direction = 'DOWN';
     }
 
-    moveLeft(pix = 1) {
-        this.sprite.x -= pix;
+    moveLeft(pix) {
+        if (pix) {
+            this.setSpeed(pix, this.speedY);
+        }
+        this.sprite.x -= this.speedX;
+        this.direction = 'LEFT';
     }
 
-    moveRight(pix = 1) {
-        this.sprite.x += pix;
+    moveRight(pix) {
+        if (pix) {
+            this.setSpeed(pix, this.speedY);
+        }
+        this.sprite.x += this.speedX;
+        this.direction = 'RIGHT';
     }
+
 
     // 初始化动作函数
     initAction(actionName) {
@@ -116,7 +185,7 @@ class Solider {
     // 以后考虑move,up而不是move@up
     _setAction(name, callback) {
         // 注册该动作
-        this.actionTypes.push(name);
+        this.actionTypes.includes(name)?null:this.actionTypes.push(name);
         // 注册其函数
         const actions = name.split('@');
         let pointer = this.actions;
@@ -139,18 +208,30 @@ class Solider {
             return console.error('该对象没有加载到BattleGround对象上')
         }
         // 时间可能存在一点问题，存在补足或者缺失问题.
-        setInterval(()=>{
-            this.actionTypes.forEach(type=>{
-                // this.BattleGround.makeChildrenActive(type);
-                this.doAction(type);   
-            })
-        }, 1000/this.MAL.fps)
+        let timer = setInterval(()=>{
+            if (!this.isLive) {
+                this.die();
+                cancelInterval(timer);
+            }
+            this.BattleGround.makeChildrenActive(this);
+            // this.actionTypes.forEach(type=>{
+            //     if (this.BattleGround.makeChildrenActive(this, type)) {
+            //         this.doAction(type);  
+            //     }
+            // })
+        }, 100)
     }
 
 
     // 针对每种行为制作其动画,子动画使用@链接,MOVE@UP
     doAction = (actionType) => {
+        // 当前对象行为和上次一样则直接跳过逻辑，继续以当前状态运行
+        if (this.lastStep === actionType) {
+            return;
+        }
         this.MAL.stop();
+        // 保存改步骤
+        this.steps.push(actionType);
         // action动画效果逻辑
         const actions = actionType.split('@');
         // 占用的帧
@@ -171,6 +252,8 @@ class Solider {
         // MOVE@UP,(MOVE,UP)都可以，推荐MOVE@UP
         // actionFunc(this);
         // actionFunc.call(this, this);
+        this.lastStep = actionType;
+        return this;
     }
 
     // 改变当前精灵的贴图
@@ -191,8 +274,6 @@ class Solider {
             frames instanceof PIXI.Texture?this.MAL.changeFrame(frames):console.error('请输入正确的行为参数');
         }
     }
-
-
     // 加载帧
     // frames为路径数组或者路径或者undefined(此时必须制定src),
     // 所以只有两种情况，frames有时srcID没有值, frames没有值时，srcID有值
@@ -252,7 +333,7 @@ class Solider {
         // 初始化动作函数
         // 初始化INIT
         this.sprite.texture = this.animateState['INIT'];
-        console.log(this.animateState);
+        // console.log(this.animateState);
     }
 
     // 指定初始化帧，指定精灵位置，指定精灵交互情况,如果你有特定的初始帧可以在回调函数中
@@ -294,6 +375,64 @@ class Solider {
 
         return this;
     }
+
+    isStop() {
+        const rt = this.speedX || this.speedY;
+        return !!!rt;
+    }
+
+    stopMove = () => {
+        console.log('stop soldier');
+        this.setSpeed(0, 0);
+    }
+
+    // move to
+    moveTo = (dest) => {
+        let timer = setInterval(()=>{
+            const position = this.getPosition();
+            if (position.x === dest.x && position.y === dest.y) {
+                this.stopMove();
+                this.MAL.stop();
+                clearInterval(timer);
+            }
+            this._moveTo(dest)
+        }, 100);
+    }
+
+
+    _moveTo = (dest) => {
+        const { x, y } = dest;
+        const position = this.getPosition();
+        const actions = [];
+
+        if (x > position.x) {
+            actions.push('MOVE@RIGHT')
+        }
+
+        if (x < position.x) {
+            actions.push('MOVE@LEFT');
+        }
+
+        if (y > position.y) {
+            actions.push('MOVE@DOWN');
+        }
+
+        if (y < position.y) {
+            actions.push('MOVE@UP')
+        }
+
+        const action = actions[Math.floor(Math.random()*actions.length)];
+        //console.log(actions)
+        action?this.doAction(action):null;
+    }
+    // 获取位置
+    getPosition() {
+        return {
+            x: this.sprite.x,
+            y: this.sprite.y
+        }
+    }
+
     // 设置位置
     setPosition(x = 0, y = 0) {
         if (typeof x === 'object') {

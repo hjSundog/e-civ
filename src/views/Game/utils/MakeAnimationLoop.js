@@ -8,6 +8,7 @@
 // TODO: 反复的动画，现在只是一个方向的动画，以后添加往复的动画效果.
 import * as PIXI from 'pixi.js';
 import _ from 'lodash';
+import noop from '@/utils//noop'
 
 export default class AnimationManager {
     constructor(sprite) {
@@ -21,11 +22,24 @@ export default class AnimationManager {
         // 目标帧顺序
         this.cacheFrames = [];
         this.isStop = true;
-        this.fps = 8;
+        this.fps = 10;
         this.now = Date.now();
         this.animations = {};
         // 是否循环往复播放
         this.loopDirection = true;
+        this.actionCallback = noop;
+        // 时间间隔，这个参数的意义在于同步外界时间间隙，
+        // 动画的播放速率是由interval 和 fps决定的
+        // speed = interval / fps
+        this.interval = 1000;
+    }
+
+    setInterval(interval) {
+        this.interval = interval;
+    }
+
+    getInterval() {
+        return this.interval;
     }
 
     getFrames(){
@@ -194,6 +208,7 @@ export default class AnimationManager {
         // 重置帧状态
         this.currentFrame = 0;
         this.isStop = false;
+        this.actionCallback = callback;
         // 设置缓存帧
         this.cacheFrames = frames;
         // 帧循环控制
@@ -234,6 +249,7 @@ export default class AnimationManager {
         this.loop(() => {
             this.sprite.texture = this.cacheFrames[this.currentFrame];
             this.currentFrame = (this.currentFrame + 1) % this.cacheFrames.length;
+            this.actionCallback.call(this.owner, this.owner);
         })
     }
 
@@ -251,7 +267,7 @@ export default class AnimationManager {
     }
 
     loop = (callback, once) => {
-        const interval = 1000 / this.fps;
+        const interval = this.interval / this.fps;
         let delta;
         window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
         if (this.isStop) {
