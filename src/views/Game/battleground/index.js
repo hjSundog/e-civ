@@ -22,7 +22,7 @@
 //     false,                   // bounce
 //     false,                   // global coordinate
 //     function(collision, platform){
-  
+
 //       //`collision` tells you the side on player that the collision occurred on.
 //       //`platform` is the sprite from the `world.platforms` array
 //       //that the player is colliding with
@@ -48,15 +48,15 @@ export default class BattleGround {
         // 每格单位所占长宽
         this.resize(x, y);
     }
-    
-    getCenter(){
+
+    getCenter() {
         return {
-            x: this.x/2,
-            y: this.y/2
+            x: this.x / 2,
+            y: this.y / 2
         }
     }
 
-    getBoxSize(){
+    getBoxSize() {
         return {
             width: this.xs,
             height: this.ys
@@ -73,7 +73,7 @@ export default class BattleGround {
         // this._initChildren(dist);
         // 人物战斗循环及其移动、攻击、技能判定
         for (let group of Object.keys(this.groups)) {
-            this._initGroupPosition(group, group===dist);
+            this._initGroupPosition(group, group === dist);
         }
         return this;
     }
@@ -88,7 +88,7 @@ export default class BattleGround {
         // 设置大体位置
         if (!!!isLeft) {
             direction = -1;
-            prePosition = this.layout.row * (this.layout.col-1);
+            prePosition = this.layout.row * (this.layout.col - 1);
         }
         // 按照优先级排序之后进行初始化位置
         const groupChildren = _.groupBy(children, (child) => {
@@ -108,37 +108,37 @@ export default class BattleGround {
         const length = children.length;
         //适配横版或者竖版这里默认为横版
         const isLandScope = true;
-        let boardMap = isLandScope?(val)=>{
+        let boardMap = isLandScope ? (val) => {
             // 默认为横版
-            const {row, col} = this.layout;
-            const rt = [(val%row+row-1)%row, Math.floor((val-1)/row)];
+            const { row, col } = this.layout;
+            const rt = [(val % row + row - 1) % row, Math.floor((val - 1) / row)];
             return rt;
-        }:(val) => {
-            const {row, col} = this.layout;
-            return [Math.floor((val-1)/col), (val%col-1+col)%col];
+        } : (val) => {
+            const { row, col } = this.layout;
+            return [Math.floor((val - 1) / col), (val % col - 1 + col) % col];
         }
         // 列数
         if (direction < 0) {
             // 从右到左放置
             let temp = 1;
-            for (let i=0;i<length;i++) {
+            for (let i = 0; i < length; i++) {
                 // 如果当前可以被row整除,则下一次减一
-                last ++;
+                last++;
                 // console.log(last);
                 const matrix = boardMap(last);
                 // console.log(matrix);
                 this._justifyBox(matrix[0], matrix[1], children[i]);
-                if (last%this.layout.row === 0) {
+                if (last % this.layout.row === 0) {
                     temp = -1;
                 }
                 if (temp === -1) {
-                    last -= 2*this.layout.row;
+                    last -= 2 * this.layout.row;
                     temp = 1;
                 }
             }
         } else {
             // 从左到右放置
-            for (let i=0;i<length;i++) {
+            for (let i = 0; i < length; i++) {
                 last++;
                 // console.log(last);
                 const matrix = boardMap(last);
@@ -156,7 +156,7 @@ export default class BattleGround {
         for (let group of Object.keys(this.groups)) {
             totalChildren = [...totalChildren, ...this.groups[group]];
         }
-        totalChildren.forEach(child=>{
+        totalChildren.forEach(child => {
             this.addChildToScene(child, fittable);
         })
         return this;
@@ -164,7 +164,7 @@ export default class BattleGround {
 
     battle = () => {
         //this.makeChildrenActive();
-        this.children.forEach(child=>{
+        this.children.forEach(child => {
             // this.moveRandom(child);
             // 每个人物激活
             child.active();
@@ -176,14 +176,14 @@ export default class BattleGround {
     // 将所有子对象加载到场景中
     addChildToScene(child, fittable) {
         if (fittable) {
-            const {sprite} = child;
-            const {height, width} = sprite;
-            const {ys, xs} = this;
-            sprite.scale.x = xs/width;
-            sprite.scale.y = ys/height;
+            const { sprite } = child;
+            const { height, width } = sprite;
+            const { ys, xs } = this;
+            sprite.scale.x = xs / width;
+            sprite.scale.y = ys / height;
             //sprite.anchor.set(0.5, 0.5);
         }
-        const {width, height} = this.getBoxSize();
+        const { width, height } = this.getBoxSize();
         child.unitX = width;
         child.unitY = height;
         child.addToScene(this.scene);
@@ -207,23 +207,23 @@ export default class BattleGround {
 
     // test
     moveRandom = (target) => {
-        const actionType = ['UP','DOWN','LEFT','RIGHT'];
+        const actionType = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
         const prefix = 'MOVE';
         // target.doAction('MOVE@UP');
-        setInterval(()=>{
+        setInterval(() => {
             const bounds = this._boundLimit(target.sprite);
             const avaliableDirection = actionType.filter(action => {
                 return !bounds.includes(action)
             })
             // console.log(avaliableDirection);
-            target.doAction(`${prefix}@${avaliableDirection[Math.floor(Math.random()*avaliableDirection.length)]}`);
+            target.doAction(`${prefix}@${avaliableDirection[Math.floor(Math.random() * avaliableDirection.length)]}`);
         }, 2000);
     }
 
     // TODO: bump contain替换
     // 返回当前精灵的所处边界
     _boundLimit(sprite) {
-        const  {x, y} = sprite;
+        const { x, y } = sprite;
         const bounds = [];
         if (x < 0) {
             bounds.push('LEFT');
@@ -243,26 +243,36 @@ export default class BattleGround {
     moveToOtherSide = () => {
 
     }
-    // TODO:
+    // TODO: 判断战斗是否结束-> 判断该对象是否存活 -> 判断该对象是否可以攻击-> 移动到
+    // 可攻击范围->
     makeChildrenActive(child, actionName) {
         let otherSide;
-        // 该对象没有目标则随机分配一个目标
-        if (!child.enemy) {
-            const side = child.groupName;
-            for (let name of Object.keys(this.groups)) {
-                if (name !== side) {
-                    otherSide = this.groups[name]
-                }
+        // 没有地方战斗结束
+        const side = child.groupName;   // 本方阵营
+        for (let name of Object.keys(this.groups)) {
+            if (name !== side) {
+                otherSide = this.groups[name]
             }
-            // 随机一个目标对象
-            const randEnemy = otherSide[Math.floor(Math.random()*otherSide.length)];
-            child.enemy = randEnemy;
+        }
+        // 敌方全灭
+        if (otherSide.length === 0) {
+            child.stop();
+            return;
         }
         // 便利每个孩子决定其行为
         if (!this.judgeLiveState(child)) {
             child.die();
             return;
-        } 
+        }
+        // 该对象没有目标则随机分配一个目标
+        if (!child.enemy) {
+            // 随机一个目标对象
+            const randEnemy = otherSide[Math.floor(Math.random() * otherSide.length)];
+            child.enemy = randEnemy;
+            // 该目标对象保存攻击者，以便于自己死亡时通知攻击者更改目标对象
+            randEnemy.attackedBy.push(child);
+        }
+
         // 判断是否可以攻击
         if (this.judgeAttack(child, child.enemy)) {
             // console.log('你已经在我攻击范围了： '+child.enemy.SoldierType);
@@ -274,6 +284,7 @@ export default class BattleGround {
                 if (!child.isStop()) {
                     child.stopMove();
                 }
+                //  console.log(child.SoldierType+' has '+ child.blood +'HP will attack the ' + child.enemy.blood + 'HP ' + child.enemy.SoldierType)
                 child.attack(child.enemy);
             }
             return;
@@ -285,9 +296,9 @@ export default class BattleGround {
     }
 
     addToGroup = (children, groupName) => {
-        
+
         // 将每个对象的战场对象注册为本对象
-        children.forEach(child=>{
+        children.forEach(child => {
             child.BattleGround = this;
             child.groupName = groupName;
         })
@@ -308,7 +319,7 @@ export default class BattleGround {
 
     // 移除对象
     removeChild(child) {
-        const index = this.children.findIndex(ele=>{
+        const index = this.children.findIndex(ele => {
             return ele === child;
         });
         if (index === -1) {
@@ -318,21 +329,23 @@ export default class BattleGround {
         // 移出group
         const groups = this.groups[child.groupName];
         if (groups) {
-            const _index = groups.findIndex(ele=>{
+            const _index = groups.findIndex(ele => {
                 return ele === child;
             });
             if (_index === -1) {
-                return console.error(child.groupName+' 中没有改对象,请检查!');
+                return console.error(child.groupName + ' 中没有改对象,请检查!');
             }
             groups.splice(_index, 1);
         }
+
+        return this;
     }
 
     // 判断是否移动
     judgeMove(child, enemy) {
         // 判断移动范围
         const point = enemy.getPosition();
-        const {x, y} = child.getPosition();
+        const { x, y } = child.getPosition();
         // 先不考虑碰撞检测
         child._moveTo(point);
     }
@@ -340,8 +353,8 @@ export default class BattleGround {
     // 判断是否能够攻击
     judgeAttack(child, enemy) {
         const point = enemy.getPosition();
-        const {x, y} = point;
-        const {minX, minY, maxX, maxY} = this._getAttackArea(child);
+        const { x, y } = point;
+        const { minX, minY, maxX, maxY } = this._getAttackArea(child);
         // 判断敌人是否在攻击范围内
         if (x < maxX && x > minX && y < maxY && y > minY) {
             return true;
@@ -353,17 +366,17 @@ export default class BattleGround {
     _getAttackArea = (target) => {
         const local = target.getPosition();
         // 单元格数目
-        const {attackArea} = target;
+        const { attackArea } = target;
         // 单元格长宽
-        const {width, height} = this.getBoxSize();
-        const {x, y} = local;
+        const { width, height } = this.getBoxSize();
+        const { x, y } = local;
         return {
-            minX: x - attackArea*width,
-            maxX: x + 2*width*attackArea,
-            minY: y - height*attackArea,
-            maxY: y + 2*height*attackArea
+            minX: x - attackArea * width,
+            maxX: x + 2 * width * attackArea,
+            minY: y - height * attackArea,
+            maxY: y + 2 * height * attackArea
         }
-        
+
     }
 
     // 判断对象状态

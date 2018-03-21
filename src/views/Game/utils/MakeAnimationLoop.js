@@ -32,6 +32,8 @@ export default class AnimationManager {
         // 动画的播放速率是由interval 和 fps决定的
         // speed = interval / fps
         this.interval = 1000;
+        // 动作类型
+        this.actionType = null;
     }
 
     setInterval(interval) {
@@ -42,19 +44,19 @@ export default class AnimationManager {
         return this.interval;
     }
 
-    getFrames(){
+    getFrames() {
         return this.frames
     }
 
-    getCurentFrameId(){
+    getCurentFrameId() {
         return this.currentFrame
     }
 
-    getCurentFrame(){
+    getCurentFrame() {
         return this.frames[this.currentFrame];
     }
 
-    getFPS(){
+    getFPS() {
         return this.fps;
     }
 
@@ -146,7 +148,7 @@ export default class AnimationManager {
         }
 
         if (type === 'Object') {
-            this._loadFramesFromJSON(frames, special, rowCount,colCount);
+            this._loadFramesFromJSON(frames, special, rowCount, colCount);
         }
 
         if (type === 'String') {
@@ -181,22 +183,22 @@ export default class AnimationManager {
             ? sequence.forEach((val) => {
                 let type = toString.call(val).slice(8, -1)
                 if (type === 'Array') {
-                    sequenceFrames = [...sequenceFrames, ...val.map(v => this.frames[v+base])];
+                    sequenceFrames = [...sequenceFrames, ...val.map(v => this.frames[v + base])];
                 }
                 if (type === 'Object') {
                     if (typeof val.start !== 'undefined') {
                         const end = val.end ? val.end : this.frames.length - 1;
                         const arr = Array.from({ length: end - val.start + 1 }, (v, k) => { return k + val.start });
-                        sequenceFrames = [...sequenceFrames, ...arr.map(v => this.frames[v+base])];
+                        sequenceFrames = [...sequenceFrames, ...arr.map(v => this.frames[v + base])];
                     } else {
                         console.error('对象必须包含start属性');
                     }
                 }
                 if (type === 'Number') {
-                    sequenceFrames.push(this.frames[val+base]);
+                    sequenceFrames.push(this.frames[val + base]);
                 }
                 if (type === 'String') {
-                    sequenceFrames.push(this.frames[+val+base]);
+                    sequenceFrames.push(this.frames[+val + base]);
                 }
             })
             : sequenceFrames;
@@ -204,7 +206,15 @@ export default class AnimationManager {
     }
 
     // 根据传入帧产生动画
-    _animate = (frames, callback, once) => {
+    _animate = (name, frames, callback, once, cb) => {
+        // 当前对象行为和上次一样则直接跳过逻辑，继续以当前状态运行
+        if (name === this.actionType) {
+            return;
+        }
+        // 停止正在运行的动画
+        this.stop();
+        // 改变当前动画
+        this.actionType = name;
         // 重置帧状态
         this.currentFrame = 0;
         this.isStop = false;
@@ -213,10 +223,11 @@ export default class AnimationManager {
         this.cacheFrames = frames;
         // 帧循环控制
         this.loop(() => {
+            // this.owner.SoldierType === 'Archer' ? console.log('这是第%s帧', this.currentFrame + 1) : null;
             this.sprite.texture = this.cacheFrames[this.currentFrame];
             this.currentFrame = (this.currentFrame + 1) % this.cacheFrames.length;
             callback.call(this.owner, this.owner);
-        }, once);
+        }, once, cb);
     }
 
     changeFrame(frame) {
@@ -224,18 +235,19 @@ export default class AnimationManager {
     }
 
     // 逆向帧动画
-    _animateReverse(frames, callback, once) {
+    _animateReverse(frames, callback, once, cb) {
 
     }
 
     // 只动画一次
-    animateOnce(frames, callback) {
-        this._animate(frames, callback, true);
+    animateOnce(name, frames, callback, cb) {
+        this._animate(name, frames, callback, true, cb);
     }
 
     // frames and action
-    animate(frames, callback) {
-        this._animate(frames, callback);
+    //
+    animate(name, frames, callback, cb) {
+        this._animate(name, frames, callback, false, cb);
     }
 
     pause() {
@@ -266,7 +278,8 @@ export default class AnimationManager {
         window.cancelRequestAnimFrame(this.timer);
     }
 
-    loop = (callback, once) => {
+    // 传入每帧调用回调函数，是否只动画一次，动画一次调用回调函数
+    loop = (callback, once, cb) => {
         const interval = this.interval / this.fps;
         let delta;
         window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
@@ -275,21 +288,27 @@ export default class AnimationManager {
             return;
         }
 
-        // 简单的通过最后帧和是否once参数来决定是否继续循环
-
-        if (once && this.currentFrame === this.sequenceFrame.length - 1) {
-            this.stop();
-            return;
-        }
         // 请求动画帧
         if (window.requestAnimationFrame) {
             let now = Date.now();
             delta = now - this.now;
             if (delta > interval) {
                 this.now = now - (delta % interval);
+                // 简单的通过最后帧和是否once参数来决定是否继续循环
+
+                if (once && this.currentFrame === this.cacheFrames.length - 1) {
+                    this.stop();
+                    return;
+                }
+
+                // 运行完一次动画后调用的回调函数
+                if (cb && this.currentFrame === (this.cacheFrames.length - 1)) {
+                    cb();
+                }
+
                 callback();
             }
-            this.timer = window.requestAnimationFrame(this.loop.bind(this, callback, once));
+            this.timer = window.requestAnimationFrame(this.loop.bind(this, callback, once, cb));
         }
     }
 

@@ -150,7 +150,9 @@ class Game extends React.Component {
         if (Soldiers[soldierType]) {
             let num = Math.ceil(count / 100);
             for (let i=0;i<num;i++) {
-                let solider = new Soldiers[soldierType](cache);
+
+                let solider = new Soldiers[soldierType](cache, count>=100?100:count);
+                count -= 100;
                 // 加入容器
                 // solider.addToScene(this.gameScene);
                 // this.gameScene.addChild(solider.sprite);
@@ -233,28 +235,28 @@ class Game extends React.Component {
 
 
 Game.defaultProps = {
-    // my: [{
-    //     soldierType: 'Archer',
-    //     count: 80,
-    // }],
-    // enemy: [{
-    //     soldierType: 'ThiefHead',
-    //     count: 80,
-    // }],
-    enemy: [{
-        soldierType: 'Archer',
-        count: 400
-    },{
-        soldierType: 'ThiefHead',
-        count: 350
-    }],
     my: [{
         soldierType: 'Archer',
-        count: 620
-    },{
-        soldierType: 'ThiefHead',
-        count: 130
+        count: 180,
     }],
+    enemy: [{
+        soldierType: 'ThiefHead',
+        count: 180,
+    }],
+    // enemy: [{
+    //     soldierType: 'Archer',
+    //     count: 400
+    // },{
+    //     soldierType: 'ThiefHead',
+    //     count: 350
+    // }],
+    // my: [{
+    //     soldierType: 'Archer',
+    //     count: 620
+    // },{
+    //     soldierType: 'ThiefHead',
+    //     count: 130
+    // }],
     sceneType: 'normal',// 地图场景
     dealBattleResult: noop,  // 处理战斗结果回调
     controlSpeed: 1, // 战斗速率

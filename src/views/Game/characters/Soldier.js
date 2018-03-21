@@ -17,7 +17,9 @@ class Solider {
     static SoldierType = 'Soldier';
 
     // cache 为空时在loadFrames中指定帧来源，为对象
-    constructor(cache, ) {
+    constructor(cache, blood) {
+        // 生命值
+        this.blood = blood;
         // 攻击范围
         this.attackArea = 1;
         // 移动速度
@@ -52,21 +54,59 @@ class Solider {
         this.group = '';
         // 敌人
         this.enemy = null;
+        // 受到的攻击者
+        this.attackedBy = [];
     }
 
     // 受到攻击
-    attacked = (enemy) => {
+    attacked = (enemy, hurt) => {
+        this.blood -= hurt;
+        // console.log('受到来自'+enemy.SoldierType+'的攻击,损失'+hurt+'点血量！');
+        // this.SoldierType==='Archer'?console.log('Archer只剩%s点血量了', this.blood):console.error('ThiefHead只剩%s点血量了', this.blood);
+        if (this.blood <=0 && this.getLiveState()) {
+            this.setLiveState(false);
+        }
+    }
+
+    // 计算伤害值
+    computeHurt(ATK, Penetration, DEF) {
+        const actualDEF = DEF - Penetration>0?DEF-Penetration:0;
+        return ATK - actualDEF>0?ATK - actualDEF:1;
+    }
+
+    // 停止射击
+    stopShot(){
+        this.MAL.stop();
+    }
+
+    // 射击类间接伤害
+    shot = (enemy) => {
 
     }
 
-    // 攻击 
+    // 停止攻击
+    stopAttack() {
+        this.MAL.stop();
+    }
+
+
+
+    // 攻击,直接伤害
     attack = (enemy) => {
-        this.doAction('ATTACK@'+this.direction);
-        console.log(this.SoldierType+' attack the '+enemy.SoldierType);
+        this.doAction('ATTACK@'+this.direction, false, ()=>{
+            const {ATK, Penetration} = this;
+            const {DEF} = enemy;
+            const hurt = this.computeHurt(ATK, Penetration, DEF);
+            enemy.attacked(this, hurt);
+        });
     }
 
     getResult = () => {
 
+    }
+
+    setLiveState(state) {
+        this.isLive = state;
     }
 
     getLiveState(){
@@ -74,10 +114,24 @@ class Solider {
     }
 
     die() {
+        // 清除自己的定时器
+        console.log(this.SoldierType+' died!...');
+        this.stop();
         this.isLive = false;
         this.sprite.destroy();
         // 移除战场
         this.BattleGround.removeChild(this);
+        // 移除攻击者目标
+        this.attackedBy.forEach(attacker=> {
+            attacker.stopAttack();
+            attacker.enemy = null;
+        })
+        this.destroy();
+    }
+
+    destroy() {
+        // this = undefined;
+        console.log('destroy is contructing...');
     }
 
     initSpeed() {
@@ -197,6 +251,13 @@ class Solider {
         return this;
     }
 
+    // 人物静止
+    stop = () => {
+        clearInterval(this.timer);
+        // 停止动作
+        this.MAL.stop();
+    }
+
     // 人物运动循环，激活人物
     active = () => {
         // 死循环的尝试所有动作，并根据
@@ -208,11 +269,7 @@ class Solider {
             return console.error('该对象没有加载到BattleGround对象上')
         }
         // 时间可能存在一点问题，存在补足或者缺失问题.
-        let timer = setInterval(()=>{
-            if (!this.isLive) {
-                this.die();
-                cancelInterval(timer);
-            }
+        this.timer = setInterval(()=>{
             this.BattleGround.makeChildrenActive(this);
             // this.actionTypes.forEach(type=>{
             //     if (this.BattleGround.makeChildrenActive(this, type)) {
@@ -224,12 +281,12 @@ class Solider {
 
 
     // 针对每种行为制作其动画,子动画使用@链接,MOVE@UP
-    doAction = (actionType) => {
+    doAction = (actionType, once ,cb) => {
         // 当前对象行为和上次一样则直接跳过逻辑，继续以当前状态运行
-        if (this.lastStep === actionType) {
-            return;
-        }
-        this.MAL.stop();
+        // if (this.lastStep === actionType) {
+        //     return;
+        // }
+        // this.SoldierType === 'Archer'?console.log('do the '+actionType+' action!'):null;
         // 保存改步骤
         this.steps.push(actionType);
         // action动画效果逻辑
@@ -245,14 +302,14 @@ class Solider {
 
         const type = toString.call(frames).slice(8, -1);
         type === 'Array'
-        ?this.MAL.animate(frames, actionFunc)
+        ?(once?this.MAL.animateOnce(actionType, frames, actionFunc, cb):this.MAL.animate(actionType, frames, actionFunc, cb))
         :this.MAL.changeFrame(frames, actionFunc);
         // action实际效果逻辑
         // 这里做个适配吧
         // MOVE@UP,(MOVE,UP)都可以，推荐MOVE@UP
         // actionFunc(this);
         // actionFunc.call(this, this);
-        this.lastStep = actionType;
+        // this.lastStep = actionType;
         return this;
     }
 
@@ -386,6 +443,10 @@ class Solider {
         this.setSpeed(0, 0);
     }
 
+    startMove(){
+        this.initSpeed();
+    }
+
     // move to
     moveTo = (dest) => {
         let timer = setInterval(()=>{
@@ -404,6 +465,7 @@ class Solider {
         const { x, y } = dest;
         const position = this.getPosition();
         const actions = [];
+        this.isStop()?this.startMove():null;
 
         if (x > position.x) {
             actions.push('MOVE@RIGHT')
