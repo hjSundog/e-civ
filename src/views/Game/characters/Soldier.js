@@ -12,6 +12,9 @@ import noop from '@/utils/noop.js';
 
 // const Rectangle = PIXI.Rectangle;
 
+const HEALTH_WIDTH = 30;
+const HEALTH_HEIGHT = 3;
+
 class Solider {
     static primarity = 0;
     static SoldierType = 'Soldier';
@@ -20,6 +23,7 @@ class Solider {
     constructor(cache, blood) {
         // 生命值
         this.blood = blood;
+        this.maxBlood = blood;
         // 攻击范围
         this.attackArea = 1;
         // 移动速度
@@ -33,6 +37,7 @@ class Solider {
         this.Penetration = 10;
         // 精灵图标
         this.sprite = new PIXI.Sprite();
+        this.displayEntity = new PIXI.Container();
         this.cache = cache?cache:null;
         // 方向
         this.direction = 'RIGHT';
@@ -58,11 +63,52 @@ class Solider {
         this.lastEnemy = null;
         // 受到的攻击者
         this.attackedBy = [];
+        // 初始化可见对象
+        this._init();
+    }
+
+    _init(){
+        this._createBloodState(this.blood);
+        this.displayEntity.addChild(this.sprite);
+        this.displayEntity.addChild(this.healthBar);
+    }
+
+    // 制作血条
+    _createBloodState = (blood) => {
+        const healthBar = new PIXI.Container();
+        //const {x, y} = this.getPosition();
+        healthBar.position.set(0, 10);
+        //Create the black background rectangle
+        let innerBar = new PIXI.Graphics();
+        innerBar.beginFill(0xffffff);
+        innerBar.drawRect(0, 0, HEALTH_WIDTH, HEALTH_HEIGHT);
+        innerBar.endFill();
+        healthBar.addChild(innerBar);
+
+        //Create the front red rectangle
+        let outerBar = new PIXI.Graphics();
+        outerBar.beginFill(0x31d255);
+        outerBar.drawRect(0, 0, HEALTH_WIDTH, HEALTH_HEIGHT);
+        outerBar.endFill();
+        healthBar.addChild(outerBar);
+        healthBar.outer = outerBar;
+
+        this.healthBar = healthBar;
+    }
+    // 获取真正的血条
+    getHealthBar(){
+        return this.healthBar.outer;
+    }
+
+    setHealthBar(len) {
+        this.healthBar.outer.width = len;
     }
 
     // 受到攻击
     attacked = (enemy, hurt) => {
         this.blood -= hurt;
+        const percent = this.blood/this.maxBlood;
+        this.setHealthBar(HEALTH_WIDTH*percent);
         // console.log('受到来自'+enemy.SoldierType+'的攻击,损失'+hurt+'点血量！');
         this.SoldierType==='Archer'?console.log('Archer只剩%s点血量了', this.blood):console.error('ThiefHead只剩%s点血量了', this.blood);
         if (this.blood <=0 && this.getLiveState()) {
@@ -144,6 +190,7 @@ class Solider {
         this.stop();
         this.isLive = false;
         this.sprite.destroy();
+        this.displayEntity.destroy();
         // 移除战场
         this.BattleGround.removeChild(this);
         // 移除攻击者目标
@@ -186,7 +233,8 @@ class Solider {
         if (pix) {
             this.setSpeed(this.speedX, pix);
         }
-        this.sprite.y -= this.speedY;
+        //this.sprite.y -= this.speedY;
+        this.displayEntity.y -= this.speedY;
         this.turnTo('UP');
     }
 
@@ -194,7 +242,8 @@ class Solider {
         if (pix) {
             this.setSpeed(this.speedX, pix);
         }
-        this.sprite.y += this.speedY;
+        // this.sprite.y += this.speedY;
+        this.displayEntity.y += this.speedY;
         this.turnTo('DOWN');
     }
 
@@ -202,7 +251,8 @@ class Solider {
         if (pix) {
             this.setSpeed(pix, this.speedY);
         }
-        this.sprite.x -= this.speedX;
+        //this.sprite.x -= this.speedX;
+        this.displayEntity.x -= this.speedX;
         this.turnTo('LEFT');
     }
 
@@ -210,7 +260,8 @@ class Solider {
         if (pix) {
             this.setSpeed(pix, this.speedY);
         }
-        this.sprite.x += this.speedX;
+        // this.sprite.x += this.speedX;
+        this.displayEntity.x += this.speedX;
         this.turnTo('RIGHT');
     }
 
@@ -552,21 +603,31 @@ class Solider {
     }
     // 获取位置
     getPosition() {
+        // return {
+        //     x: this.sprite.x,
+        //     y: this.sprite.y
+        // }
         return {
-            x: this.sprite.x,
-            y: this.sprite.y
+            x: this.displayEntity.x,
+            y: this.displayEntity.y
         }
     }
 
     // 设置位置
     setPosition(x = 0, y = 0) {
+        // if (typeof x === 'object') {
+        //     this.sprite.x = x.x;
+        //     this.sprite.y = x.y;
+        // } else {
+        //     this.sprite.x = x;
+        //     this.sprite.y = y;
+        // }
         if (typeof x === 'object') {
-            this.sprite.x = x.x;
-            this.sprite.y = x.y;
+            this.displayEntity.position.set(x.x, x.y);
         } else {
-            this.sprite.x = x;
-            this.sprite.y = y;
+            this.displayEntity.position.set(x, y);
         }
+        // 血条位置精灵位置
     }
     // 转向
     turnTo(direction) {
@@ -579,7 +640,7 @@ class Solider {
     // 将该对象加入容器中
     addToScene(scene) {
         console.log(this.SoldierType + '加入战场');
-        scene.addChild ? scene.addChild(this.sprite) : console.error('加入的不是容器，请检查其类型');
+        scene.addChild ? scene.addChild(this.displayEntity) : console.error('加入的不是容器，请检查其类型');
     }
 }
 

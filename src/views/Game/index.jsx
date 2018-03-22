@@ -263,7 +263,7 @@ Game.defaultProps = {
     }],
     my: [{
         soldierType: 'Archer',
-        count: 520
+        count: 620
     },{
         soldierType: 'ThiefHead',
         count: 130

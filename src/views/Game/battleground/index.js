@@ -3,9 +3,7 @@
 // 仲裁各个对象的行为和状态，类似于一个管理器
 import _ from 'lodash';
 import * as PIXI from 'pixi.js';
-import DC from '../utils/DetectCollision';
 import Bump from 'bump.js'
-import { platform } from 'os';
 export default class BattleGround {
     constructor(x = 800, y = 600, layout = { col: 30, row: 40 }, gameScene = new PIXI.Container(), gameOverScene = new PIXI.Container()) {
         this.gameOverScene = gameOverScene;
@@ -72,7 +70,7 @@ export default class BattleGround {
         });
         const orderedChildren = _.sortBy(groupChildren, ['primarity']);
         // console.log(orderedChildren);
-        //　判断每种兵种所占位置
+        // 判断每种兵种所占位置
         orderedChildren.forEach(child => {
             prePosition = this._judgeArea(child, direction, prePosition);
         })
@@ -195,26 +193,6 @@ export default class BattleGround {
             // console.log(avaliableDirection);
             target.doAction(`${prefix}@${avaliableDirection[Math.floor(Math.random() * avaliableDirection.length)]}`);
         }, 2000);
-    }
-
-    // TODO: bump contain替换
-    // 返回当前精灵的所处边界
-    _boundLimit(sprite) {
-        const { x, y } = sprite;
-        const bounds = [];
-        if (x < 0) {
-            bounds.push('LEFT');
-        }
-        if (y < 0) {
-            bounds.push('UP');
-        }
-        if (x > this.x) {
-            bounds.push('RIGHT');
-        }
-        if (y > this.y) {
-            bounds.push('DOWN');
-        }
-        return bounds;
     }
 
     // 清理战场
