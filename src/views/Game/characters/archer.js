@@ -7,6 +7,7 @@ export default class Archer extends Soldier {
         super(cache, blood);
         this.primarity = 0;
         this.attackArea = 3;
+        this.ATK = 5;
         this.SoldierType = "Archer";
         this.init(Math.floor(Math.random()*800), Math.floor(Math.random()*600),true,()=>{
             console.log('Archer');

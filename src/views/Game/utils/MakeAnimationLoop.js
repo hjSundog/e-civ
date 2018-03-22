@@ -22,7 +22,7 @@ export default class AnimationManager {
         // 目标帧顺序
         this.cacheFrames = [];
         this.isStop = true;
-        this.fps = 10;
+        this.fps = 8;
         this.now = Date.now();
         this.animations = {};
         // 是否循环往复播放
@@ -34,6 +34,10 @@ export default class AnimationManager {
         this.interval = 1000;
         // 动作类型
         this.actionType = null;
+        // 当前循环函数，每帧
+        this.currentLoop = noop;
+        // 当前循环函数, 多帧结束
+        this.overLoop = noop;
     }
 
     setInterval(interval) {
@@ -125,7 +129,7 @@ export default class AnimationManager {
             return this._loadFramesFromResource(rawTextures, null, rowCount, colCount);
         }
         // 一张雪碧图
-        if (width && height) {
+        if (colCount && rowCount) {
             rawTexture = PIXI.Texture.fromImage(frames);
             // 从左到右，从上到下
             return this._loadFramesFromResource(rawTexture, null, rowCount, colCount);
@@ -152,7 +156,7 @@ export default class AnimationManager {
         }
 
         if (type === 'String') {
-            const pix = frames.split('.')[1];
+            // const pix = frames.split('.')[1];
             // 判断条件
             // 加载
             this._loadFramesFromIMG(frames, rowCount, colCount);
@@ -208,9 +212,9 @@ export default class AnimationManager {
     // 根据传入帧产生动画
     _animate = (name, frames, callback, once, cb) => {
         // 当前对象行为和上次一样则直接跳过逻辑，继续以当前状态运行
-        if (name === this.actionType) {
-            return;
-        }
+        // if (this.actionType === name) {
+        //     return;
+        // }
         // 停止正在运行的动画
         this.stop();
         // 改变当前动画
@@ -221,13 +225,17 @@ export default class AnimationManager {
         this.actionCallback = callback;
         // 设置缓存帧
         this.cacheFrames = frames;
+        // 设置当前循环函数
+        this.currentLoop = callback;
+        this.overLoop = cb;
         // 帧循环控制
-        this.loop(() => {
-            // this.owner.SoldierType === 'Archer' ? console.log('这是第%s帧', this.currentFrame + 1) : null;
-            this.sprite.texture = this.cacheFrames[this.currentFrame];
-            this.currentFrame = (this.currentFrame + 1) % this.cacheFrames.length;
-            callback.call(this.owner, this.owner);
-        }, once, cb);
+        this.loop(this._loopFunc, once);
+    }
+
+    _loopFunc = () => {
+        this.sprite.texture = this.cacheFrames[this.currentFrame];
+        this.currentFrame = (this.currentFrame + 1) % this.cacheFrames.length;
+        this.currentLoop.call(this.owner, this.owner);
     }
 
     changeFrame(frame) {
@@ -236,7 +244,7 @@ export default class AnimationManager {
 
     // 逆向帧动画
     _animateReverse(frames, callback, once, cb) {
-
+        return cb;
     }
 
     // 只动画一次
@@ -278,8 +286,19 @@ export default class AnimationManager {
         window.cancelRequestAnimFrame(this.timer);
     }
 
+
+    // 清除overLoop函数
+    clearOverLoop = () => {
+        this.overLoop = noop;
+    }
+
+    // 清除每帧循环函数
+    clearCurrentLoop = () => {
+        this.currentLoop = noop;
+    }
+
     // 传入每帧调用回调函数，是否只动画一次，动画一次调用回调函数
-    loop = (callback, once, cb) => {
+    loop = (callback, once) => {
         const interval = this.interval / this.fps;
         let delta;
         window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
@@ -287,7 +306,6 @@ export default class AnimationManager {
             this.stop();
             return;
         }
-
         // 请求动画帧
         if (window.requestAnimationFrame) {
             let now = Date.now();
@@ -295,20 +313,17 @@ export default class AnimationManager {
             if (delta > interval) {
                 this.now = now - (delta % interval);
                 // 简单的通过最后帧和是否once参数来决定是否继续循环
-
                 if (once && this.currentFrame === this.cacheFrames.length - 1) {
                     this.stop();
                     return;
                 }
-
                 // 运行完一次动画后调用的回调函数
-                if (cb && this.currentFrame === (this.cacheFrames.length - 1)) {
-                    cb();
+                if (this.currentFrame === (this.cacheFrames.length - 1)) {
+                    typeof this.overLoop === 'function'?this.overLoop():null;
                 }
-
                 callback();
             }
-            this.timer = window.requestAnimationFrame(this.loop.bind(this, callback, once, cb));
+            this.timer = window.requestAnimationFrame(this.loop.bind(this, callback, once));
         }
     }
 

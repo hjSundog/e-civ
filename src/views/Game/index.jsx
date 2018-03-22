@@ -6,7 +6,7 @@ import _ from 'lodash';
 import * as PIXI from 'pixi.js'
 import './index.less'
 import noop from '@/utils/noop'
-import MakeAnimationLoop from './utils/MakeAnimationLoop'
+// import MakeAnimationLoop from './utils/MakeAnimationLoop'
 
 // 想法，传入的参数应该是两个军队，每个军队数据对象包含兵种及每个兵种的数目，当然每个兵种都有最大值
 // 先100个为一组，
@@ -14,18 +14,18 @@ import MakeAnimationLoop from './utils/MakeAnimationLoop'
 let Application = PIXI.Application,
     loader = PIXI.loader,
     resources = PIXI.loader.resources,
-    Sprite = PIXI.Sprite,
-    Texture = PIXI.Texture,
-    Rectangle = PIXI.Rectangle,
+    // Sprite = PIXI.Sprite,
+    // Texture = PIXI.Texture,
+    // Rectangle = PIXI.Rectangle,
     Container = PIXI.Container,
     Text = PIXI.Text,
-    TextStyle = PIXI.TextStyle,
-    TextureCache = PIXI.utils.TextureCache;
+    TextStyle = PIXI.TextStyle;
+    // TextureCache = PIXI.utils.TextureCache;
     // base = new PIXI.BaseTexture(anyImageObject),
     // texture = new PIXI.Texture(base),
     // sprite = new PIXI.Sprite(texture)
 
-const ROOT_PATH = 'static/images/'
+//  const ROOT_PATH = 'static/images/'
 
 class Game extends React.Component {
     constructor () {
@@ -51,7 +51,7 @@ class Game extends React.Component {
         this.gameOverScene = new Container();
         this.gameScene.visible = true;
         this.gameOverScene.visible = false;
-        this.battleGround = new BattleGround(800, 600, {row: 5, col: 20}, this.gameScene);
+        this.battleGround = new BattleGround(800, 600, {row: 5, col: 20}, this.gameScene, this.gameOverScene);
         // 初始化资源
         this.initResource();
     }
@@ -100,12 +100,23 @@ class Game extends React.Component {
                 dropShadowAngle: Math.PI / 6,
                 dropShadowDistance: 6,
             });
-            this.message = new Text('start', style);
+            this.message = new Text('', style);
+            const center = this.battleGround.getCenter();
+            this.message.anchor.set(0.5, 0.5);
+            this.message.position.set(center.x, center.y);
+            //this.message.pivot.set(this.message.width/2, this.message.height/2);
             this.gameOverScene.addChild(this.message);
-
+            // battleGround setting
             this.battleGround.initGroup('my');
             this.battleGround.addGroupToScene(true);
             this.battleGround.battle();
+            this.battleGround.over((side)=>{
+                if (side === 'my') {
+                    this.message.text = '恭喜你，己方队伍获得胜利!'
+                    return;
+                }
+                this.message.text = '很遗憾，己方队伍溃败了！';
+            })
             // test
             // let testTexture = _.cloneDeep(textures.textures['Archer.png']);
             // testTexture.frame = new Rectangle(0, 0, 48, 64);
@@ -184,8 +195,8 @@ class Game extends React.Component {
         }
 
         loader.add(resources)
-        .on('progress', progressHanlder)
-        .load(callback)
+            .on('progress', progressHanlder)
+            .load(callback)
     }
 
     // 运行程序
@@ -235,28 +246,28 @@ class Game extends React.Component {
 
 
 Game.defaultProps = {
-    my: [{
-        soldierType: 'Archer',
-        count: 180,
-    }],
-    enemy: [{
-        soldierType: 'ThiefHead',
-        count: 180,
-    }],
-    // enemy: [{
-    //     soldierType: 'Archer',
-    //     count: 400
-    // },{
-    //     soldierType: 'ThiefHead',
-    //     count: 350
-    // }],
     // my: [{
     //     soldierType: 'Archer',
-    //     count: 620
-    // },{
-    //     soldierType: 'ThiefHead',
-    //     count: 130
+    //     count: 180,
     // }],
+    // enemy: [{
+    //     soldierType: 'ThiefHead',
+    //     count: 280,
+    // }],
+    enemy: [{
+        soldierType: 'Archer',
+        count: 420
+    },{
+        soldierType: 'ThiefHead',
+        count: 350
+    }],
+    my: [{
+        soldierType: 'Archer',
+        count: 520
+    },{
+        soldierType: 'ThiefHead',
+        count: 130
+    }],
     sceneType: 'normal',// 地图场景
     dealBattleResult: noop,  // 处理战斗结果回调
     controlSpeed: 1, // 战斗速率

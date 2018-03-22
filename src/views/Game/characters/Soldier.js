@@ -10,7 +10,7 @@ import _ from 'lodash';
 import MakeAnimationLoop from '../utils/MakeAnimationLoop'
 import noop from '@/utils/noop.js';
 
-const Rectangle = PIXI.Rectangle;
+// const Rectangle = PIXI.Rectangle;
 
 class Solider {
     static primarity = 0;
@@ -54,6 +54,8 @@ class Solider {
         this.group = '';
         // 敌人
         this.enemy = null;
+        // 用于判断是否是上次的敌人，以确保目标，最好的方法是为每个敌人设置一个id
+        this.lastEnemy = null;
         // 受到的攻击者
         this.attackedBy = [];
     }
@@ -62,7 +64,7 @@ class Solider {
     attacked = (enemy, hurt) => {
         this.blood -= hurt;
         // console.log('受到来自'+enemy.SoldierType+'的攻击,损失'+hurt+'点血量！');
-        // this.SoldierType==='Archer'?console.log('Archer只剩%s点血量了', this.blood):console.error('ThiefHead只剩%s点血量了', this.blood);
+        this.SoldierType==='Archer'?console.log('Archer只剩%s点血量了', this.blood):console.error('ThiefHead只剩%s点血量了', this.blood);
         if (this.blood <=0 && this.getLiveState()) {
             this.setLiveState(false);
         }
@@ -81,11 +83,14 @@ class Solider {
 
     // 射击类间接伤害
     shot = (enemy) => {
-
+        return enemy;
     }
 
     // 停止攻击
+    // 停止内部循环函数
     stopAttack() {
+        // this.MAL.stop();
+        // console.log(this.SoldierType + ' stop attack');
         this.MAL.stop();
     }
 
@@ -93,16 +98,32 @@ class Solider {
 
     // 攻击,直接伤害
     attack = (enemy) => {
+        // 判断是否是同意敌人
+        if (this.lastEnemy !== enemy) {
+            this.doAction('ATTACK@'+this.direction, false, ()=>{
+                const {ATK, Penetration} = this;
+                const {DEF} = enemy;
+                const hurt = this.computeHurt(ATK, Penetration, DEF);
+                enemy.attacked(this, hurt);
+            }, true);  
+            this.lastEnemy = enemy;
+            return this;
+        }
         this.doAction('ATTACK@'+this.direction, false, ()=>{
             const {ATK, Penetration} = this;
             const {DEF} = enemy;
             const hurt = this.computeHurt(ATK, Penetration, DEF);
             enemy.attacked(this, hurt);
         });
+        return this;
     }
 
     getResult = () => {
 
+    }
+
+    getSprite() {
+        return this.sprite;
     }
 
     setLiveState(state) {
@@ -115,7 +136,11 @@ class Solider {
 
     die() {
         // 清除自己的定时器
-        console.log(this.SoldierType+' died!...');
+        console.log(this.groupName + ' 的 '+this.SoldierType+' died!...');
+        // test
+        const bg  = this.BattleGround;
+        console.log('my方还有%s个人，enemy方还有%s个人!', bg['groups']['my'].length, bg['groups']['enemy'].length);
+        // test
         this.stop();
         this.isLive = false;
         this.sprite.destroy();
@@ -162,7 +187,7 @@ class Solider {
             this.setSpeed(this.speedX, pix);
         }
         this.sprite.y -= this.speedY;
-        this.direction = 'UP';
+        this.turnTo('UP');
     }
 
     moveDown(pix) {
@@ -170,7 +195,7 @@ class Solider {
             this.setSpeed(this.speedX, pix);
         }
         this.sprite.y += this.speedY;
-        this.direction = 'DOWN';
+        this.turnTo('DOWN');
     }
 
     moveLeft(pix) {
@@ -178,7 +203,7 @@ class Solider {
             this.setSpeed(pix, this.speedY);
         }
         this.sprite.x -= this.speedX;
-        this.direction = 'LEFT';
+        this.turnTo('LEFT');
     }
 
     moveRight(pix) {
@@ -186,7 +211,7 @@ class Solider {
             this.setSpeed(pix, this.speedY);
         }
         this.sprite.x += this.speedX;
-        this.direction = 'RIGHT';
+        this.turnTo('RIGHT');
     }
 
 
@@ -276,17 +301,17 @@ class Solider {
             //         this.doAction(type);  
             //     }
             // })
-        }, 100)
+        }, 50)
     }
 
 
     // 针对每种行为制作其动画,子动画使用@链接,MOVE@UP
-    doAction = (actionType, once ,cb) => {
+    doAction = (actionType, once ,cb, reset = false) => {
         // 当前对象行为和上次一样则直接跳过逻辑，继续以当前状态运行
-        // if (this.lastStep === actionType) {
-        //     return;
-        // }
-        // this.SoldierType === 'Archer'?console.log('do the '+actionType+' action!'):null;
+        if (this.lastStep === actionType && !reset) {
+            return;
+        }
+        // console.log('reset action');
         // 保存改步骤
         this.steps.push(actionType);
         // action动画效果逻辑
@@ -302,14 +327,14 @@ class Solider {
 
         const type = toString.call(frames).slice(8, -1);
         type === 'Array'
-        ?(once?this.MAL.animateOnce(actionType, frames, actionFunc, cb):this.MAL.animate(actionType, frames, actionFunc, cb))
-        :this.MAL.changeFrame(frames, actionFunc);
+            ?(once?this.MAL.animateOnce(actionType, frames, actionFunc, cb):this.MAL.animate(actionType, frames, actionFunc, cb))
+            :this.MAL.changeFrame(frames, actionFunc);
         // action实际效果逻辑
         // 这里做个适配吧
         // MOVE@UP,(MOVE,UP)都可以，推荐MOVE@UP
         // actionFunc(this);
         // actionFunc.call(this, this);
-        // this.lastStep = actionType;
+        this.lastStep = actionType;
         return this;
     }
 
@@ -337,7 +362,7 @@ class Solider {
     loadFrames(actionType, rowNum = 1 , colNum = 1, frames, srcID) {
         //this.MAL.loadFrames
         let loadedFrames;
-        const type = toString.call(frames).slice(8, -1);
+        // const type = toString.call(frames).slice(8, -1);
         const actions = actionType.split('.');
         if (frames) {
             loadedFrames = this.MAL.loadFrames(frames, rowNum, colNum);
@@ -357,7 +382,7 @@ class Solider {
 
     // state制定每个动作所需要的动画帧
     setState(callback) {
-        const frames = this.MAL.getFrames();
+        // const frames = this.MAL.getFrames();
         const state = callback.call(this, this);
         const MAL = this.MAL;
         function recurse(obj, dist, actions, mapFunc) {
@@ -409,33 +434,33 @@ class Solider {
         const that = this;
         this.sprite.on('pointerdown', () => {
             switch (that.direction) {
-                case 'U':
-                    that.doAction('TURN@RIGHT')
-                    that.turnTo('R');
-                    break;
-                case 'R':
-                    that.doAction('TURN@DOWN');
-                    that.turnTo('D');
-                    break;
-                case 'D':
-                    that.doAction('MOVE@LEFT');
-                    that.turnTo('L');
-                    break;
-                case 'L':
-                    that.doAction('MOVE@UP');
-                    that.turnTo('U');
-                    break;
-                default:
-                    return;
+            case 'U':
+                that.doAction('TURN@RIGHT')
+                that.turnTo('R');
+                break;
+            case 'R':
+                that.doAction('TURN@DOWN');
+                that.turnTo('D');
+                break;
+            case 'D':
+                that.doAction('MOVE@LEFT');
+                that.turnTo('L');
+                break;
+            case 'L':
+                that.doAction('MOVE@UP');
+                that.turnTo('U');
+                break;
+            default:
+                return;
             }
         });
-
+        typeof callback === 'function'?callback.call(this):null;
         return this;
     }
 
     isStop() {
         const rt = this.speedX || this.speedY;
-        return !!!rt;
+        return !rt;
     }
 
     stopMove = () => {
@@ -448,7 +473,7 @@ class Solider {
     }
 
     // move to
-    moveTo = (dest) => {
+    _moveTo = (dest) => {
         let timer = setInterval(()=>{
             const position = this.getPosition();
             if (position.x === dest.x && position.y === dest.y) {
@@ -461,29 +486,67 @@ class Solider {
     }
 
 
-    _moveTo = (dest) => {
+    moveTo = (dest, forbiddenDirection = []) => {
         const { x, y } = dest;
+        const totalAction = ['MOVE@RIGHT', 'MOVE@LEFT', 'MOVE@DOWN', 'MOVE@UP'];
         const position = this.getPosition();
-        const actions = [];
         this.isStop()?this.startMove():null;
-
+        this.avaliableDirection = [];
         if (x > position.x) {
-            actions.push('MOVE@RIGHT')
+            this.avaliableDirection.push('MOVE@RIGHT')
         }
 
         if (x < position.x) {
-            actions.push('MOVE@LEFT');
+            this.avaliableDirection.push('MOVE@LEFT');
         }
 
         if (y > position.y) {
-            actions.push('MOVE@DOWN');
+            this.avaliableDirection.push('MOVE@DOWN');
         }
 
         if (y < position.y) {
-            actions.push('MOVE@UP')
+            this.avaliableDirection.push('MOVE@UP')
         }
 
-        const action = actions[Math.floor(Math.random()*actions.length)];
+        // 剔除禁止的方向
+        forbiddenDirection.forEach((direc) => {
+            let index = this.avaliableDirection.findIndex(d =>{
+                return d === direc
+            })
+            if (index !== -1) {
+                this.avaliableDirection.splice(index, 1);
+            }
+        });
+                
+        // 如果没有路径可走，则随机一个没有禁止的方向
+        if (this.avaliableDirection.length <=0) {
+            // 剔除禁止方向
+            forbiddenDirection.forEach((direc) => {
+                let index = totalAction.findIndex(d =>{
+                    return d === direc
+                })
+                if (index !== -1) {
+                    totalAction.splice(index, 1);
+                }
+            });
+            // 剩余随机方向
+            // 剩余方向没有
+            if (totalAction.length >0) {
+                const randomDirection = totalAction[Math.floor(Math.random()*totalAction.length)];
+                this.doAction(randomDirection);
+                return ;
+            }
+            this.doAction(this.actionTypes[Math.floor(Math.random()*this.actionTypes.length)]);
+            return;
+        }
+
+        // 是否是同一方向，这里采取的是如果上一次方向可用，则继续上一次方向，而不是随机方向
+        // 导致人物走较长的折线
+        if (this.avaliableDirection.includes(this.lastStep)) {
+            this.doAction(this.lastStep);
+            return;   
+        }
+        const action = this.avaliableDirection[Math.floor(Math.random()*this.avaliableDirection.length)];
         //console.log(actions)
         action?this.doAction(action):null;
     }
@@ -507,7 +570,6 @@ class Solider {
     }
     // 转向
     turnTo(direction) {
-        console.log('ture to: ' + direction);
         this.direction = direction;
         // this.changeFrame(this.direction, this.texture);
         // this.sprite.texture = this.texture;

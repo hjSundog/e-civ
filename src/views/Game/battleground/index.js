@@ -1,43 +1,17 @@
 
 // 该对象设计主要用于检测浏览器窗口变化和管理游戏界面的尺寸比例
 // 仲裁各个对象的行为和状态，类似于一个管理器
-
-// 判断画布边界
-//Contain the sprite and find the collision value
-// let collision = contain(anySprite, {x: 0, y: 0, width: 512, height: 512});
-
-// //If there's a collision, display the boundary that the collision happened on
-// if(collision) {
-//   if collision.has("left") console.log("The sprite hit the left");  
-//   if collision.has("top") console.log("The sprite hit the top");  
-//   if collision.has("right") console.log("The sprite hit the right");  
-//   if collision.has("bottom") console.log("The sprite hit the bottom");  
-// }
-
-// 碰撞检测
-// let playerVsPlatforms = hit(
-//     player,                  // sprite one
-//     world.platforms,         // sprite two
-//     true,                    // prevent overlap
-//     false,                   // bounce
-//     false,                   // global coordinate
-//     function(collision, platform){
-
-//       //`collision` tells you the side on player that the collision occurred on.
-//       //`platform` is the sprite from the `world.platforms` array
-//       //that the player is colliding with
-//     }
-//   );
-
 import _ from 'lodash';
 import * as PIXI from 'pixi.js';
 import DC from '../utils/DetectCollision';
 import Bump from 'bump.js'
+import { platform } from 'os';
 export default class BattleGround {
-    constructor(x = 800, y = 600, layout = { col: 30, row: 40 }, scene = new PIXI.Container()) {
+    constructor(x = 800, y = 600, layout = { col: 30, row: 40 }, gameScene = new PIXI.Container(), gameOverScene = new PIXI.Container()) {
+        this.gameOverScene = gameOverScene;
+        this.gameScene = gameScene;
         this.layout = layout;
         this.children = [];
-        this.scene = scene;
         this.groups = {};
         // 缩放比例
         this.scale = {
@@ -47,6 +21,8 @@ export default class BattleGround {
         this.bump = new Bump(PIXI);
         // 每格单位所占长宽
         this.resize(x, y);
+        // 是否胜利
+        this.isBattleOver = false;
     }
 
     getCenter() {
@@ -64,7 +40,7 @@ export default class BattleGround {
     }
 
     getScene() {
-        return this.scene;
+        return this.gameScene;
     }
 
     // 战场开始
@@ -86,7 +62,7 @@ export default class BattleGround {
         // 记录一次的位置
         let prePosition = 0;
         // 设置大体位置
-        if (!!!isLeft) {
+        if (!isLeft) {
             direction = -1;
             prePosition = this.layout.row * (this.layout.col - 1);
         }
@@ -171,6 +147,7 @@ export default class BattleGround {
             // child.moveTo(this.getCenter());
         });
         console.log('battle start');
+
     }
 
     // 将所有子对象加载到场景中
@@ -186,7 +163,7 @@ export default class BattleGround {
         const { width, height } = this.getBoxSize();
         child.unitX = width;
         child.unitY = height;
-        child.addToScene(this.scene);
+        child.addToScene(this.gameScene);
     }
 
     // 自适应格子
@@ -240,12 +217,32 @@ export default class BattleGround {
         return bounds;
     }
 
+    // 清理战场
+    clearBattleGround = (side) => {
+        if (this.isBattleOver) {
+            console.log('清理战场中...');
+            // 停止所有动作
+            this.children.forEach(child=>{
+                child.stop();
+            })
+            typeof this.overCB === 'function'?this.overCB(side):null;
+            this.gameScene.visible = false;
+            this.gameOverScene.visible = true;
+            console.log('战场打扫完毕！');
+        }
+    }
+
+    // 接受回调
+    over = (cb) => {
+        this.overCB = cb;
+    }
+
     moveToOtherSide = () => {
 
     }
     // TODO: 判断战斗是否结束-> 判断该对象是否存活 -> 判断该对象是否可以攻击-> 移动到
     // 可攻击范围->
-    makeChildrenActive(child, actionName) {
+    makeChildrenActive(child) {
         let otherSide;
         // 没有地方战斗结束
         const side = child.groupName;   // 本方阵营
@@ -256,7 +253,10 @@ export default class BattleGround {
         }
         // 敌方全灭
         if (otherSide.length === 0) {
+            //console.log(side+'方赢了这场战斗!');
+            this.isBattleOver = true;
             child.stop();
+            this.clearBattleGround(side);
             return;
         }
         // 便利每个孩子决定其行为
@@ -341,28 +341,118 @@ export default class BattleGround {
         return this;
     }
 
+    // 获取当前对象之外的其他对象
+    _getExtraChildren = (child) => {
+        const children = [...this.children];
+        const index = children.findIndex(ele => {
+            return ele === child;
+        });
+        if (index === -1) {
+            return console.error('没有找到该对象，请检查参数!');
+        }
+        children.splice(index, 1);
+        return children;
+    }
+
+    
+
     // 判断是否移动
     judgeMove(child, enemy) {
         // 判断移动范围
         const point = enemy.getPosition();
-        const { x, y } = child.getPosition();
-        // 先不考虑碰撞检测
-        child._moveTo(point);
+        const {x, y} = this;
+        const forbiddenDirection = new Set();
+        // const { x, y } = child.getPosition();
+        // 边界检测
+        let boundLimit = this.bump.contain(child.getSprite(), { x: 0, y: 0, width: x, height: y });
+
+        //If there's a collision, display the boundary that the collision happened on
+        if (boundLimit) {
+            if (boundLimit.has("left")){
+                // console.log("The sprite hit the left");
+                forbiddenDirection.add('MOVE@LEFT');
+            } 
+            if (boundLimit.has("top")){
+                //console.log("The sprite hit the top");
+                forbiddenDirection.add('MOVE@UP');
+
+            } 
+            if (boundLimit.has("right")){
+                //console.log("The sprite hit the right");
+                forbiddenDirection.add('MOVE@RIGHT');
+            } 
+            if (boundLimit.has("bottom")){
+                //console.log("The sprite hit the bottom");
+                forbiddenDirection.add('MOVE@DOWN');
+            } 
+        }
+        // 碰撞检测
+        const otherChildren = this._getExtraChildren(child);
+        const sprites = otherChildren.map(oChild => {
+            return oChild.getSprite();
+        })
+        const collision = this.bump.hit(child.getSprite(), 
+            sprites,
+            false,
+            false,
+            true,
+            // (colli, platform) => {
+            //     console.log('get Collision')
+            //     return;
+            // }
+        )
+        // 存在碰撞
+        if (collision) {
+            // 转向
+            switch(collision) {
+            case 'right':
+                forbiddenDirection.add('MOVE@RIGHT');
+                break;
+            case 'left':
+                forbiddenDirection.add('MOVE@LEFT');
+                break;
+            case 'top':
+                forbiddenDirection.add('MOVE@UP');
+                break;
+            case 'down':
+                forbiddenDirection.add('MOVE@DOWN');
+                break;
+            default:
+                console.log('collistion has '+collision);   
+            }
+        }
+        const TFD = Array.from(forbiddenDirection);
+        if (TFD.length) {
+            console.log('不能向'+TFD+'走了');
+        }
+        child.moveTo(point, TFD);
     }
 
     // 判断是否能够攻击
-    judgeAttack(child, enemy) {
+    judgeAttack = (child, enemy) => {
         const point = enemy.getPosition();
         const { x, y } = point;
-        const { minX, minY, maxX, maxY } = this._getAttackArea(child);
-        // 判断敌人是否在攻击范围内
-        if (x < maxX && x > minX && y < maxY && y > minY) {
-            return true;
+        const { width, height } = this.getBoxSize();
+        const attackArea = this._getAttackArea(child);
+        const enemyR = {
+            x: x,
+            y: y,
+            width: width,
+            height: height
         }
-        return false;
+        // 判断敌人是否在攻击范围内
+        const canAttack = attackArea.some(area => {
+            return this.bump.hitTestRectangle(area, enemyR)
+        });
+        return canAttack;
     }
 
-    // 周围九宫格
+
+    // 判断两个区域是否相交
+
+
+    // 周围九宫格或者四个方向
+    // 返回Rectangle对象数组
     _getAttackArea = (target) => {
         const local = target.getPosition();
         // 单元格数目
@@ -370,12 +460,48 @@ export default class BattleGround {
         // 单元格长宽
         const { width, height } = this.getBoxSize();
         const { x, y } = local;
-        return {
-            minX: x - attackArea * width,
-            maxX: x + 2 * width * attackArea,
-            minY: y - height * attackArea,
-            maxY: y + 2 * height * attackArea
+        const rectangles = [];
+        // 中间矩形
+        const cr = {
+            x: x,
+            y: y,
+            width: width,
+            height: height
         }
+        rectangles.push(cr);
+        // 上面矩形
+        for(let i=0;i<attackArea;i++) {
+            // 左右
+            let rr = {
+                x: x + width*i,
+                y: y,
+                width: width,
+                height: height
+            };
+            let lr = {
+                x: x - width*i,
+                y: y,
+                width: width,
+                height: height
+            };
+            // 上下
+            let ur = {
+                x: x,
+                y: y + i*height,
+                width: width,
+                height: height
+            }
+            let dr = {
+                x: x,
+                y: y - i*height,
+                width: width,
+                height: height
+            }
+            rectangles.concat(rr, lr, ur, dr);
+        }
+
+
+        return rectangles
 
     }
 
