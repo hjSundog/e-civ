@@ -4,6 +4,7 @@
 import _ from 'lodash';
 import * as PIXI from 'pixi.js';
 import Bump from 'bump.js'
+
 export default class BattleGround {
     constructor(x = 800, y = 600, layout = { col: 30, row: 40 }, gameScene = new PIXI.Container(), gameOverScene = new PIXI.Container()) {
         this.gameOverScene = gameOverScene;
@@ -16,6 +17,8 @@ export default class BattleGround {
             x: 1,
             y: 1
         };
+        this.padding = 5;
+        this.marging = 5;
         this.bump = new Bump(PIXI);
         // 每格单位所占长宽
         this.resize(x, y);
@@ -84,11 +87,11 @@ export default class BattleGround {
         const isLandScope = true;
         let boardMap = isLandScope ? (val) => {
             // 默认为横版
-            const { row, col } = this.layout;
+            const { row } = this.layout;
             const rt = [(val % row + row - 1) % row, Math.floor((val - 1) / row)];
             return rt;
         } : (val) => {
-            const { row, col } = this.layout;
+            const { col } = this.layout;
             return [Math.floor((val - 1) / col), (val % col - 1 + col) % col];
         }
         // 列数
@@ -186,13 +189,13 @@ export default class BattleGround {
         const prefix = 'MOVE';
         // target.doAction('MOVE@UP');
         setInterval(() => {
-            const bounds = this._boundLimit(target.sprite);
+            const bounds = [...this._judgeBounds(target)];
             const avaliableDirection = actionType.filter(action => {
                 return !bounds.includes(action)
             })
             // console.log(avaliableDirection);
             target.doAction(`${prefix}@${avaliableDirection[Math.floor(Math.random() * avaliableDirection.length)]}`);
-        }, 2000);
+        }, 1000);
     }
 
     // 清理战场
@@ -270,11 +273,12 @@ export default class BattleGround {
         // 判断是否可以移动，并且决定移动方向
         if (this.judgeMove(child, child.enemy)) {
             // 
+            return;
         }
     }
 
+    // 加入分组
     addToGroup = (children, groupName) => {
-
         // 将每个对象的战场对象注册为本对象
         children.forEach(child => {
             child.BattleGround = this;
@@ -332,38 +336,11 @@ export default class BattleGround {
         return children;
     }
 
-    
-
-    // 判断是否移动
-    judgeMove(child, enemy) {
+    // 判断边界
+    // 返回边界数组
+    getChildForbiddenDirection(child) {
         // 判断移动范围
-        const point = enemy.getPosition();
-        const {x, y} = this;
-        const forbiddenDirection = new Set();
-        // const { x, y } = child.getPosition();
-        // 边界检测
-        let boundLimit = this.bump.contain(child.getSprite(), { x: 0, y: 0, width: x, height: y });
-
-        //If there's a collision, display the boundary that the collision happened on
-        if (boundLimit) {
-            if (boundLimit.has("left")){
-                // console.log("The sprite hit the left");
-                forbiddenDirection.add('MOVE@LEFT');
-            } 
-            if (boundLimit.has("top")){
-                //console.log("The sprite hit the top");
-                forbiddenDirection.add('MOVE@UP');
-
-            } 
-            if (boundLimit.has("right")){
-                //console.log("The sprite hit the right");
-                forbiddenDirection.add('MOVE@RIGHT');
-            } 
-            if (boundLimit.has("bottom")){
-                //console.log("The sprite hit the bottom");
-                forbiddenDirection.add('MOVE@DOWN');
-            } 
-        }
+        const forbiddenDirection = this._judgeBounds(child);
         // 碰撞检测
         const otherChildren = this._getExtraChildren(child);
         const sprites = otherChildren.map(oChild => {
@@ -374,36 +351,85 @@ export default class BattleGround {
             false,
             false,
             true,
-            // (colli, platform) => {
-            //     console.log('get Collision')
-            //     return;
-            // }
+            (colli, platform) => {
+                // console.log('get Collision: collision is '+colli+'; platform is '+ platform);
+                // const {x, y} = child.getSprite().getGlobalPosition();
+                // console.log('x: '+x+' : y '+y);
+                // child.setPosition(x, y);
+                // child.stopMove();
+                return;
+            }
         )
         // 存在碰撞
         if (collision) {
             // 转向
             switch(collision) {
             case 'right':
-                forbiddenDirection.add('MOVE@RIGHT');
+                forbiddenDirection.add('RIGHT');
                 break;
             case 'left':
-                forbiddenDirection.add('MOVE@LEFT');
+                forbiddenDirection.add('LEFT');
                 break;
             case 'top':
-                forbiddenDirection.add('MOVE@UP');
+                forbiddenDirection.add('UP');
                 break;
             case 'down':
-                forbiddenDirection.add('MOVE@DOWN');
+                forbiddenDirection.add('DOWN');
                 break;
             default:
-                console.log('collistion has '+collision);   
+                //console.log('collistion has '+collision);   
             }
         }
-        const TFD = Array.from(forbiddenDirection);
+        // TFD 可转向方向
+        return Array.from(forbiddenDirection);
+    }
+
+    // 封装contain函数
+    _contain = (child) => {
+        const {x, y} = this;
+        const sprite = child.getSprite();
+        this.bump.contain(sprite, {
+            x: 0,
+            y: 0,
+            width: x,
+            height: y
+        })
+    }
+
+    // 判断战场边界
+    _judgeBounds = (child) => {
+        const bounds = new Set();
+        let boundLimit = this._contain(child);
+        if (boundLimit) {
+            if (boundLimit.has("left")){
+                // console.log("The sprite hit the left");
+                bounds.add('LEFT');
+            } 
+            if (boundLimit.has("top")){
+                //console.log("The sprite hit the top");
+                bounds.add('UP');
+
+            } 
+            if (boundLimit.has("right")){
+                //console.log("The sprite hit the right");
+                bounds.add('RIGHT');
+            } 
+            if (boundLimit.has("bottom")){
+                //console.log("The sprite hit the bottom");
+                bounds.add('DOWN');
+            } 
+        }
+        return bounds;
+    }
+
+    // 判断是否移动
+    judgeMove = (child, enemy) => {
+        // const TFD = this.getChildForbiddenDirection(child);
+        const TFD = [];
         if (TFD.length) {
             console.log('不能向'+TFD+'走了');
         }
-        child.moveTo(point, TFD);
+        child.moveTo(enemy, TFD);
     }
 
     // 判断是否能够攻击
@@ -475,7 +501,10 @@ export default class BattleGround {
                 width: width,
                 height: height
             }
-            rectangles.concat(rr, lr, ur, dr);
+            rectangles.push(rr);
+            rectangles.push(lr);
+            rectangles.push(ur);
+            rectangles.push(dr);
         }
 
 

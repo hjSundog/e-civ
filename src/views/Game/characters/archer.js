@@ -6,17 +6,19 @@ export default class Archer extends Soldier {
     constructor(cache, blood) {
         super(cache, blood);
         this.primarity = 0;
-        this.attackArea = 3;
+        this.attackArea = 6;
         this.ATK = 5;
         this.SoldierType = "Archer";
+        this.isShotType = false;
         this.init(Math.floor(Math.random()*800), Math.floor(Math.random()*600),true,()=>{
             console.log('Archer');
         });
         // this.loadFrames(rowCount, colCount,[]) // 没有传frames组,cache为undefined时直接从指定文件夹加载
         // 以4*4加载帧图形
         this.loadFrames('INIT.MOVE.TURN', 4 , 4, null, 'Archer.png'); // 已经传入了frames组
-        this.loadFrames('DEAD', 4, 3, null, 'Archer_dead.png');
-        this.loadFrames('ATTACK', 4, 4, null, 'Archer_melee.png')
+        this.loadFrames('DEAD', 4, 4, null, 'Archer_dead.png');
+        this.loadFrames('ATTACK', 4, 4, null, 'Archer_melee.png');
+        this.loadFrames('SHOT', 4, 4, null, 'Archer_shot.png');
         //this.initActionState()
         this.setState((archer)=>{
             return {

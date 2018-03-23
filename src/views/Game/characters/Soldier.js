@@ -38,17 +38,17 @@ class Solider {
         // 精灵图标
         this.sprite = new PIXI.Sprite();
         this.displayEntity = new PIXI.Container();
-        this.cache = cache?cache:null;
+        this.cache = cache ? cache : null;
         // 方向
         this.direction = 'RIGHT';
         // 状态设置
         // 动作状态
-        this.animateState = {};     // 动画帧存储
-        this.actions = {};          // 动作效果回调函数存储
-        this.actionTypes = ['MOVE@UP', 'MOVE@DOWN', 'MOVE@LEFT', 'MOVE@RIGHT'];      // 注册的动作类型存储
-        this.steps = [];            // 该对象从开始到最后经历的动作集合
-        this.maxStepLength = 50;    // 默认最多的步骤为50步
-        this.lastStep = '';         // 上一步
+        this.animateState = {}; // 动画帧存储
+        this.actions = {}; // 动作效果回调函数存储
+        this.actionTypes = ['MOVE@UP', 'MOVE@DOWN', 'MOVE@LEFT', 'MOVE@RIGHT']; // 注册的动作类型存储
+        this.steps = []; // 该对象从开始到最后经历的动作集合
+        this.maxStepLength = 50; // 默认最多的步骤为50步
+        this.lastStep = ''; // 上一步
         this.nowActionState = '';
         // 动作怔状态
         this.loopState = 0;
@@ -63,11 +63,15 @@ class Solider {
         this.lastEnemy = null;
         // 受到的攻击者
         this.attackedBy = [];
+        // 远程对象
+        // 是否是间接伤害
+        this.isShotType = false;
+        this.shotItems = [];
         // 初始化可见对象
         this._init();
     }
 
-    _init(){
+    _init() {
         this._createBloodState(this.blood);
         this.displayEntity.addChild(this.sprite);
         this.displayEntity.addChild(this.healthBar);
@@ -80,7 +84,7 @@ class Solider {
         healthBar.position.set(0, 10);
         //Create the black background rectangle
         let innerBar = new PIXI.Graphics();
-        innerBar.beginFill(0xffffff);
+        innerBar.beginFill(0xff1c1c);
         innerBar.drawRect(0, 0, HEALTH_WIDTH, HEALTH_HEIGHT);
         innerBar.endFill();
         healthBar.addChild(innerBar);
@@ -96,7 +100,7 @@ class Solider {
         this.healthBar = healthBar;
     }
     // 获取真正的血条
-    getHealthBar(){
+    getHealthBar() {
         return this.healthBar.outer;
     }
 
@@ -107,28 +111,30 @@ class Solider {
     // 受到攻击
     attacked = (enemy, hurt) => {
         this.blood -= hurt;
-        const percent = this.blood/this.maxBlood;
-        this.setHealthBar(HEALTH_WIDTH*percent);
+        const percent = this.blood / this.maxBlood;
+        this.setHealthBar(HEALTH_WIDTH * percent);
         // console.log('受到来自'+enemy.SoldierType+'的攻击,损失'+hurt+'点血量！');
-        this.SoldierType==='Archer'?console.log('Archer只剩%s点血量了', this.blood):console.error('ThiefHead只剩%s点血量了', this.blood);
-        if (this.blood <=0 && this.getLiveState()) {
+        // this.SoldierType === 'Archer' ? console.log('Archer只剩%s点血量了', this.blood) : console.error('ThiefHead只剩%s点血量了', this.blood);
+        if (this.blood <= 0 && this.getLiveState()) {
             this.setLiveState(false);
         }
     }
 
+
+
     // 计算伤害值
     computeHurt(ATK, Penetration, DEF) {
-        const actualDEF = DEF - Penetration>0?DEF-Penetration:0;
-        return ATK - actualDEF>0?ATK - actualDEF:1;
+        const actualDEF = DEF - Penetration > 0 ? DEF - Penetration : 0;
+        return ATK - actualDEF > 0 ? ATK - actualDEF : 1;
     }
 
     // 停止射击
-    stopShot(){
+    stopShot() {
         this.MAL.stop();
     }
 
     // 射击类间接伤害
-    shot = (enemy) => {
+    _shot = (enemy) => {
         return enemy;
     }
 
@@ -140,32 +146,49 @@ class Solider {
         this.MAL.stop();
     }
 
-
+    attack = (enemy) => {
+        if (this.isShotType) {
+            this._shot(enemy);
+        } else {
+            this._attack(enemy);
+        }
+    }
 
     // 攻击,直接伤害
-    attack = (enemy) => {
+    _attack = (enemy) => {
+        // 转向目标
+        const directions = this._judgeDirection(enemy);
+        if (!directions.includes(this.direction)) {
+            this.direction = directions[Math.floor(Math.random()*directions.length)];
+        }
         // 判断是否是同意敌人
         if (this.lastEnemy !== enemy) {
-            this.doAction('ATTACK@'+this.direction, false, ()=>{
-                const {ATK, Penetration} = this;
-                const {DEF} = enemy;
+            this.doAction('ATTACK@' + this.direction, false, () => {
+                const {
+                    ATK,
+                    Penetration
+                } = this;
+                const {
+                    DEF
+                } = enemy;
                 const hurt = this.computeHurt(ATK, Penetration, DEF);
                 enemy.attacked(this, hurt);
-            }, true);  
+            }, true);
             this.lastEnemy = enemy;
             return this;
         }
-        this.doAction('ATTACK@'+this.direction, false, ()=>{
-            const {ATK, Penetration} = this;
-            const {DEF} = enemy;
+        this.doAction('ATTACK@' + this.direction, false, () => {
+            const {
+                ATK,
+                Penetration
+            } = this;
+            const {
+                DEF
+            } = enemy;
             const hurt = this.computeHurt(ATK, Penetration, DEF);
             enemy.attacked(this, hurt);
         });
         return this;
-    }
-
-    getResult = () => {
-
     }
 
     getSprite() {
@@ -176,34 +199,37 @@ class Solider {
         this.isLive = state;
     }
 
-    getLiveState(){
+    getLiveState() {
         return this.isLive;
     }
 
-    die() {
+    die = () => {
+        this.doAction('DEAD', false, ()=>{
         // 清除自己的定时器
-        console.log(this.groupName + ' 的 '+this.SoldierType+' died!...');
-        // test
-        const bg  = this.BattleGround;
-        console.log('my方还有%s个人，enemy方还有%s个人!', bg['groups']['my'].length, bg['groups']['enemy'].length);
-        // test
-        this.stop();
-        this.isLive = false;
-        this.sprite.destroy();
-        this.displayEntity.destroy();
-        // 移除战场
-        this.BattleGround.removeChild(this);
-        // 移除攻击者目标
-        this.attackedBy.forEach(attacker=> {
-            attacker.stopAttack();
-            attacker.enemy = null;
-        })
-        this.destroy();
+            console.log(this.groupName + ' 的 ' + this.SoldierType + ' died!...');
+            // test
+            const bg = this.BattleGround;
+            console.log('my方还有%s个人，enemy方还有%s个人!', bg['groups']['my'].length, bg['groups']['enemy'].length);
+            // test
+
+            this.stop();
+            this.isLive = false;
+            this.sprite.destroy();
+            this.displayEntity.destroy();
+            // 移除战场
+            this.BattleGround.removeChild(this);
+            // 移除攻击者目标
+            this.attackedBy.forEach(attacker => {
+                attacker.stopAttack();
+                attacker.enemy = null;
+            })
+            this.destroy();
+        });
     }
 
     destroy() {
         // this = undefined;
-        console.log('destroy is contructing...');
+        // console.log('destroy is contructing...');
     }
 
     initSpeed() {
@@ -228,38 +254,66 @@ class Solider {
     setSpeedY(vy) {
         this.speedY = vy;
     }
-    
-    moveUP(pix){
+
+    moveUP(pix) {
+        const DIRECTION = 'UP';
         if (pix) {
             this.setSpeed(this.speedX, pix);
         }
+        // const bounds = this.BattleGround.getChildForbiddenDirection(this);
+        // // 如果不允许往上走则向其他方向移动
+        // if (bounds.includes(DIRECTION)) {
+        //     this.moveRight();
+        //     return this;
+        // }
         //this.sprite.y -= this.speedY;
         this.displayEntity.y -= this.speedY;
         this.turnTo('UP');
     }
 
     moveDown(pix) {
+        const DIRECTION = 'DOWN';
         if (pix) {
             this.setSpeed(this.speedX, pix);
         }
+        // const bounds = this.BattleGround.getChildForbiddenDirection(this);
+        // // 如果不允许往上走则向其他方向移动
+        // if (bounds.includes(DIRECTION)) {
+        //     this.moveLeft();
+        //     return this;
+        // }
         // this.sprite.y += this.speedY;
         this.displayEntity.y += this.speedY;
         this.turnTo('DOWN');
     }
 
     moveLeft(pix) {
+        const DIRECTION = 'LEFT';
         if (pix) {
             this.setSpeed(pix, this.speedY);
         }
+        // const bounds = this.BattleGround.getChildForbiddenDirection(this);
+        // // 如果不允许往上走则向其他方向移动
+        // if (bounds.includes(DIRECTION)) {
+        //     this.moveUP();
+        //     return this;
+        // }
         //this.sprite.x -= this.speedX;
         this.displayEntity.x -= this.speedX;
         this.turnTo('LEFT');
     }
 
     moveRight(pix) {
+        const DIRECTION = 'RIGHT';
         if (pix) {
             this.setSpeed(pix, this.speedY);
         }
+        // const bounds = this.BattleGround.getChildForbiddenDirection(this);
+        // // 如果不允许往上走则向其他方向移动
+        // if (bounds.includes(DIRECTION)) {
+        //     this.moveDown();
+        //     return this;
+        // }
         // this.sprite.x += this.speedX;
         this.displayEntity.x += this.speedX;
         this.turnTo('RIGHT');
@@ -275,22 +329,22 @@ class Solider {
     // 指定某个行为的回调函数 {name: ,callback}
     // 指定一系列行为的回调
     // 指定一系列行为各自的回调
-    setAction= (map, callback) => {
-        const type = toString.call(map).slice(8, -1) ;
+    setAction = (map, callback) => {
+        const type = toString.call(map).slice(8, -1);
         if (type === 'Array') {
-            map.forEach(_map=>{
+            map.forEach(_map => {
                 const _map_type = toString.call(_map.name).slice(8, -1);
                 if (_map_type === 'Array') {
-                    _map.name.forEach(name=>{
-                        this._setAction(name, _map.callback?_map.callback:noop);
+                    _map.name.forEach(name => {
+                        this._setAction(name, _map.callback ? _map.callback : noop);
                     })
                 }
 
                 if (_map_type === 'String') {
-                    this._setAction(_map.name, _map.callback?_map.callback:noop);
+                    this._setAction(_map.name, _map.callback ? _map.callback : noop);
                 }
             })
-        }   
+        }
 
         if (type === 'String') {
             this._setAction(map, callback);
@@ -299,31 +353,29 @@ class Solider {
         if (type === 'Object') {
             const _type = toString.call(map.name).slice(8, -1);
             if (_type === 'Array') {
-                map.name.forEach(name=>{
-                    this._setAction(name, map.callback?map.callback:noop);
+                map.name.forEach(name => {
+                    this._setAction(name, map.callback ? map.callback : noop);
                 })
             }
             if (_type === 'String') {
-                this._setAction(map.name, map.callback?map.callback:noop);
+                this._setAction(map.name, map.callback ? map.callback : noop);
             }
         }
         return this;
     }
 
-
-
     // 以后考虑move,up而不是move@up
     _setAction(name, callback) {
         // 注册该动作
-        this.actionTypes.includes(name)?null:this.actionTypes.push(name);
+        this.actionTypes.includes(name) ? null : this.actionTypes.push(name);
         // 注册其函数
         const actions = name.split('@');
         let pointer = this.actions;
         const length = actions.length;
-        for (let i=0;i<length-1;i++) {
+        for (let i = 0; i < length - 1; i++) {
             pointer = pointer[actions[i]];
         }
-        pointer[actions[length-1]] = callback;
+        pointer[actions[length - 1]] = callback;
         return this;
     }
 
@@ -336,7 +388,6 @@ class Solider {
 
     // 人物运动循环，激活人物
     active = () => {
-        // 死循环的尝试所有动作，并根据
         if (!this.MAL) {
             return console.error('该对象没有加载到MakeAnimationLoop对象上')
         }
@@ -345,19 +396,14 @@ class Solider {
             return console.error('该对象没有加载到BattleGround对象上')
         }
         // 时间可能存在一点问题，存在补足或者缺失问题.
-        this.timer = setInterval(()=>{
+        this.timer = setInterval(() => {
             this.BattleGround.makeChildrenActive(this);
-            // this.actionTypes.forEach(type=>{
-            //     if (this.BattleGround.makeChildrenActive(this, type)) {
-            //         this.doAction(type);  
-            //     }
-            // })
-        }, 50)
+        }, 10)
     }
 
 
     // 针对每种行为制作其动画,子动画使用@链接,MOVE@UP
-    doAction = (actionType, once ,cb, reset = false) => {
+    doAction = (actionType, once, cb, reset = false) => {
         // 当前对象行为和上次一样则直接跳过逻辑，继续以当前状态运行
         if (this.lastStep === actionType && !reset) {
             return;
@@ -377,14 +423,10 @@ class Solider {
         }, this.actions);
 
         const type = toString.call(frames).slice(8, -1);
-        type === 'Array'
-            ?(once?this.MAL.animateOnce(actionType, frames, actionFunc, cb):this.MAL.animate(actionType, frames, actionFunc, cb))
-            :this.MAL.changeFrame(frames, actionFunc);
-        // action实际效果逻辑
-        // 这里做个适配吧
-        // MOVE@UP,(MOVE,UP)都可以，推荐MOVE@UP
-        // actionFunc(this);
-        // actionFunc.call(this, this);
+        type === 'Array' ?
+            (once ? this.MAL.animateOnce(actionType, frames, actionFunc, cb) : this.MAL.animate(actionType, frames, actionFunc, cb)) :
+            this.MAL.changeFrame(frames, actionFunc);
+
         this.lastStep = actionType;
         return this;
     }
@@ -400,30 +442,30 @@ class Solider {
         // 做个输入参数的判断吧
         const type = toString.call(frames).slice(8, -1);
         if (type === 'Array') {
-            id?this.MAL.changeFrame(frames[id]):console.error('请输入指定的帧数id');
+            id ? this.MAL.changeFrame(frames[id]) : console.error('请输入指定的帧数id');
         }
 
         if (type === 'Object') {
-            frames instanceof PIXI.Texture?this.MAL.changeFrame(frames):console.error('请输入正确的行为参数');
+            frames instanceof PIXI.Texture ? this.MAL.changeFrame(frames) : console.error('请输入正确的行为参数');
         }
     }
     // 加载帧
     // frames为路径数组或者路径或者undefined(此时必须制定src),
     // 所以只有两种情况，frames有时srcID没有值, frames没有值时，srcID有值
-    loadFrames(actionType, rowNum = 1 , colNum = 1, frames, srcID) {
+    loadFrames(actionType, rowNum = 1, colNum = 1, frames, srcID) {
         //this.MAL.loadFrames
         let loadedFrames;
         // const type = toString.call(frames).slice(8, -1);
         const actions = actionType.split('.');
         if (frames) {
             loadedFrames = this.MAL.loadFrames(frames, rowNum, colNum);
-            actions.forEach(action=>{
+            actions.forEach(action => {
                 this.animateState[action] = {};
                 this.animateState[action]['base'] = loadedFrames;
             })
         } else {
             loadedFrames = this.MAL.loadFrames(this.cache, rowNum, colNum, srcID);
-            actions.forEach(action=>{
+            actions.forEach(action => {
                 this.animateState[action] = {};
                 this.animateState[action]['base'] = loadedFrames;
             })
@@ -436,21 +478,22 @@ class Solider {
         // const frames = this.MAL.getFrames();
         const state = callback.call(this, this);
         const MAL = this.MAL;
+
         function recurse(obj, dist, actions, mapFunc) {
             for (let key of Object.keys(obj)) {
                 let type = toString.call(obj[key]).slice(8, -1);
                 if (type === 'Object') {
-                    dist[key] = {...dist[key]};
+                    dist[key] = { ...dist[key]};
                     actions[key] = {};
                     recurse(obj[key], dist[key], actions[key], mapFunc);
                 } else {
                     actions[key] = noop;
-                    dist[key] = mapFunc(obj[key], dist.base);
+                    dist[key] = mapFunc(obj[key], typeof dist.base !== 'undefined'?dist.base:dist[key].base);
                 }
             }
         }
         // 根据state(数据)映射到animateState(帧)和动作函数
-        recurse(state, this.animateState, this.actions, (val, base)=>{
+        recurse(state, this.animateState, this.actions, (val, base) => {
             let type = toString.call(val).slice(8, -1);
             let sequences = val;
             if (type === 'Array') {
@@ -480,7 +523,7 @@ class Solider {
         // 相应事件
         if (interactiveable) {
             this.sprite.interactive = true;
-            this.sprite.buttonMode = true;   
+            this.sprite.buttonMode = true;
         }
         const that = this;
         this.sprite.on('pointerdown', () => {
@@ -505,7 +548,7 @@ class Solider {
                 return;
             }
         });
-        typeof callback === 'function'?callback.call(this):null;
+        typeof callback === 'function' ? callback.call(this) : null;
         return this;
     }
 
@@ -519,13 +562,13 @@ class Solider {
         this.setSpeed(0, 0);
     }
 
-    startMove(){
+    startMove() {
         this.initSpeed();
     }
 
     // move to
     _moveTo = (dest) => {
-        let timer = setInterval(()=>{
+        let timer = setInterval(() => {
             const position = this.getPosition();
             if (position.x === dest.x && position.y === dest.y) {
                 this.stopMove();
@@ -536,44 +579,87 @@ class Solider {
         }, 100);
     }
 
-
-    moveTo = (dest, forbiddenDirection = []) => {
-        const { x, y } = dest;
-        const totalAction = ['MOVE@RIGHT', 'MOVE@LEFT', 'MOVE@DOWN', 'MOVE@UP'];
+    // 路径优化一下
+    _judgeShortestDirection(target) {
+        const {x,y} = target.getPosition();
         const position = this.getPosition();
-        this.isStop()?this.startMove():null;
-        this.avaliableDirection = [];
+        const xLength = Math.abs(position.x - x);
+        const yLength = Math.abs(position.y - y);
+        let primarity;
+        if (xLength < yLength && xLength) {
+            primarity = ['LEFT', 'RIGHT'];
+        }
+
+        if (yLength < xLength && yLength) {
+            primarity = ['UP', 'DOWN'];
+        }
+
+        if (yLength === xLength) {
+            primarity = ['LEFT', 'RIGHT', 'UP', 'DOWN'];
+        }
+
+        if (xLength === 0) {
+            primarity = ['UP', 'DOWN'];
+        }
+
+        if (yLength === 0) {
+            primarity = ['LEFT', 'RIGHT'];
+        }
+    
+        return primarity;
+    }
+
+    // 判断目标方向
+    // 参数是Soldier对象
+    _judgeDirection(target) {
+        const rt = [];
+        const {x,y} = target.getPosition();
+        const position = this.getPosition();
         if (x > position.x) {
-            this.avaliableDirection.push('MOVE@RIGHT')
+            rt.push('RIGHT');
         }
 
         if (x < position.x) {
-            this.avaliableDirection.push('MOVE@LEFT');
+            rt.push('LEFT');
         }
 
         if (y > position.y) {
-            this.avaliableDirection.push('MOVE@DOWN');
+            rt.push('DOWN');
         }
 
         if (y < position.y) {
-            this.avaliableDirection.push('MOVE@UP')
+            rt.push('UP');
         }
+        return rt;
+    }
 
+    // 移动到目标
+    // 参数目标坐标
+    moveTo = (dest, forbiddenDirection = []) => {
+        const totalAction = ['RIGHT', 'LEFT', 'DOWN', 'UP'];
+        this.isStop() ? this.startMove() : null;
+        this.avaliableDirection = [];
+        // 判断方向
+        const directions = this._judgeDirection(dest);
+        directions.forEach(direction => {
+            // this.avaliableDirection.push('MOVE@'+direction);
+            this.avaliableDirection.push(direction);
+        })
         // 剔除禁止的方向
         forbiddenDirection.forEach((direc) => {
-            let index = this.avaliableDirection.findIndex(d =>{
+            let index = this.avaliableDirection.findIndex(d => {
                 return d === direc
             })
             if (index !== -1) {
                 this.avaliableDirection.splice(index, 1);
             }
         });
-                
+
         // 如果没有路径可走，则随机一个没有禁止的方向
-        if (this.avaliableDirection.length <=0) {
+        if (this.avaliableDirection.length <= 0) {
             // 剔除禁止方向
             forbiddenDirection.forEach((direc) => {
-                let index = totalAction.findIndex(d =>{
+                let index = totalAction.findIndex(d => {
                     return d === direc
                 })
                 if (index !== -1) {
@@ -582,24 +668,40 @@ class Solider {
             });
             // 剩余随机方向
             // 剩余方向没有
-            if (totalAction.length >0) {
-                const randomDirection = totalAction[Math.floor(Math.random()*totalAction.length)];
-                this.doAction(randomDirection);
-                return ;
+            if (totalAction.length > 0) {
+                const randomDirection = totalAction[Math.floor(Math.random() * totalAction.length)];
+                this.doAction('MOVE@' + randomDirection);
+                return;
             }
-            this.doAction(this.actionTypes[Math.floor(Math.random()*this.actionTypes.length)]);
+            this.doAction(this.actionTypes[Math.floor(Math.random() * this.actionTypes.length)]);
             return;
         }
+        // 优化路径
+        // let best;
+        // const prefer = this._judgeShortestDirection(dest);
+        // this.avaliableDirection.forEach(direction => {
+        //     // 有优化的选择
+        //     if (prefer.includes(direction)) {
+        //         best = direction;
+        //     }
+        // })
 
+        // if (best === this.lastStep) {
+        //     this.doAction(this.lastStep);
+        //     return;
+        // }
+        // this.doAction('MOVE@'+best);
+        // return;
         // 是否是同一方向，这里采取的是如果上一次方向可用，则继续上一次方向，而不是随机方向
         // 导致人物走较长的折线
-        if (this.avaliableDirection.includes(this.lastStep)) {
+        const temp = this.lastStep.split('@');
+        if (temp[0] === 'MOVE' && this.avaliableDirection.includes(temp[1])) {
             this.doAction(this.lastStep);
-            return;   
+            return;
         }
-        const action = this.avaliableDirection[Math.floor(Math.random()*this.avaliableDirection.length)];
+        const action = this.avaliableDirection[Math.floor(Math.random() * this.avaliableDirection.length)];
         //console.log(actions)
-        action?this.doAction(action):null;
+        action ? this.doAction('MOVE@'+action) : null;
     }
     // 获取位置
     getPosition() {
@@ -615,23 +717,22 @@ class Solider {
 
     // 设置位置
     setPosition(x = 0, y = 0) {
-        // if (typeof x === 'object') {
-        //     this.sprite.x = x.x;
-        //     this.sprite.y = x.y;
-        // } else {
-        //     this.sprite.x = x;
-        //     this.sprite.y = y;
-        // }
         if (typeof x === 'object') {
             this.displayEntity.position.set(x.x, x.y);
         } else {
             this.displayEntity.position.set(x, y);
         }
-        // 血条位置精灵位置
     }
     // 转向
-    turnTo(direction) {
-        this.direction = direction;
+    // 参数方向或者Soldier对象
+    turnTo(to) {
+        if (typeof to === 'string') {
+            this.direction = to;
+        } else {
+            const directions = this._judgeDirection(to);
+            this.direction = directions[Math.floor(Math.random()*directions.length)];
+        }
+        // console.log('turn to '+this.direction);
         // this.changeFrame(this.direction, this.texture);
         // this.sprite.texture = this.texture;
         //this.sprite.texture.update();

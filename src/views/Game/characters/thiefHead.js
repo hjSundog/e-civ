@@ -9,7 +9,7 @@ export default class ThiefHead extends Soldier {
             console.log('ThiefHead');
         });
         this.loadFrames('INIT.TURN.MOVE', 4 , 4, null, 'ThiefHead.png'); // 已经传入了frames组
-        this.loadFrames('DEAD', 4, 3, null, 'ThiefHead_dead.png');
+        this.loadFrames('DEAD', 4, 4, null, 'ThiefHead_dead.png');
         this.loadFrames('ATTACK', 4, 4, null, 'ThiefHead_melee.png')
         //this.initActionState()
         this.setState((frames, state)=>{

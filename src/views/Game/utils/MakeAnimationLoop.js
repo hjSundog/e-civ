@@ -232,6 +232,7 @@ export default class AnimationManager {
         this.loop(this._loopFunc, once);
     }
 
+    // 每帧的改变
     _loopFunc = () => {
         this.sprite.texture = this.cacheFrames[this.currentFrame];
         this.currentFrame = (this.currentFrame + 1) % this.cacheFrames.length;
@@ -314,13 +315,15 @@ export default class AnimationManager {
                 this.now = now - (delta % interval);
                 // 简单的通过最后帧和是否once参数来决定是否继续循环
                 if (once && this.currentFrame === this.cacheFrames.length - 1) {
-                    this.stop();
+                    // this.stop();
+                    typeof this.overLoop === 'function'?this.overLoop():null;
                     return;
                 }
                 // 运行完一次动画后调用的回调函数
                 if (this.currentFrame === (this.cacheFrames.length - 1)) {
                     typeof this.overLoop === 'function'?this.overLoop():null;
                 }
+                // 每帧的变化回调
                 callback();
             }
             this.timer = window.requestAnimationFrame(this.loop.bind(this, callback, once));
