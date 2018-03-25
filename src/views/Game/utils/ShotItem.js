@@ -8,9 +8,31 @@ class ShotItem {
         // console.log(enemy);
         this.enemy = enemy;
         this._init(texture);
-        this.speed = 20;
+        this.speed = 4;
+        this.vx = 0;
+        this.vy = 0;
+        // 角度,这里tan值
+        this.angel = 0;
+        this.loopTime = 10;
+        // 大致的方向
+        this.direction = 'RIGHT';   // 
+        this.directions = ['UP', 'LEFT', 'RIGHT', 'DOWN'];
     }
 
+
+    setDirection = (direction) => {
+        const type = toString.call(direction).slice(8, -1);
+        // switch (type) {
+        //     case 'String':
+        //     this.direction = direction;
+        //     break;
+        //     case 'Array':
+        //     this.direction = 
+        //     break;
+        //     case 'Object':
+        //     break;
+        // }
+    }
 
     init = (frame, x, y) => {
         this.setTexture(frame);
@@ -37,9 +59,10 @@ class ShotItem {
         }
     }
 
-
+    // 设置速度
     setSpeed(speed) {
         this.speed = speed;
+        this._setSpeed(this.angel);
     }
 
     _init(texture) {
@@ -48,11 +71,15 @@ class ShotItem {
     }
 
     // 飞行函数，回调用于击中目标之后运行
-    fly = (callback) => {
-        this._cb = callback;
-        this.timer = setInterval(this._fly, 10);
+    fly = (callback, outOfBounds) => {
+        this._hitCallback = callback;    
+        this._outBounds = outOfBounds;
+        this.timer = setInterval(this._fly, this.loopTime);
     }
 
+    getSprite() {
+        return this.sprite;
+    }
 
     // 击中敌人停止飞行
     // 敌人死亡停止飞行
@@ -64,12 +91,25 @@ class ShotItem {
         clearInterval(this.timer);
     }
 
+    // 是否越界
+    _isOutOfBounds = () => {
+        return this.enemy.BattleGround._contain(this);
+    }
+
     // 定时器运行函数
     _fly = () => {
         const itemRec = this.getArea();
         const enemyRec = this.enemy.getArea();
+        // 是否飞出边界
+        if (this._isOutOfBounds()) {
+            console.log('飞出边界了');
+            typeof this._outBounds === 'function'?this._outBounds():null;
+            this.stopFly();
+            return;
+        }
+        // 是否击中目标
         if (this._isHitTarget(itemRec, enemyRec)) {
-            this._cb(this.enemy);
+            typeof this._hitCallback === 'function'?this._hitCallback(this.enemy):null;
             this.stopFly();
             return;
         }
@@ -78,14 +118,56 @@ class ShotItem {
             x: enemyRec.centerX,
             y: enemyRec.centerY
         };
-        // x方向速度
-        const vx = (tarPoint.x - myPoint.x) / this.speed;
-        const vy = (tarPoint.y - myPoint.y) / this.speed;
-        const rotation = this._getRotation(vx, vy);
+        // 设置角度
+        this._setRotation(tarPoint);
+        // 设置速度
+        const {dx ,dy} = this._getDistance(tarPoint);
+        this._setSpeed(dx, dy);
+        // 位置
+        this._setPosition(myPoint.x + this.vx, myPoint.y + this.vy);
+    }
+
+    // 根据角度决定vx,vy
+    _setSpeed = (dx = 0, dy = 0) => {
+        const tan = dy/dx;
+        const pow = Math.pow(tan, 2);
+        this.vx = Math.sqrt(1/(1+pow)) * this.speed;
+        this.vy = Math.sqrt(1/(1+1/pow)) * this.speed;
+        if (dx<0) {
+            this.vx *= -1;
+        }
+
+        if (dy<0) {
+            this.vy *= -1;
+        }
+    }
+
+    // 获取两个对象的坐标差
+    _getDistance = (targetX = 0, targetY = 0) => {
+        let x, y;
+        if (typeof targetX === 'object') {
+            x = targetX.x;
+            y = targetX.y;
+        }  else {
+            x = targetX,
+            y = targetY;
+        }
+        const myPoint = this._getPosition();
+        const xLength = x - myPoint.x;
+        const yLength = y - myPoint.y;
+        return {
+            dx: xLength,
+            dy: yLength
+        }
+    }
+
+    // 设置偏转角度
+    _setRotation = (targetX = 0, targetY = 0) => {
+        const {dx, dy} = this._getDistance(targetX, targetY);
+        const rotation = this._getRotation(dx, dy);
+        this.angel = rotation;
         // 旋转角度
         this.sprite.rotation = rotation;
-        // 位置
-        this._setPosition(myPoint.x + vx, myPoint.y + vy);
     }
 
     // 获取旋转角度

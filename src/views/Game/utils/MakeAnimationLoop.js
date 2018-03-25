@@ -22,7 +22,7 @@ export default class AnimationManager {
         // 目标帧顺序
         this.cacheFrames = [];
         this.isStop = true;
-        this.fps = 8;
+        this.fps = 2;
         this.now = Date.now();
         this.animations = {};
         // 是否循环往复播放

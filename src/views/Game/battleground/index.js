@@ -388,7 +388,7 @@ export default class BattleGround {
     _contain = (child) => {
         const {x, y} = this;
         const sprite = child.getSprite();
-        this.bump.contain(sprite, {
+        return this.bump.contain(sprite, {
             x: 0,
             y: 0,
             width: x,

@@ -153,6 +153,7 @@ class Solider {
         let initWidth, initHeight;
         // shot fly
         const shotItem = new ShotItem(enemy);
+        // shotItem.setDirection(this.direction);
         const scene = this.BattleGround.getScene();
         shotItem.addToScene(scene);
         // 被瞄准
