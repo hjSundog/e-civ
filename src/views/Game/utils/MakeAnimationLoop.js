@@ -68,7 +68,7 @@ export default class AnimationManager {
         this.fps = fps;
     }
 
-    _loadFramesFromResource(textures, special, rowCount = 1, colCount = 1) {
+    _loadFramesFromResource = (textures, special, rowCount = 1, colCount = 1) => {
         let width, height, texture, _textures, frame;
         let frames = [];
         const type = toString.call(textures).slice(8, -1);
@@ -142,7 +142,16 @@ export default class AnimationManager {
         return this._loadFramesFromResource(resource, special, rowCount, colCount);
     }
 
-    loadFrames(frames, rowCount, colCount, special) {
+    _update = () => {
+        if (this.sprite.texture) {
+            this.sprite.texture.update();
+            this.sprite.texture._updateUvs();
+        } else{
+            console.error('没有texture');
+        }
+    }
+
+    loadFrames = (frames, rowCount, colCount, special) => {
         const rt = this.frames.length;
         const type = toString.call(frames).slice(8, -1);
         // 一级小texture
@@ -181,7 +190,7 @@ export default class AnimationManager {
     }
 
     // 根据参数获取指定帧
-    getSequenceFrames(sequence, base = 0) {
+    getSequenceFrames = (sequence, base = 0) => {
         let sequenceFrames = [];
         sequence.length
             ? sequence.forEach((val) => {
@@ -235,12 +244,14 @@ export default class AnimationManager {
     // 每帧的改变
     _loopFunc = () => {
         this.sprite.texture = this.cacheFrames[this.currentFrame];
+        this._update();
         this.currentFrame = (this.currentFrame + 1) % this.cacheFrames.length;
         this.currentLoop.call(this.owner, this.owner);
     }
 
     changeFrame(frame) {
         this.sprite.texture = frame;
+        this._update();
     }
 
     // 逆向帧动画
@@ -263,18 +274,19 @@ export default class AnimationManager {
         this.isStop = true;
     }
 
-    resume() {
+    resume = () => {
         this.isStop = false;
         this.currentFrame = (this.currentFrame + 1) % this.cacheFrames.length;
         // 控制程序
         this.loop(() => {
             this.sprite.texture = this.cacheFrames[this.currentFrame];
+            this._update();
             this.currentFrame = (this.currentFrame + 1) % this.cacheFrames.length;
             this.actionCallback.call(this.owner, this.owner);
         })
     }
 
-    stop() {
+    stop = () => {
         this.isStop = true;
         window.cancelRequestAnimFrame = (function () {
             return window.cancelAnimationFrame ||

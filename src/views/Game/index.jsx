@@ -246,28 +246,28 @@ class Game extends React.Component {
 
 
 Game.defaultProps = {
-    my: [{
-        soldierType: 'Archer',
-        count: 280,
-    }],
-    enemy: [{
-        soldierType: 'ThiefHead',
-        count: 180,
-    }],
-    // enemy: [{
-    //     soldierType: 'Archer',
-    //     count: 420
-    // },{
-    //     soldierType: 'ThiefHead',
-    //     count: 350
-    // }],
     // my: [{
     //     soldierType: 'Archer',
-    //     count: 620
-    // },{
-    //     soldierType: 'ThiefHead',
-    //     count: 130
+    //     count: 280,
     // }],
+    // enemy: [{
+    //     soldierType: 'ThiefHead',
+    //     count: 180,
+    // }],
+    enemy: [{
+        soldierType: 'Archer',
+        count: 420
+    },{
+        soldierType: 'ThiefHead',
+        count: 350
+    }],
+    my: [{
+        soldierType: 'Archer',
+        count: 620
+    },{
+        soldierType: 'ThiefHead',
+        count: 130
+    }],
     sceneType: 'normal',// 地图场景
     dealBattleResult: noop,  // 处理战斗结果回调
     controlSpeed: 1, // 战斗速率

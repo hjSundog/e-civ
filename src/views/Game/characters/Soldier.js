@@ -9,6 +9,7 @@ import * as PIXI from 'pixi.js';
 import _ from 'lodash';
 import MakeAnimationLoop from '../utils/MakeAnimationLoop'
 import noop from '@/utils/noop.js';
+import ShotItem from '@/views/Game/utils/ShotItem';
 
 // const Rectangle = PIXI.Rectangle;
 
@@ -63,6 +64,7 @@ class Solider {
         this.lastEnemy = null;
         // 受到的攻击者
         this.attackedBy = [];
+        this.shotedBy = [];
         // 远程对象
         // 是否是间接伤害
         this.isShotType = false;
@@ -133,9 +135,82 @@ class Solider {
         this.MAL.stop();
     }
 
+    // 攻击击中计算伤害
+    _hit = (enemy) => {
+        const {
+            ATK,
+            Penetration
+        } = this;
+        const {
+            DEF
+        } = enemy;
+        const hurt = this.computeHurt(ATK, Penetration, DEF);
+        enemy.attacked(this, hurt);
+    }
+
+    // 飞行物攻击操作
+    _shotHit = (enemy, frames) => {
+        let initWidth, initHeight;
+        // shot fly
+        const shotItem = new ShotItem(enemy);
+        const scene = this.BattleGround.getScene();
+        shotItem.addToScene(scene);
+        // 被瞄准
+        enemy.shotedBy.push(shotItem);
+        const {x, y} = this.getPosition();
+        const {width, height} = this.displayEntity;
+        switch(this.direction) {
+        case 'RIGHT':
+            initWidth = x + width;
+            initHeight = y + height/2;
+            break;
+        case 'LEFT':
+            initWidth = x;
+            initHeight = y + height/2;
+            break;
+        case 'UP':
+            initWidth = x + width/2;
+            initHeight = y;
+            break;
+        case 'DOWN':
+            initWidth = x + width/2;
+            initHeight = y + height;
+            break;
+        default:
+            console.log('方向有误');
+        }
+        shotItem.init(frames, initWidth, initHeight);
+        shotItem.fly(this._hit);
+    }
+
     // 射击类间接伤害
     _shot = (enemy) => {
-        return enemy;
+        // 转向目标, 最不好好的方向
+        const directions = this._judgeDirection(enemy);
+        let best;
+        const prefer = this._judgeLongestDirection(enemy);
+        directions.forEach(direction => {
+            // 有优化的选择
+            if (prefer.includes(direction)) {
+                best = direction;
+            }
+        })
+        this.direction = best;
+
+        // 判断是否是同意敌人
+        if (this.lastEnemy !== enemy) {
+            this.doAction('ATTACK@' + this.direction, false, () => {
+                const frames = this._getFrames('SHOT@'+this.direction);
+                this._shotHit(enemy, frames);
+            }, true);
+            this.lastEnemy = enemy;
+            return this;
+        }
+        this.doAction('ATTACK@' + this.direction, false, () => {
+            const frames = this._getFrames('SHOT@'+this.direction);
+            this._shotHit(enemy, frames);
+        });
+        return this;
     }
 
     // 停止攻击
@@ -161,32 +236,21 @@ class Solider {
         if (!directions.includes(this.direction)) {
             this.direction = directions[Math.floor(Math.random()*directions.length)];
         }
+
+        if (!this.direction) {
+            console.log('方向都没有你怎么不上天呢？');
+        }
+
         // 判断是否是同意敌人
         if (this.lastEnemy !== enemy) {
             this.doAction('ATTACK@' + this.direction, false, () => {
-                const {
-                    ATK,
-                    Penetration
-                } = this;
-                const {
-                    DEF
-                } = enemy;
-                const hurt = this.computeHurt(ATK, Penetration, DEF);
-                enemy.attacked(this, hurt);
+                this._hit(enemy);
             }, true);
             this.lastEnemy = enemy;
             return this;
         }
         this.doAction('ATTACK@' + this.direction, false, () => {
-            const {
-                ATK,
-                Penetration
-            } = this;
-            const {
-                DEF
-            } = enemy;
-            const hurt = this.computeHurt(ATK, Penetration, DEF);
-            enemy.attacked(this, hurt);
+            this._hit(enemy);
         });
         return this;
     }
@@ -214,7 +278,7 @@ class Solider {
 
             this.stop();
             this.isLive = false;
-            this.sprite.destroy();
+            //this.sprite.destroy();
             this.displayEntity.destroy();
             // 移除战场
             this.BattleGround.removeChild(this);
@@ -222,6 +286,10 @@ class Solider {
             this.attackedBy.forEach(attacker => {
                 attacker.stopAttack();
                 attacker.enemy = null;
+            });
+            // 移除瞄准该对象的飞行物
+            this.shotedBy.forEach(item => {
+                item.stopFly();
             })
             this.destroy();
         });
@@ -381,6 +449,7 @@ class Solider {
 
     // 人物静止
     stop = () => {
+        //  console.log('character stop action')
         clearInterval(this.timer);
         // 停止动作
         this.MAL.stop();
@@ -401,6 +470,34 @@ class Solider {
         }, 10)
     }
 
+    // 获取帧数组
+    _getFrames(actionType) {
+        const actions = actionType.split('@');
+        const frames = actions.reduce((pre, next) => {
+            return pre[next];
+        }, this.animateState);
+        return frames;
+    }
+
+    // 获取帧回调
+    _getActionFunc(actionType) {
+        const actions = actionType.split('@');
+        const actionFunc = actions.reduce((pre, next) => {
+            return pre[next];
+        }, this.actions);
+        return actionFunc;
+    }
+
+    // 获取自己的矩形
+    getArea() {
+        const {x, y} = this.getPosition();
+        return {
+            x: x,
+            y: y,
+            width: this.displayEntity.width,
+            height: this.displayEntity.height
+        }
+    }
 
     // 针对每种行为制作其动画,子动画使用@链接,MOVE@UP
     doAction = (actionType, once, cb, reset = false) => {
@@ -411,18 +508,17 @@ class Solider {
         // console.log('reset action');
         // 保存改步骤
         this.steps.push(actionType);
-        // action动画效果逻辑
-        const actions = actionType.split('@');
         // 占用的帧
-        const frames = actions.reduce((pre, next) => {
-            return pre[next];
-        }, this.animateState);
+        const frames = this._getFrames(actionType);
         // 调用的函数
-        const actionFunc = actions.reduce((pre, next) => {
-            return pre[next];
-        }, this.actions);
-
+        const actionFunc = this._getActionFunc(actionType);
+        // 讨论类型
         const type = toString.call(frames).slice(8, -1);
+
+        if (!frames) {
+            console.log('哈哈这里有问题了，来看看吧');
+        }
+
         type === 'Array' ?
             (once ? this.MAL.animateOnce(actionType, frames, actionFunc, cb) : this.MAL.animate(actionType, frames, actionFunc, cb)) :
             this.MAL.changeFrame(frames, actionFunc);
@@ -509,7 +605,34 @@ class Solider {
         // 初始化动作函数
         // 初始化INIT
         this.sprite.texture = this.animateState['INIT'];
+        this._update();
+        this.setAction('MOVE@UP', (archer)=>{
+            archer.moveUP();
+            //archer.moveUp();
+        })
+        this.setAction({
+            name: ['MOVE@DOWN'],
+            callback: (archer) => {
+                archer.moveDown();
+            }
+        })
+        this.setAction([{
+            name: 'MOVE@LEFT',
+            callback: (archer) => {
+                archer.moveLeft();
+            }
+        },{
+            name: 'MOVE@RIGHT',
+            callback: (archer) => {
+                archer.moveRight();
+            }
+        }])
         // console.log(this.animateState);
+    }
+
+    _update(){
+        this.sprite.texture?this.sprite.texture.update():null;
+        this.sprite.texture._updateUvs();
     }
 
     // 指定初始化帧，指定精灵位置，指定精灵交互情况,如果你有特定的初始帧可以在回调函数中
@@ -526,6 +649,9 @@ class Solider {
             this.sprite.buttonMode = true;
         }
         const that = this;
+        // 默认行为
+        // 改变帧
+        // 注册时间
         this.sprite.on('pointerdown', () => {
             switch (that.direction) {
             case 'U':
@@ -558,7 +684,7 @@ class Solider {
     }
 
     stopMove = () => {
-        console.log('stop soldier');
+        // console.log('stop soldier');
         this.setSpeed(0, 0);
     }
 
@@ -578,6 +704,37 @@ class Solider {
             this._moveTo(dest)
         }, 100);
     }
+
+    // 设计路径的优化
+    _judgeLongestDirection(target) {
+        const {x,y} = target.getPosition();
+        const position = this.getPosition();
+        const xLength = Math.abs(position.x - x);
+        const yLength = Math.abs(position.y - y); 
+        let primarity;
+        if (xLength < yLength && xLength) {
+            primarity = ['UP', 'DOWN'];
+        }
+
+        if (yLength < xLength && yLength) {
+            primarity = ['LEFT', 'RIGHT'];
+        }
+
+        if (yLength === xLength) {
+            primarity = ['LEFT', 'RIGHT', 'UP', 'DOWN'];
+        }
+
+        if (xLength === 0) {
+            primarity = ['UP', 'DOWN'];
+        }
+
+        if (yLength === 0) {
+            primarity = ['LEFT', 'RIGHT'];
+        }
+    
+        return primarity;
+    }
+
 
     // 路径优化一下
     _judgeShortestDirection(target) {
@@ -612,7 +769,7 @@ class Solider {
     // 判断目标方向
     // 参数是Soldier对象
     _judgeDirection(target) {
-        const rt = [];
+        let rt = [];
         const {x,y} = target.getPosition();
         const position = this.getPosition();
         if (x > position.x) {
@@ -629,6 +786,11 @@ class Solider {
 
         if (y < position.y) {
             rt.push('UP');
+        }
+
+        if (rt.length === 0) {
+            rt = ['UP', 'DOWN', 'RIGHT', 'LEFT'];
+            // console.error('我擦难道你已经无路可走了吗？。。');
         }
         return rt;
     }

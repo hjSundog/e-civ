@@ -9,7 +9,7 @@ export default class Archer extends Soldier {
         this.attackArea = 6;
         this.ATK = 5;
         this.SoldierType = "Archer";
-        this.isShotType = false;
+        this.isShotType = true;
         this.init(Math.floor(Math.random()*800), Math.floor(Math.random()*600),true,()=>{
             console.log('Archer');
         });
@@ -41,34 +41,15 @@ export default class Archer extends Soldier {
                     'LEFT': [4, 7],
                     'RIGHT': [8, 11]       
                 },
-                'DEAD': [0, 2]
+                'DEAD': [0, 2],
+                'SHOT': {
+                    'UP': 12,
+                    'DOWN': 0,
+                    'LEFT': 4,
+                    'RIGHT': 8
+                }
             }
         });
-
-        this.setAction('MOVE@UP', (archer)=>{
-            typeof archer.moveUP === 'function'?archer.moveUP():console.log('不是一个方法');
-            //archer.moveUp();
-        })
-
-
-        this.setAction({
-            name: ['MOVE@DOWN'],
-            callback: (archer) => {
-                archer.moveDown();
-            }
-        })
-
-        this.setAction([{
-            name: 'MOVE@LEFT',
-            callback: (archer) => {
-                archer.moveLeft();
-            }
-        },{
-            name: 'MOVE@RIGHT',
-            callback: (archer) => {
-                archer.moveRight();
-            }
-        }])
     }
 
 }

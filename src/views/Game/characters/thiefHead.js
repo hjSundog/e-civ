@@ -36,33 +36,7 @@ export default class ThiefHead extends Soldier {
                 'DEAD': [0, 2]
             }
         })
-        // 改变帧
-        this.changeFrame('TURN@DOWN')
 
-        this.setAction('MOVE@UP', (archer)=>{
-            typeof archer.moveUP === 'function'?archer.moveUP():console.log('不是一个方法');
-            //archer.moveUp();
-        })
-
-
-        this.setAction({
-            name: ['MOVE@DOWN'],
-            callback: (archer) => {
-                archer.moveDown();
-            }
-        })
-
-        this.setAction([{
-            name: 'MOVE@LEFT',
-            callback: (archer) => {
-                archer.moveLeft();
-            }
-        },{
-            name: 'MOVE@RIGHT',
-            callback: (archer) => {
-                archer.moveRight();
-            }
-        }])
     }
 
 }
