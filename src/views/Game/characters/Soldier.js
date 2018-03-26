@@ -115,8 +115,8 @@ class Solider {
             });
         }
 
-        const message = new PIXI.Text(this.id, style);
-        this.healthBar.addChild(message);
+        // const message = new PIXI.Text(this.id, style);
+        // this.healthBar.addChild(message);
     }
 
     // 制作血条
