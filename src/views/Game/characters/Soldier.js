@@ -79,8 +79,48 @@ class Solider {
         this.displayEntity.addChild(this.healthBar);
     }
 
+    setGroup =(group) => {
+        let style;
+        this.groupName = group;
+        const {innerBar} = this.healthBar;
+        if (this.groupName === 'enemy') {
+            // this.healthBar.innerBar.clear();
+            innerBar.beginFill(0xf46f0b);
+            innerBar.drawRect(0, 0, HEALTH_WIDTH, HEALTH_HEIGHT);
+            innerBar.endFill();
+            style = new PIXI.TextStyle({
+                fontFamily: "Arial",
+                fontSize: 10,
+                fill: "white",
+                stroke: 'red',
+                strokeThickness: 4,
+                dropShadow: true,
+                dropShadowColor: "#000000",
+                dropShadowBlur: 4,
+                dropShadowAngle: Math.PI / 6,
+                dropShadowDistance: 6,
+            });
+        } else {
+            style = new PIXI.TextStyle({
+                fontFamily: "Arial",
+                fontSize: 10,
+                fill: "white",
+                stroke: 'orange',
+                strokeThickness: 4,
+                dropShadow: true,
+                dropShadowColor: "#000000",
+                dropShadowBlur: 4,
+                dropShadowAngle: Math.PI / 6,
+                dropShadowDistance: 6,
+            });
+        }
+
+        const message = new PIXI.Text(this.id, style);
+        this.healthBar.addChild(message);
+    }
+
     // 制作血条
-    _createBloodState = (blood) => {
+    _createBloodState = () => {
         const healthBar = new PIXI.Container();
         //const {x, y} = this.getPosition();
         healthBar.position.set(0, 10);
@@ -98,12 +138,12 @@ class Solider {
         outerBar.endFill();
         healthBar.addChild(outerBar);
         healthBar.outer = outerBar;
-
+        healthBar.innerBar = innerBar;
         this.healthBar = healthBar;
     }
     // 获取真正的血条
     getHealthBar() {
-        return this.healthBar.outer;
+        return this.healthBar;
     }
 
     setHealthBar(len) {
@@ -113,6 +153,9 @@ class Solider {
     // 受到攻击
     attacked = (enemy, hurt) => {
         this.blood -= hurt;
+        if (this.blood<0) {
+            this.blood = 0;
+        }
         const percent = this.blood / this.maxBlood;
         this.setHealthBar(HEALTH_WIDTH * percent);
         // console.log('受到来自'+enemy.SoldierType+'的攻击,损失'+hurt+'点血量！');
@@ -163,11 +206,11 @@ class Solider {
         switch(this.direction) {
         case 'RIGHT':
             initWidth = x + width;
-            initHeight = y + height/2;
+            initHeight = y + height/3;
             break;
         case 'LEFT':
             initWidth = x;
-            initHeight = y + height/2;
+            initHeight = y + height/3;
             break;
         case 'UP':
             initWidth = x + width/2;
@@ -268,37 +311,41 @@ class Solider {
         return this.isLive;
     }
 
+    // bug原因可能是A对象死亡过程中某个对象通知A对象的MAL stop，导致A对象死亡过程不彻底
+    // 从而导致回调不触发
+    // 比如A attack B , C attack A, 当B死亡回调触发时，通知A stop，但是此时刚好A死亡，导致
+    // A的死亡过程被终止
     die = () => {
-        this.doAction('DEAD', false, ()=>{
-        // 清除自己的定时器
-            console.log(this.groupName + ' 的 ' + this.SoldierType + ' died!...');
-            // test
-            const bg = this.BattleGround;
-            console.log('my方还有%s个人，enemy方还有%s个人!', bg['groups']['my'].length, bg['groups']['enemy'].length);
-            // test
-
-            this.stop();
-            this.isLive = false;
-            //this.sprite.destroy();
-            this.displayEntity.destroy();
-            // 移除战场
-            this.BattleGround.removeChild(this);
+        this.doAction('DEAD', true, ()=>{
+            // console.log( this.SoldierType + ' '+ this.id + ' died!...');
+            // const bg = this.BattleGround;
+            // console.log('my方还有%s个人，enemy方还有%s个人!', bg['groups']['my'].length, bg['groups']['enemy'].length);
+            // console.log('经历的动作有:'+this.steps);
             // 移除攻击者目标
             this.attackedBy.forEach(attacker => {
-                attacker.stopAttack();
                 attacker.enemy = null;
+                // 如果该对象是存活的
+                if (attacker.getLiveState()) {
+                    attacker.stopAttack();
+                } else {
+                    attacker.die();
+                }
             });
             // 移除瞄准该对象的飞行物
             this.shotedBy.forEach(item => {
                 item.stopFly();
-            })
+            });
+            // 移除
             this.destroy();
         });
     }
 
-    destroy() {
-        // this = undefined;
-        // console.log('destroy is contructing...');
+    destroy = () => {
+        console.log(this.id+'destroying...');
+        this.BattleGround.removeChild(this);
+        this.sprite.destroy();
+        this.displayEntity.destroy();
+        this.stop();
     }
 
     initSpeed() {
@@ -506,7 +553,6 @@ class Solider {
         if (this.lastStep === actionType && !reset) {
             return;
         }
-        // console.log('reset action');
         // 保存改步骤
         this.steps.push(actionType);
         // 占用的帧
@@ -520,11 +566,10 @@ class Solider {
             console.log('哈哈这里有问题了，来看看吧');
         }
 
+        this.lastStep = actionType;
         type === 'Array' ?
             (once ? this.MAL.animateOnce(actionType, frames, actionFunc, cb) : this.MAL.animate(actionType, frames, actionFunc, cb)) :
             this.MAL.changeFrame(frames, actionFunc);
-
-        this.lastStep = actionType;
         return this;
     }
 
@@ -693,18 +738,6 @@ class Solider {
         this.initSpeed();
     }
 
-    // move to
-    _moveTo = (dest) => {
-        let timer = setInterval(() => {
-            const position = this.getPosition();
-            if (position.x === dest.x && position.y === dest.y) {
-                this.stopMove();
-                this.MAL.stop();
-                clearInterval(timer);
-            }
-            this._moveTo(dest)
-        }, 100);
-    }
 
     // 设计路径的优化
     _judgeLongestDirection(target) {

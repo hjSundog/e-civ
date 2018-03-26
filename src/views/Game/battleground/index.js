@@ -148,7 +148,6 @@ export default class BattleGround {
             // child.moveTo(this.getCenter());
         });
         console.log('battle start');
-
     }
 
     // 将所有子对象加载到场景中
@@ -249,6 +248,7 @@ export default class BattleGround {
         if (!child.enemy) {
             // 随机一个目标对象
             const randEnemy = otherSide[Math.floor(Math.random() * otherSide.length)];
+            // const randEnemy = otherSide[0];
             child.enemy = randEnemy;
             // 该目标对象保存攻击者，以便于自己死亡时通知攻击者更改目标对象
             randEnemy.attackedBy.push(child);
@@ -280,9 +280,10 @@ export default class BattleGround {
     // 加入分组
     addToGroup = (children, groupName) => {
         // 将每个对象的战场对象注册为本对象
-        children.forEach(child => {
+        children.forEach((child, index) => {
             child.BattleGround = this;
-            child.groupName = groupName;
+            child.id = groupName+'@'+child.SoldierType[0]+'@'+index;
+            child.setGroup(groupName);
         })
         // 加入this.children数组
         children.reduce((target, child) => {
@@ -319,7 +320,6 @@ export default class BattleGround {
             }
             groups.splice(_index, 1);
         }
-
         return this;
     }
 

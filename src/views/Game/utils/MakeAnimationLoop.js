@@ -22,7 +22,7 @@ export default class AnimationManager {
         // 目标帧顺序
         this.cacheFrames = [];
         this.isStop = true;
-        this.fps = 2;
+        this.fps = 8;
         this.now = Date.now();
         this.animations = {};
         // 是否循环往复播放
@@ -250,6 +250,7 @@ export default class AnimationManager {
     }
 
     changeFrame(frame) {
+        this.stop();
         this.sprite.texture = frame;
         this._update();
     }
@@ -287,6 +288,9 @@ export default class AnimationManager {
     }
 
     stop = () => {
+        if (this.isStop) {
+            return;
+        }
         this.isStop = true;
         window.cancelRequestAnimFrame = (function () {
             return window.cancelAnimationFrame ||
@@ -296,7 +300,7 @@ export default class AnimationManager {
                 window.msCancelRequestAnimationFrame ||
                 clearTimeout;
         })();
-        window.cancelRequestAnimFrame(this.timer);
+        this.timer?window.cancelRequestAnimFrame(this.timer):null;
     }
 
 
@@ -329,6 +333,7 @@ export default class AnimationManager {
                 if (once && this.currentFrame === this.cacheFrames.length - 1) {
                     // this.stop();
                     typeof this.overLoop === 'function'?this.overLoop():null;
+                    this.stop();
                     return;
                 }
                 // 运行完一次动画后调用的回调函数

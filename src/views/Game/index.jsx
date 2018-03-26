@@ -117,26 +117,6 @@ class Game extends React.Component {
                 }
                 this.message.text = '很遗憾，己方队伍溃败了！';
             })
-            // test
-            // let testTexture = _.cloneDeep(textures.textures['Archer.png']);
-            // testTexture.frame = new Rectangle(0, 0, 48, 64);
-            // let testSprite = new PIXI.Sprite(testTexture);
-            // testSprite.buttonMode = true;
-            // testSprite.interactive = true;
-
-            // let mal = new MakeAnimationLoop(testSprite);
-            // mal.loadFrames(textures, 4, 4, 'Archer.png');
-            // console.log(mal.frames.length);
-            // testSprite.x = 400;
-            // testSprite.y = 300;
-            // this.gameScene.addChild(testSprite);
-            // mal.directAnimationFrames({
-            //     start: 8,
-            //     end: 11
-            // });  
-            // testSprite.on('pointerdown', () => {
-            //     mal.isStop? mal.resume():mal.pause();
-            // })
         })
 
     }
@@ -164,9 +144,7 @@ class Game extends React.Component {
 
                 let solider = new Soldiers[soldierType](cache, count>=100?100:count);
                 count -= 100;
-                // 加入容器
-                // solider.addToScene(this.gameScene);
-                // this.gameScene.addChild(solider.sprite);
+
                 // 加入数组
                 rt.push(solider);
             }
@@ -198,13 +176,6 @@ class Game extends React.Component {
             .on('progress', progressHanlder)
             .load(callback)
     }
-
-    // 运行程序
-    run = () => {
-        requestAnimationFrame(this.run)
-        this.gameloop();
-    }
-
 
     componentWillMount () {
         this.Sprites = {};
@@ -246,28 +217,28 @@ class Game extends React.Component {
 
 
 Game.defaultProps = {
-    my: [{
-        soldierType: 'Archer',
-        count: 200,
-    }],
-    enemy: [{
-        soldierType: 'ThiefHead',
-        count: 280,
-    }],
-    // enemy: [{
-    //     soldierType: 'Archer',
-    //     count: 420
-    // },{
-    //     soldierType: 'ThiefHead',
-    //     count: 350
-    // }],
     // my: [{
     //     soldierType: 'Archer',
-    //     count: 620
-    // },{
-    //     soldierType: 'ThiefHead',
-    //     count: 130
+    //     count: 200,
     // }],
+    // enemy: [{
+    //     soldierType: 'ThiefHead',
+    //     count: 280,
+    // }],
+    enemy: [{
+        soldierType: 'Archer',
+        count: 420
+    },{
+        soldierType: 'ThiefHead',
+        count: 350
+    }],
+    my: [{
+        soldierType: 'Archer',
+        count: 620
+    },{
+        soldierType: 'ThiefHead',
+        count: 130
+    }],
     sceneType: 'normal',// 地图场景
     dealBattleResult: noop,  // 处理战斗结果回调
     controlSpeed: 1, // 战斗速率

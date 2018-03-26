@@ -164,10 +164,47 @@ class ShotItem {
     // 设置偏转角度
     _setRotation = (targetX = 0, targetY = 0) => {
         const {dx, dy} = this._getDistance(targetX, targetY);
+        const abdx = Math.abs(dx);
+        const abdy = Math.abs(dy);
         const rotation = this._getRotation(dx, dy);
-        this.angel = rotation;
+        // 第一象限
+        if (dx > 0 && dy > 0) {
+            if (abdx > abdy) {
+                this.angel = rotation;
+            }
+            if (abdx < abdy) {
+                this.angel = -rotation;
+            }
+        }
+
+        if (dx < 0 && dy >0) {
+            if (abdx > abdy) {
+                this.angel = rotation;
+            }
+            if (abdx < abdy) {
+                this.angel = -rotation;
+            }
+        }
+
+        if (dx >0 && dy < 0) {
+            if (abdx > abdy) {
+                this.angel = rotation;
+            }
+            if (abdx < abdy) {
+                this.angel = -rotation;
+            }
+        }
+
+        if (dx < 0 && dy <0) {
+            if (abdx > abdy) {
+                this.angel = rotation;
+            }
+            if (abdx < abdy) {
+                this.angel = -rotation;
+            }
+        }
         // 旋转角度
-        this.sprite.rotation = rotation;
+        this.sprite.rotation = this.angel;
     }
 
     // 获取旋转角度
