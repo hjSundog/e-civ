@@ -100,8 +100,8 @@ class AuctionItem extends React.Component {
                             <div className="provider-name">出价人:<span>{auctioner.name}</span></div>
                             <br/>
                             <div className="provider-price">出价:<span>{auctioner.price}</span></div>
-                        </div>, 
-                        <div className="auction-leftTime">距结束还有:<br/><span>{day}天{hour}时{minute}分{second}秒</span></div>, 
+                        </div>,
+                        <div className="auction-leftTime">距结束还有:<br/><span>{day}天{hour}时{minute}分{second}秒</span></div>,
                         <div className="auction-op">
                             <InputNumber min={0} defaultValue={0} onChange={this.onAuctionPriceChange} />
                             <Iconfont type="trade" onClick={this.onSurePrice}></Iconfont>
@@ -140,7 +140,7 @@ AuctionItem.propTypes = {
 function mapStateToProps(state) {
 
     return {
-        user: state.auth.user
+        user: state.user
     }
 }
 

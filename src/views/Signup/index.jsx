@@ -2,6 +2,8 @@ import React from 'react'
 import { Form, Input, Button, Row, Col, Icon, message } from 'antd'
 import { withRouter } from 'react-router-dom';
 
+import { signup } from '@/api/user'
+
 const FormItem = Form.Item
 
 import './index.less'
@@ -21,7 +23,7 @@ class Signup extends React.Component {
             loading: true
         });
         const data = this.props.form.getFieldsValue()
-        if (data.user ===  undefined || data.password === undefined || data.confirmpassword === undefined) {
+        if (data.name === undefined || data.username ===  undefined || data.password === undefined || data.confirmpassword === undefined) {
             this.setState({
                 loading: false
             });
@@ -32,11 +34,26 @@ class Signup extends React.Component {
             });
             message.error("please input correct password and confirmpassword");
         }else {
-            this.setState({
-                loading: false
-            });
-            this.toLogin();
-            message.success("Welcome " + data.user + " please login.")
+
+            signup({
+                name: data.name,
+                username: data.username,
+                password: data.password,
+                meta: {
+                    age: 22,
+                    sex: 'male',
+                }
+            }).then(res => {
+                this.setState({
+                    loading: false
+                });
+                message.success("Welcome " + data.user + " please login.")
+                this.toLogin();
+            }).catch(e => {
+                this.setState({
+                    loading: false
+                });
+            })
         }
     }
 
@@ -52,8 +69,13 @@ class Signup extends React.Component {
                     <Form layout="horizontal" onSubmit={this.handleSubmit.bind(this)} className="register-form">
                         <h2 className="logo"><span>logo</span></h2>
                         <FormItem>
-                            {getFieldDecorator('user')(
+                            {getFieldDecorator('name')(
                                 <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder='please input name' />
+                            )}
+                        </FormItem>
+                        <FormItem>
+                            {getFieldDecorator('username')(
+                                <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder='please input username' />
                             )}
                         </FormItem>
                         <FormItem>

@@ -126,7 +126,7 @@ function mapStateToProps(state) {
 
     return {
         items: tItems,
-        user: state.auth.user,
+        user: state.user,
     }
 }
 

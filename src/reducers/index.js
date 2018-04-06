@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux';
-import auth from './auth';
+import user from './user';
 import person from './person';
 import websocket from './websocket';
 import items from './items';
 import skills from './skills';
 
 const rootReducer = combineReducers({
-    auth,
+    user,
     person,
     items,
     websocket,

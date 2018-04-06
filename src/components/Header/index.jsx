@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import Iconfont from '../Iconfont'
 import './index.less'
-import { remove_user } from '../../actions/user'
+import { clear_user } from '../../actions/user'
 import { Link, withRouter } from 'react-router-dom'
 
 const { Header } = Layout;
@@ -39,13 +39,13 @@ class commonHeader extends React.Component {
         case 'globalmap':
             this.props.history.replace('/map')
             break
-        case 'relationship': 
+        case 'relationship':
             this.props.history.replace('/relationship')
             break
-        case 'items': 
+        case 'items':
             this.props.history.replace('/items')
             break
-        case 'auction': 
+        case 'auction':
             this.props.history.replace('/auction')
             break
         case 'game':
@@ -56,8 +56,8 @@ class commonHeader extends React.Component {
         }
     }
     handleLogOut = () => {
-        const {remove_user} = this.props
-        remove_user()
+        const {clear_user} = this.props
+        clear_user()
         this.props.history.replace('/login');
     }
 
@@ -177,17 +177,17 @@ class commonHeader extends React.Component {
 }
 
 function mapStateToProps(state) {
-    const {auth} = state;
-    if (auth.user) {
-        return {user: auth.user};
+    const {user} = state;
+    if (user) {
+        return {user: user};
     }
 
-    return {user: null};
+    return {user: {}};
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        remove_user: bindActionCreators(remove_user, dispatch)
+        clear_user: bindActionCreators(clear_user, dispatch)
     }
 }
 

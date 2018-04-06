@@ -17,13 +17,11 @@ const initialState = {
 export default function auth(state = initialState, action = {}) {
     switch (action.type) {
     case SET_USER:
-        window.localStorage.setItem('user', JSON.stringify(action.payload.user));
         return {
             ...state,
             user: action.payload.user
         }
     case REMOVE_USER:
-        window.localStorage.removeItem('user');
         return {
             ...state,
             user: null

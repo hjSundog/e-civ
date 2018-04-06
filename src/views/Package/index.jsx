@@ -98,7 +98,7 @@ Package.propTypes = {
 function mapStateToProps(state) {
     return {
         items: state.items.packageItems,
-        user: state.auth.user,
+        user: state.user,
         hasInitialed: state.items.hasInitialed
     }
 }

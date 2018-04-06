@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { Button, Radio, Row, Col, message } from 'antd'
+import { Row, Col, message } from 'antd'
 //import Iconfont from '../../components/Iconfont';
 import CharactorCard from './CharactorCard';
 import './index.less'
@@ -82,9 +82,9 @@ class Charactor extends React.Component {
 }
 
 function mapStateToProps (state) {
-    const { auth } = state;
+    const { user } = state;
     return {
-        user: auth.user ? auth.user : null,
+        user: user || {},
     };
 }
 

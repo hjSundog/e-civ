@@ -1,7 +1,8 @@
-import {createStore, applyMiddleware, combineReducers, compose} from 'redux';
+import {createStore, applyMiddleware, compose} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
 import promiseMiddleware from '../middlewares/promiseMiddleware'
+import persistState from './persistStateEnhancer'
 
 import reducer from '../reducers';
 
@@ -14,16 +15,11 @@ export default function configureStore(initialState) {
     let store;
 
     if (process.env.NODE_ENV === 'development') {
-        const persistState = require('redux-devtools').persistState;
         const DevTools = require('../containers/DevTools').default;
 
         const enhancer = compose(
             DevTools.instrument(),
-            persistState(
-                window.location.href.match(
-                    /[?&]debug_session=([^&#]+)\b/
-                )
-            )
+            persistState([], {}),
         );
         store = createStoreWithMiddleware(reducer, initialState, enhancer);
 
@@ -33,7 +29,10 @@ export default function configureStore(initialState) {
             );
         }
     }else{
-        store = createStoreWithMiddleware(reducer, initialState);
+        const enhancer = compose(
+            persistState([], {}),
+        )
+        store = createStoreWithMiddleware(reducer, initialState, enhancer);
     }
 
     return store;

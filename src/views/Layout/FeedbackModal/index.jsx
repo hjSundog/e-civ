@@ -84,16 +84,10 @@ FeedbackModal.defaultProps = {
 };
 
 function mapStateToProps(state) {
-    const {auth} = state;
-    if (auth.user) {
-        return {
-            user: auth.user
-        };
-    }
-
+    const {user} = state;
     return {
-        user: null
-    };
+        user: user
+    }
 }
 
 export default withRouter(connect(mapStateToProps)(FeedbackModal))

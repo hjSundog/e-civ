@@ -122,7 +122,6 @@ class Map extends React.Component {
 
     handleGo = (position) => {
         const { position: personPosition } = this.props.person
-        debugger;
         if(position.lon === personPosition.lon && position.lat === personPosition.lat ) {
             message.info('兄弟，你已经到站了，别点了')
         }

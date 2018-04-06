@@ -1,5 +1,5 @@
 export const SET_USER = 'SET_USER'
-export const REMOVE_USER = 'REMOVE_USER';
+export const CLEAR_USER = 'REMOVE_USER';
 export const UPDATE_USER = 'UPDATE_USER'
 
 export function set_user(user) {
@@ -20,12 +20,11 @@ export function update_user(user) {
     }
 }
 
-export function remove_user() {
+export function clear_user() {
 
     return {
-        type: REMOVE_USER,
+        type: CLEAR_USER,
         payload: {
-
         }
     }
 }

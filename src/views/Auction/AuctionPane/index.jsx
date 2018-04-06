@@ -121,7 +121,7 @@ AuctionPane.propTypes = {
 
 function mapStateToProps (state) {
     return {
-        user: state.auth.user,
+        user: state.user,
         websocket: state.websocket.ws
     }
 }

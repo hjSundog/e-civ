@@ -4,8 +4,8 @@ import { Form, Input, Button, Row, Col, Icon, message } from 'antd'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom';
-import api from '../../api'
-import { set_user, remove_user } from '../../actions/user'
+import { login } from '@/api/user'
+import { set_user } from '../../actions/user'
 const FormItem = Form.Item
 
 import './index.less'
@@ -32,25 +32,16 @@ class Login extends React.Component {
             loading: true
         });
         const data = this.props.form.getFieldsValue()
-        api({
-            url: '/users/login',
-            method: 'post',
-            params: {
-                username: data.username,
-                password: data.password
-            }
+        login({
+            username: data.username,
+            password: data.password
         }).then(res => {
             this.setState({
                 loading: false
             });
-            if (res.status !== 200) {
-                message.error(res.data.error);
-            }
-            if (res.status === 200)  {
-                message.success('Welcome ' + res.data.name)
-                this.props.set_user(res.data)
-                this.props.history.replace('/')
-            }
+            message.success('Welcome ' + res.name)
+            this.props.set_user(res)
+            this.props.history.replace('/')
         }).catch(err => {
             this.setState({
                 loading: false
@@ -98,9 +89,9 @@ Login.propTypes = propTypes;
 Login = Form.create()(Login);
 
 function mapStateToProps(state) {
-    const {auth} = state;
-    if (auth.user) {
-        return {user: auth.user};
+    const {user} = state;
+    if (user) {
+        return {user: user};
     }
 
     return {user: null};
@@ -109,7 +100,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         set_user: bindActionCreators(set_user, dispatch),
-        remove_user: bindActionCreators(remove_user, dispatch)
     }
 }
 

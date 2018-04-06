@@ -2,14 +2,14 @@ import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 
-import configureStore from './store/configureStore';
+import store from './store';
 
 import Root from './containers/Root';
 
 import 'normalize.css';
 import './style/index.less'
 
-const store = configureStore();
+
 
 render(
     <AppContainer>

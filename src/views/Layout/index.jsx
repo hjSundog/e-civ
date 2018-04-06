@@ -17,7 +17,7 @@ import TradeWindow from '@/components/TradeWindow'
 import Websocket from '@/components/Websocket'
 import {add_message, add_invitation, init_websocket, cancle_invitation, change_trade_target} from '@/actions/websocket';
 import {init_package, add_to_item, change_to_extra, add_package_items} from '@/actions/items'
-import {remove_user} from '@/actions/user';
+import {clear_user} from '@/actions/user';
 import { init_person } from '../../actions/person'
 import api from '../../api'
 import './index.less';
@@ -187,7 +187,7 @@ class App extends React.Component {
             <Layout className="ant-layout-has-sider">
                 <Spin size="large" spinning={this.state.loading}></Spin>
                 <Layout>
-                    <Header profile={user} logout={actions.remove_user} />
+                    <Header profile={user} logout={actions.clear_user} />
                     <Layout>
                         <Sidebar>Sider</Sidebar>
                         <Content>
@@ -250,9 +250,9 @@ App.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-    const { auth } = state;
+    const { user } = state;
     return {
-        user: auth.user ? auth.user : null,
+        user: user,
         person: state.person
     };
 };
