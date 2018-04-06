@@ -8,7 +8,7 @@
 // TODO: 反复的动画，现在只是一个方向的动画，以后添加往复的动画效果.
 import * as PIXI from 'pixi.js';
 import _ from 'lodash';
-import noop from '@/utils//noop'
+import noop from '@/utils/noop'
 
 export default class AnimationManager {
     constructor(sprite) {

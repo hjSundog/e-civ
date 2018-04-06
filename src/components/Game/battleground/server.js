@@ -5,7 +5,7 @@ import _ from 'lodash';
 import * as PIXI from 'pixi.js';
 import Bump from 'bump.js'
 
-export default class BattleGround {
+export default class BGServer {
     constructor(x = 800, y = 600, layout = { col: 30, row: 40 }, gameScene = new PIXI.Container(), gameOverScene = new PIXI.Container()) {
         this.gameOverScene = gameOverScene;
         this.gameScene = gameScene;
@@ -252,6 +252,7 @@ export default class BattleGround {
             child.enemy = randEnemy;
             // 该目标对象保存攻击者，以便于自己死亡时通知攻击者更改目标对象
             randEnemy.attackedBy.push(child);
+            child.enemyQuene.push(randEnemy.id);
         }
 
         // 判断是否可以攻击

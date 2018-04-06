@@ -29,7 +29,7 @@ module.exports = {
             {
                 test: /\.(js|jsx)$/,
                 loader: 'babel-loader',
-                include: [resolve('src'), resolve('tests')]
+                include: [resolve('src'), resolve('tests')],
             },
             {
                 test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

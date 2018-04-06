@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js';
 import _ from 'lodash';
 import MakeAnimationLoop from '../utils/MakeAnimationLoop'
 import noop from '@/utils/noop.js';
-import ShotItem from '@/views/Game/utils/ShotItem';
+import ShotItem from '../utils/ShotItem';
 
 // const Rectangle = PIXI.Rectangle;
 
@@ -65,6 +65,7 @@ class Solider {
         // 受到的攻击者
         this.attackedBy = [];
         this.shotedBy = [];
+        this.enemyQuene = [];
         // 远程对象
         // 是否是间接伤害
         this.isShotType = false;
@@ -372,65 +373,33 @@ class Solider {
     }
 
     moveUP(pix) {
-        const DIRECTION = 'UP';
         if (pix) {
             this.setSpeed(this.speedX, pix);
         }
-        // const bounds = this.BattleGround.getChildForbiddenDirection(this);
-        // // 如果不允许往上走则向其他方向移动
-        // if (bounds.includes(DIRECTION)) {
-        //     this.moveRight();
-        //     return this;
-        // }
-        //this.sprite.y -= this.speedY;
         this.displayEntity.y -= this.speedY;
         this.turnTo('UP');
     }
 
     moveDown(pix) {
-        const DIRECTION = 'DOWN';
         if (pix) {
             this.setSpeed(this.speedX, pix);
         }
-        // const bounds = this.BattleGround.getChildForbiddenDirection(this);
-        // // 如果不允许往上走则向其他方向移动
-        // if (bounds.includes(DIRECTION)) {
-        //     this.moveLeft();
-        //     return this;
-        // }
-        // this.sprite.y += this.speedY;
         this.displayEntity.y += this.speedY;
         this.turnTo('DOWN');
     }
 
     moveLeft(pix) {
-        const DIRECTION = 'LEFT';
         if (pix) {
             this.setSpeed(pix, this.speedY);
         }
-        // const bounds = this.BattleGround.getChildForbiddenDirection(this);
-        // // 如果不允许往上走则向其他方向移动
-        // if (bounds.includes(DIRECTION)) {
-        //     this.moveUP();
-        //     return this;
-        // }
-        //this.sprite.x -= this.speedX;
         this.displayEntity.x -= this.speedX;
         this.turnTo('LEFT');
     }
 
     moveRight(pix) {
-        const DIRECTION = 'RIGHT';
         if (pix) {
             this.setSpeed(pix, this.speedY);
         }
-        // const bounds = this.BattleGround.getChildForbiddenDirection(this);
-        // // 如果不允许往上走则向其他方向移动
-        // if (bounds.includes(DIRECTION)) {
-        //     this.moveDown();
-        //     return this;
-        // }
-        // this.sprite.x += this.speedX;
         this.displayEntity.x += this.speedX;
         this.turnTo('RIGHT');
     }
