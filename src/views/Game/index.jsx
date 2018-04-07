@@ -1,7 +1,7 @@
 import React from 'react'
 import Game from 'e-civ-game';
 import * as PIXI from 'pixi.js';
-
+import Data from './test';
 const enemy = [{
     soldierType: 'Archer',
     count: 420
@@ -29,15 +29,21 @@ class GameScene extends React.Component {
 
     componentDidMount() {
         this.gs = new Game();
-        const data = JSON.parse(localStorage.getItem('rt')).data;
-        this.gs.setDriveFrames(data);
         this.gs.mountAt(this.node);
+        this.gs.setClientOrServer(Game.CLIENT);
         this.gs.setBattleGround(800, 600, {
             row: 5,
             col: 20
         });
         // 设置背景色
         this.gs.setBg(0x4f7dc4);
+        const d = Data;
+        if (!d) {
+            return;
+        }
+        const data = d.data;
+        this.gs.setDriveFrames(data);
+
         // 创建结束场景
         this.gs.makeScene('gameOver', (pre, scene) => {
             let style = new PIXI.TextStyle({

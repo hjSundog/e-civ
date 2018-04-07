@@ -258,7 +258,7 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({add_package_items, add_to_item, change_to_extra, change_trade_target, init_package, remove_user, init_websocket, cancle_invitation, add_invitation, add_message, init_person}, dispatch)};
+    return {actions: bindActionCreators({add_package_items, add_to_item, change_to_extra, change_trade_target, init_package, init_websocket, cancle_invitation, add_invitation, add_message, init_person}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

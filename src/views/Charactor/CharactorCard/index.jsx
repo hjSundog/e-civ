@@ -1,13 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Select, Row, Col, Radio, Button, Input, Tooltip } from 'antd'
+import { Form, Select, Row, Col, Radio, Button, Input, Tooltip, AutoComplete } from 'antd'
 import NumericInput from '../../../components/NumericInput'
-import './index.less'
 
+const AutoCompleteOption = AutoComplete.Option;
+const FormItem = Form.Item
 const Option = Select.Option
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
+import './index.less'
+import { FromItem } from '@/actions/item';
 
 const skins = ['black', 'yellow', 'white']
 
@@ -16,78 +19,34 @@ const skins = ['black', 'yellow', 'white']
 class CharactorCard extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {
-            charactor: {
-                name: 'mddd',
-                des: '',
-                meta: {
-                    age: 22,
-                    sex: 'female',
-                    skin: 'yellow',
-                    height: 170,
-                    weight: 70
-                }
+        this.state = {}
+    }
+
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.props.form.validateFieldsAndScroll((err, values) => {
+            if (!err) {
+                console.log('Received values of form: ', values);
+                this.props.callback(values);
             }
-        }
+        });
     }
 
-    componentWillMount() {
+
+    validateDescription = () => {
+
     }
 
-    handleSkinChange(value) {
-        const charactor = this.state.charactor
-        charactor.meta.skin = value
-        this.setState({
-            charactor
-        })
-    }
-    //提交创建的角色
-    handleSubmit(){
-        console.log(this.state.charactor)
-        this.props.callback(this.state.charactor);
+    validateNickName = () => {
+
     }
 
-    handlFilterOption(input, option) {
-        return option.props.children.toLowerCase()
-            .indexOf(input.toLowerCase()) >= 0
+    validateHeight = () => {
+
     }
 
-    handleHeightChange(value) {
-        const charactor = this.state.charactor
-        charactor.meta.height = value
-        this.setState({
-            charactor
-        })
-    }
-    handleWeightChange(value) {
-        const charactor = this.state.charactor
-        charactor.meta.weight = value
-        this.setState({
-            charactor
-        })
-    }
+    validateWeight = () => {
 
-    handleName(e) {
-        const charactor = this.state.charactor
-        charactor.name = e.target.value.replace(/(^\s*)|(\s*$)/g, "")
-        this.setState({
-            charactor
-        })
-    }
-    handleDes(e) {
-        const charactor = this.state.charactor
-        charactor.des = e.target.value.replace(/(^\s*)|(\s*$)/g, "")
-        this.setState({
-            charactor
-        })
-    }
-
-    handleSex(e){
-        const charactor = this.state.charactor
-        charactor.meta.sex = e.target.value.replace(/(^\s*)|(\s*$)/g, "")
-        this.setState({
-            charactor
-        })
     }
 
     render() {
@@ -95,73 +54,111 @@ class CharactorCard extends React.Component {
             return <Option key={skin}>{skin}</Option>
         })
 
+        const { getFieldDecorator } = this.props.form;
+
         return (
-            <div>
+            <Form>
                 <Row>
                     <Col span={16} style={{ height: '500px' }}>
                         这里显示人物形象
                     </Col>
                     <Col span={8}>
-                        <Row>
-                            <Col>
-                                <Input placeholder="昵称" onChange={this.handleName.bind(this)} />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <Input placeholder="自我介绍" onChange={this.handleDes.bind(this)} />
-                            </Col>
-                        </Row>
-                        <Row >
-                            <Col span={6}>肤色:</Col>
-                            <Col span={18} >
+                        <FormItem label="nickname">
+                            {getFieldDecorator('nickname', {
+                                rules: [{
+                                    required: true, 
+                                    message: 'Please input your nickname',
+                                    whitespace: true
+                                }]
+                            })(
+                                <Input placeholder="your nickname here !"/>
+                            )}
+                        </FormItem>
+                        <FormItem label = 'description'>
+                            {getFieldDecorator('description', {
+                                rules: [{
+                                    whitespace: true
+                                }],
+                                initialValue: ''
+                            })(
+                                <Input placeholder="introduce yourself !" />
+                            )}
+                        </FormItem>
+                        <FormItem label = '肤色'>
+                            {getFieldDecorator('skin', {
+                                rules: [{
+                                    required: true, message: 'Please select your skin'
+                                }],
+                                initialValue: 'yellow'
+                            })(
                                 <Select
-                                    defaultValue="yellow"
                                     showSearch
                                     placeholder="select your skin"
                                     optionFilterProp="children"
-                                    onChange={this.handleSkinChange.bind(this)}
                                     onFocus={this.handleSkinFocus}
                                     onBlur={this.handleSkinBlur}
                                     filterOption={this.handlSkinFilterOption}>
                                     {skinsOptions}
                                 </Select>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col span={6}>身高:</Col>
-                            <Col span={18}>
-                                <NumericInput style={{ width: 120 }} value={this.state.charactor.meta.height} onChange={this.handleHeightChange.bind(this)} />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col span={6}>体重:</Col>
-                            <Col span={18}>
-                                <NumericInput style={{ width: 120 }} value={this.state.charactor.meta.weight} onChange={this.handleWeightChange.bind(this)} />
-                            </Col>
-                        </Row>
+                            )}
+                        </FormItem>
+
+                        <FormItem label = '身高'>
+                            {getFieldDecorator('height', {
+                                rules: [{
+                                    required: true, message: 'Please input your height'
+                                }],
+                                initialValue: '170'
+                            })(
+                                <NumericInput style={{ width: 120 }}  />
+                            )}
+                        </FormItem>
+
+                        <FormItem label = '体重'>
+                            {getFieldDecorator('weight', {
+                                rules: [{
+                                    required: true, message: 'Please input your weight'
+                                }],
+                                initialValue: '60'
+                            })(
+                                <NumericInput style={{ width: 120 }}  />
+                            )}
+                        </FormItem>
+
                     </Col>
                 </Row>
                 <Row justify="center" style={{ margin: '10px 16px' }}>
-                    <Col span={24} style={{display:'flex',justifyContent:'center'}}>
-                        <RadioGroup defaultValue='男' onChange={this.handleSex.bind(this)}>
-                            <RadioButton value="男">男</RadioButton>
-                            <RadioButton value="女">女</RadioButton>
-                        </RadioGroup>
+                    <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
+                        <FormItem>
+                            {getFieldDecorator('sex', {
+                                rules: [],
+                                initialValue: '男'
+                            })(
+                                <RadioGroup >
+                                    <RadioButton value="男">男</RadioButton>
+                                    <RadioButton value="女">女</RadioButton>
+                                </RadioGroup>
+                            )}
+                        </FormItem>
+
                     </Col>
                 </Row>
                 <Row justify="center" style={{ margin: '0 16px' }}>
-                    <Col span={24} style={{display:'flex',justifyContent:'center'}}>
-                        <Button type="primary" onClick={this.handleSubmit.bind(this)} loading={this.state.loading}>创建</Button>
+                    <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
+                        <FormItem >
+                            <Button type="primary" htmlType="submit" onClick={this.handleSubmit}>创建</Button>
+                        </FormItem>
                     </Col>
                 </Row>
-            </div>
+            </Form>
         )
     }
 }
 
+const CharacterCard = Form.create()(CharactorCard);
+
 CharactorCard.defaultProps = {
-    callback: () => {}
+    callback: () => { }
 }
 
 CharactorCard.propTypes = {
@@ -179,4 +176,4 @@ CharactorCard.propTypes = {
 //     }
 // }
 
-export default CharactorCard
+export default CharacterCard

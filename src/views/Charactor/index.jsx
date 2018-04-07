@@ -5,7 +5,7 @@ import { Row, Col, message } from 'antd'
 //import Iconfont from '../../components/Iconfont';
 import CharactorCard from './CharactorCard';
 import './index.less'
-import api from '../../api'
+import { createCharacter } from '@/api/user'
 import { withRouter } from 'react-router'
 import * as PersonActionCreators from '@/actions/person'
 import { update_user } from '@/actions/user'
@@ -23,16 +23,12 @@ class Charactor extends React.Component {
     }
     //这里有个问题。因为创建一个角色，user信息也会跟着变化，所以这里采取创建一个角色成功后将该id直接加入
     //加入redux进行保存以保持和后台同步而不是重新获取数据库user来更新redux
-    handleCreatePerson(person) {
+    handleCreatePerson = (person) => {
         this.setState({
             loading: true
         })
-        api({
-            url: '/persons',
-            method: 'post',
-            data: {
-                ...person
-            }
+        createCharacter({
+            ...person
         }).then(res => {
             this.setState({
                 loading: false
@@ -72,7 +68,7 @@ class Charactor extends React.Component {
                 </Row>
                 <Row style={{ margin: '10px 16px' }}>
                     <Col span={24} >
-                        <CharactorCard callback={this.handleCreatePerson.bind(this)}/>
+                        <CharactorCard callback={this.handleCreatePerson} />
                     </Col>
                 </Row>
 
