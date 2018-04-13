@@ -1,16 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Form, Select, Row, Col, Radio, Button, Input, Tooltip, AutoComplete } from 'antd'
+import { Form, Select, Row, Col, Radio, Button, Input, Upload, Modal, Icon, message } from 'antd'
 import NumericInput from '../../../components/NumericInput'
+import AvatarUpload from '../AvatarUpload'
 
-const AutoCompleteOption = AutoComplete.Option;
 const FormItem = Form.Item
 const Option = Select.Option
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 import './index.less'
-import { FromItem } from '@/actions/item';
 
 const skins = ['black', 'yellow', 'white']
 
@@ -26,7 +25,10 @@ class CharactorCard extends React.Component {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                if (!values.description) {
+                    values.description = '这人很懒，什么描述都没有...';
+                }
+                // console.log('Received values of form: ', values);
                 this.props.callback(values);
             }
         });
@@ -49,6 +51,14 @@ class CharactorCard extends React.Component {
 
     }
 
+
+    handleAvatarUpload = (dataUrl, reader) => {
+        this.setState({
+            extra: dataUrl
+        })
+        return dataUrl;
+    }
+
     render() {
         const skinsOptions = skins.map(skin => {
             return <Option key={skin}>{skin}</Option>
@@ -59,22 +69,19 @@ class CharactorCard extends React.Component {
         return (
             <Form>
                 <Row>
-                    <Col span={16} style={{ height: '500px' }}>
-                        这里显示人物形象
-                    </Col>
                     <Col span={8}>
-                        <FormItem label="nickname">
+                        <FormItem label="昵称">
                             {getFieldDecorator('nickname', {
                                 rules: [{
-                                    required: true, 
+                                    required: true,
                                     message: 'Please input your nickname',
                                     whitespace: true
                                 }]
                             })(
-                                <Input placeholder="your nickname here !"/>
+                                <Input placeholder="your nickname here !" />
                             )}
                         </FormItem>
-                        <FormItem label = 'description'>
+                        <FormItem label='说点什么'>
                             {getFieldDecorator('description', {
                                 rules: [{
                                     whitespace: true
@@ -84,7 +91,7 @@ class CharactorCard extends React.Component {
                                 <Input placeholder="introduce yourself !" />
                             )}
                         </FormItem>
-                        <FormItem label = '肤色'>
+                        <FormItem label='肤色'>
                             {getFieldDecorator('skin', {
                                 rules: [{
                                     required: true, message: 'Please select your skin'
@@ -103,28 +110,36 @@ class CharactorCard extends React.Component {
                             )}
                         </FormItem>
 
-                        <FormItem label = '身高'>
+                        <FormItem label='身高'>
                             {getFieldDecorator('height', {
                                 rules: [{
                                     required: true, message: 'Please input your height'
                                 }],
                                 initialValue: '170'
                             })(
-                                <NumericInput style={{ width: 120 }}  />
+                                <NumericInput style={{ width: 120 }} />
                             )}
                         </FormItem>
 
-                        <FormItem label = '体重'>
+                        <FormItem label='体重'>
                             {getFieldDecorator('weight', {
                                 rules: [{
                                     required: true, message: 'Please input your weight'
                                 }],
                                 initialValue: '60'
                             })(
-                                <NumericInput style={{ width: 120 }}  />
+                                <NumericInput style={{ width: 120 }} />
                             )}
                         </FormItem>
-
+                    </Col>
+                    <Col span={16} style={{ height: '500px' }}>
+                        <FormItem >
+                            {getFieldDecorator('avatar', {
+                                trigger: 'callback'
+                            })(
+                                <AvatarUpload callback={this.handleAvatarUpload}/>
+                            )}
+                        </FormItem>
                     </Col>
                 </Row>
                 <Row justify="center" style={{ margin: '10px 16px' }}>

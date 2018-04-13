@@ -1,14 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { Row, Col, message } from 'antd'
+import { Row, Col, message, Button } from 'antd'
 //import Iconfont from '../../components/Iconfont';
 import CharactorCard from './CharactorCard';
 import './index.less'
-import { createCharacter } from '@/api/user'
+import { createCharacter } from '@/api/person'
 import { withRouter } from 'react-router'
 import * as PersonActionCreators from '@/actions/person'
-import { update_user } from '@/actions/user'
+import { update_user, clear_user } from '@/actions/user'
+
 class Charactor extends React.Component {
 
     constructor (props) {
@@ -24,32 +25,24 @@ class Charactor extends React.Component {
     //这里有个问题。因为创建一个角色，user信息也会跟着变化，所以这里采取创建一个角色成功后将该id直接加入
     //加入redux进行保存以保持和后台同步而不是重新获取数据库user来更新redux
     handleCreatePerson = (person) => {
+        const {user, actions} = this.props;
         this.setState({
             loading: true
         })
         createCharacter({
             ...person
-        }).then(res => {
+        }, user.token).then(res => {
             this.setState({
                 loading: false
             })
             if (res.status === 200) {
                 //res.data
-                console.log('charactor create')
-                console.log(res.data)
-                this.props.actions.create_person(res.data)
+                actions.create_person(res.data)
                 //更新user
                 //set_user()
-
-                this.props.actions.update_user({
-                    person_id: res.data._id
+                actions.update_user({
+                    person_id: res.data.id
                 })
-                const user = JSON.parse(localStorage.getItem('user'));
-                localStorage.removeItem('user');
-                localStorage.setItem('user',JSON.stringify({
-                    ...user,
-                    person_id: res.data._id
-                }))
                 this.props.history.replace('/')
             }
         }).catch(err => {
@@ -60,11 +53,18 @@ class Charactor extends React.Component {
         })
 
     }
+
+    handleLogout = () => {
+        const {actions} = this.props
+        actions.clear_user()
+        this.props.history.replace('/login');
+    }
+
     render () {
         return (
             <div id="Charactor" className={`Charactor ${this.loading?'loading':''}`}>
                 <Row>
-                    这里可以添加其他的东西，下面是ChractorCard组件
+                    <Button type="primary" onClick={this.handleLogout}>返回登陆界面</Button>
                 </Row>
                 <Row style={{ margin: '10px 16px' }}>
                     <Col span={24} >
@@ -86,7 +86,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
     return {
-        actions: bindActionCreators({...PersonActionCreators,update_user}, dispatch)
+        actions: bindActionCreators({...PersonActionCreators,update_user, clear_user}, dispatch)
     }
 }
 

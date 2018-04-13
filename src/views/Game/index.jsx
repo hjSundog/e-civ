@@ -1,8 +1,14 @@
 import React from 'react'
 import Game from 'e-civ-game';
 import * as PIXI from 'pixi.js';
+// test
 import Data from './test';
-const enemy = [{
+import { withRouter } from 'react-router'
+import { connect } from 'react-redux'
+import { message } from 'antd'
+import { getGameFrames } from '@/api/game'
+
+const enemySoldiers = [{
     soldierType: 'Archer',
     count: 420
 },{
@@ -10,7 +16,7 @@ const enemy = [{
     count: 350
 }];
 
-const my =  [{
+const mySoldiers =  [{
     soldierType: 'Archer',
     count: 620
 },{
@@ -23,11 +29,16 @@ class GameScene extends React.Component {
         super()
         this.state = {
             isPlay: true,
-            count: 1
+            count: 1,
+            isLoading: true
         }
     }
 
     componentDidMount() {
+        const own = this.getMySoldiers();
+        const enemy = this.getEnemySoldiers();
+        const {user} = this.props;
+
         this.gs = new Game();
         this.gs.mountAt(this.node);
         this.gs.setClientOrServer(Game.CLIENT);
@@ -37,13 +48,6 @@ class GameScene extends React.Component {
         });
         // 设置背景色
         this.gs.setBg(0x4f7dc4);
-        const d = Data;
-        if (!d) {
-            return;
-        }
-        const data = d.data;
-        this.gs.setDriveFrames(data);
-
         // 创建结束场景
         this.gs.makeScene('gameOver', (pre, scene) => {
             let style = new PIXI.TextStyle({
@@ -72,17 +76,51 @@ class GameScene extends React.Component {
             console.log('gameOver 啦');
         })
 
-        this.gs.load(()=>{
-            this.gs.setSoldiers({
-                soldiers: enemy, 
-                user: 'enemy'
-            }, 
-            {
-                soldiers: my, 
-                user: 'my'
+        this.setState({
+            isLoading: true
+        });
+
+        getGameFrames({
+            own, enemy
+        }).then(res => {
+            this.setState({
+                isLoading: false
             });
-            this.gs.start('my');
+            if( res.status === 200) {
+                console.log(res.data);
+                this.gs.setDriveFrames(res.data);
+                // 加载并运行游戏
+                this.gs.load(()=>{
+                    this.gs.setSoldiers(enemy, own);
+                    this.gs.start(user.name);
+                })
+            }
+        }).catch(err => {
+            this.setState({
+                isLoading: false
+            })
+            message.error(err)
         })
+    }
+
+    componentWillUnmount() {
+        this.gs.unmount();
+    }
+
+
+    getMySoldiers = () => {
+        const {user} = this.props;
+        return {
+            soldiers: mySoldiers, 
+            user: user.name
+        }
+    }
+
+    getEnemySoldiers = () => {
+        return {
+            soldiers: enemySoldiers,
+            user: 'enemy'
+        }
     }
 
     render () {
@@ -95,4 +133,12 @@ class GameScene extends React.Component {
 }
 
 
-export default GameScene
+function mapStateToProps (state) {
+    const { user } = state;
+    return {
+        user: user || {},
+    };
+}
+
+
+export default withRouter(connect(mapStateToProps)(GameScene))

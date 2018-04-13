@@ -10,7 +10,7 @@ import {
 import _ from 'lodash'
 
 const initialState = {
-    name: 'init person',
+    nickname: 'init person',
     id: null,
     attributes: {
         str: 1,
@@ -42,8 +42,6 @@ const initialState = {
 
 export default function auth(state = initialState, action = {}) {
     switch (action.type) {
-    case INIT_PERSON:
-        return {...action.person}
     case RESET_PERSON:
         return initialState
     case CREATE_PERSON:

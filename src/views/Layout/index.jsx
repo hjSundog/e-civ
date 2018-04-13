@@ -32,66 +32,66 @@ class App extends React.Component {
             chatroomsVisible: false,
             tradeWindowVisible: false,
             responseTradePane: false,
-            loading: true
+            loading: false
         }
     }
     componentWillMount() {
         const {actions, user} = this.props
-        this.setState({
-            loading: true
-        })
+        // this.setState({
+        //     loading: true
+        // })
         // actions.init_person(this.props.person);
         // this.setState({
         //     loading: false
         // })
         // 初始化用户
-        api({
-            url: `/persons/${user ? user.person_id : 1}`,
-            method: 'get',
-        }).then(res => {
-            this.setState({
-                loading: false
-            })
-            if (res.status !== 200) {
-                message.error(res.data.error);
-            }
-            if (res.status === 200) {
-                console.log('init person')
-                actions.init_person(res.data)
-            }
-        }).catch(err => {
-            this.setState({
-                loading: false
-            });
-            message.error(err);
-        })
+        // api({
+        //     url: `/persons/${user ? user.person_id : 1}`,
+        //     method: 'get',
+        // }).then(res => {
+        //     this.setState({
+        //         loading: false
+        //     })
+        //     if (res.status !== 200) {
+        //         message.error(res.data.error);
+        //     }
+        //     if (res.status === 200) {
+        //         console.log('init person')
+        //         actions.init_person(res.data)
+        //     }
+        // }).catch(err => {
+        //     this.setState({
+        //         loading: false
+        //     });
+        //     message.error(err);
+        // })
 
-        // 初始化背包
-        const url = `/persons/${user.name}/items`
-        api({
-            method: 'get',
-            url: url,
-        }).then(res => {
-            this.setState({
-                loading: false
-            })
-            if (res.status === 200){
-                this.props.actions.init_package(res.data.map(item=> {
-                    return {
-                        item: item,
-                        count: 1
-                    }
-                }));
+        // // 初始化背包
+        // const url = `/persons/${user.name}/items`
+        // api({
+        //     method: 'get',
+        //     url: url,
+        // }).then(res => {
+        //     this.setState({
+        //         loading: false
+        //     })
+        //     if (res.status === 200){
+        //         this.props.actions.init_package(res.data.map(item=> {
+        //             return {
+        //                 item: item,
+        //                 count: 1
+        //             }
+        //         }));
 
-            } else {
-                console.log(res.message)
-            }
-        }).catch(error => {
-            message.error(error)
-            this.setState({
-                loading: false
-            })
-        })
+        //     } else {
+        //         console.log(res.message)
+        //     }
+        // }).catch(error => {
+        //     message.error(error)
+        //     this.setState({
+        //         loading: false
+        //     })
+        // })
 
     }
 

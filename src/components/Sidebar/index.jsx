@@ -126,9 +126,9 @@ class Sidebar extends React.Component {
                           actions={[<Icon type="up" key={1} onClick={that.handleHealthUp.bind(that)}/>, <Icon key={2} type="down" onClick={that.handleHealthDown.bind(that)}/>, <Icon type="reload" key={3} onClick={that.handleHealthReload.bind(that)}/>]}
                       >
                           <Meta
-                              avatar={<Badge count={1}><Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" /></Badge>}
-                              title={charactor.name}
-                              description={charactor.des}
+                              avatar={<Badge count={1}><Avatar src={charactor.avatar} /></Badge>}
+                              title={charactor.nickname}
+                              description={charactor.description}
                           />
                       </Card>
                   </Col>
