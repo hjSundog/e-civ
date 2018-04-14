@@ -3,13 +3,11 @@ import PropTypes from 'prop-types'
 import { withRouter, matchPath } from 'react-router'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import api from '../../api'
-import { Layout, Menu, Icon, Progress, Row, Col, Badge, Dropdown, Avatar, Popover, Card } from 'antd'
-import { Link } from 'react-router-dom'
+import { Layout, Progress, Row, Col, Badge, Avatar, Card } from 'antd'
 import * as PersonActionCreators from '@/actions/person'
+import RadarChart from './RadarChart'
 
-const SubMenu = Menu.SubMenu
-const { Meta } = Card;
+const { Meta, Grid } = Card;
 import './index.less'
 
 const { Sider } = Layout;
@@ -21,6 +19,27 @@ const isActive = (path, history) => {
         strict: false
     })
 }
+
+const attributeMap = {
+    str: '力量',
+    dex: '敏捷',
+    con: '体质',
+    int: '智力',
+    wis: '智慧',
+    cha: '魅力'
+}
+
+
+const gridStyle = {
+    width: '50%',
+    textAlign: 'center',
+    padding: '20px 15px'
+}
+
+const bodyStyle = {
+    padding: '0px'
+}
+
 
 class Sidebar extends React.Component {
 
@@ -42,31 +61,11 @@ class Sidebar extends React.Component {
   }
 
   componentDidMount () {
-      // api({
-      //     url: '/persons/2233',
-      //     method: 'get'
-      // }).then(res => {
-      //     // this.setState({
-      //     //     loading: false
-      //     // });
-      //     if (res.status !== 200) {
-      //         console.log('获取人物信息失败')
-      //     }
-      //     if (res.status === 200)  {
-      //         this.setState({
-      //             person: Object.assign({},this.state.person,res.data)
-      //         })
-      //     }
-      // }).catch(err => {
-      //     this.setState({update_person
-      //         loading: false
-      //     });
-      //     throw new Error(err)
-      // })
+
   }
 
   componentWillReceiveProps(nextProps) {
-      Array.isArray(nextProps.items) && nextProps.items.map((item, i) => {
+      Array.isArray(nextProps.items) && nextProps.items.map((item) => {
           Array.isArray(item.child) && item.child.map((node) => {
               if(node.url && isActive(node.url, this.props.history)){
                   this.menuClickHandle({
@@ -98,17 +97,44 @@ class Sidebar extends React.Component {
           health: this.props.person.conditions.health-10
       })
   }
+
+  createStateBar = (state, key, percent) => {
+      if (!percent) {
+          percent = key;
+          key = state;
+      }
+      return (<div key={key} className="state_bar"><span>{state}</span><Progress showInfo={false} percent={percent} /></div>);
+  }
+
+
+  createAttributeBar = (state, key, number) => {
+      if (!number) {
+          number = key;
+          key = state;
+      }
+      return (<div key={key} className="state_bar"><span>{state}</span><Progress showInfo={false} percent={percent} /></div>);
+  }
+
   render () {
-      const that = this
       const charactor = this.props.person
-      let statesItems = ''
-      let attributeItems = ''
+      let attributeData = [];
+      let statesItems = []
+      let attributeItems = []
       if (charactor.conditions && charactor.attributes) {
-          statesItems = Object.entries(charactor.conditions).map(condition => {
-              return <div key={condition[0]}><span>{condition[0]}</span><Progress showInfo={false} percent={condition[1]}/></div>
-          })
+          const {health, maxHealth, stamina, maxStamina} = charactor.conditions;
+          const healthPercent = (health / maxHealth) * 100;
+          const staminaPercent = (stamina / maxStamina) * 100;
+
+
+          statesItems.push(this.createStateBar('生命值', 'health', healthPercent));
+          statesItems.push(this.createStateBar('耐力值',  'stamina', staminaPercent));
+
           attributeItems = Object.entries(charactor.attributes).map(attribute => {
-              return <div key={attribute[0]}><span>{attribute[0]}</span><span>{attribute[1]}</span></div>
+              // 属性map
+              const data = [attributeMap[attribute[0]], attribute[1]];
+              attributeData.push(data);
+              // 视图
+              return <Grid key={attribute[0]} style={gridStyle}><div className="Attribute_Card"><span>{data[0]+':'}</span><span>{data[1]}</span></div></Grid>
           })
       }
       return (
@@ -123,7 +149,7 @@ class Sidebar extends React.Component {
                   <Col>
                       <Card
                           cover={<img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />}
-                          actions={[<Icon type="up" key={1} onClick={that.handleHealthUp.bind(that)}/>, <Icon key={2} type="down" onClick={that.handleHealthDown.bind(that)}/>, <Icon type="reload" key={3} onClick={that.handleHealthReload.bind(that)}/>]}
+                          //   actions={[<Icon type="up" key={1} onClick={that.handleHealthUp.bind(that)}/>, <Icon key={2} type="down" onClick={that.handleHealthDown.bind(that)}/>, <Icon type="reload" key={3} onClick={that.handleHealthReload.bind(that)}/>]}
                       >
                           <Meta
                               avatar={<Badge count={1}><Avatar src={charactor.avatar} /></Badge>}
@@ -143,7 +169,15 @@ class Sidebar extends React.Component {
               <Row>
                   <Col>
                       <Card title="我的属性" bordered={false}>
-                          {attributeItems}
+                          <RadarChart 
+                              width={150} 
+                              extraDemensionName='其他'
+                              maxDemensionInfo
+                              data={attributeData}
+                          />
+                          <Card bodyStyle={bodyStyle}>
+                              {attributeItems}
+                          </Card>
                       </Card>
                   </Col>
               </Row>

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Form, Select, Row, Col, Radio, Button, Input, Upload, Modal, Icon, message } from 'antd'
 import NumericInput from '../../../components/NumericInput'
-import AvatarUpload from '../AvatarUpload'
+import AvatarUpload, {AvatarUrl} from '../AvatarUpload'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -135,7 +135,8 @@ class CharactorCard extends React.Component {
                     <Col span={16} style={{ height: '500px' }}>
                         <FormItem >
                             {getFieldDecorator('avatar', {
-                                trigger: 'callback'
+                                trigger: 'callback',
+                                initialValue: AvatarUrl
                             })(
                                 <AvatarUpload callback={this.handleAvatarUpload}/>
                             )}
