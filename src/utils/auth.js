@@ -8,9 +8,9 @@ const validate = function(history) {
     if (!isLoggedIn && history.location.pathname != "/login") {
         history.replace("/login");
     }
-    // if(isLoggedIn && !user.person_id) {
-    //     history.replace('/charactor');
-    // }
+    if(isLoggedIn && !user.person_id) {
+        history.replace('/charactor');
+    }
 };
 
 /**

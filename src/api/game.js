@@ -1,4 +1,4 @@
-import service from './service'
+import service from './index'
 
 export const getGameFrames = ({own, enemy}) => {
     return service.post('/game', {

@@ -72,7 +72,7 @@ class RadarChart extends React.Component {
 
     // 数据监测
     dataPreCheck = (data) => {
-        let rt;
+        let rt = [...data];
         const {demension, extraDemensionName, extraDemensionValue, spreadTime} = this.props;
         const {maxDemension} = this.state
         // 检查维度

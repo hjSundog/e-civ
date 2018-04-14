@@ -39,8 +39,8 @@ class Login extends React.Component {
             this.setState({
                 loading: false
             });
-            message.success('Welcome ' + res.name)
-            this.props.set_user(res)
+            message.success('Welcome ' + res.data.name)
+            this.props.set_user(res.data)
             this.props.history.replace('/')
         }).catch(err => {
             this.setState({

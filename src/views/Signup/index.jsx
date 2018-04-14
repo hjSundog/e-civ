@@ -47,7 +47,7 @@ class Signup extends React.Component {
                 this.setState({
                     loading: false
                 });
-                message.success("Welcome " + data.user + " please login.")
+                message.success("Welcome " + data.username + " please login.")
                 this.toLogin();
             }).catch(e => {
                 this.setState({
