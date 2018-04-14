@@ -3,5 +3,5 @@ var prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  BASE_API: '"//e-civ-api.lwio.me/"',
+  BASE_API: '"//localhost:8800/"',
 })

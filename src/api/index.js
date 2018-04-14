@@ -1,5 +1,6 @@
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
+import store from '@/store'
 import tpl2entity from '@/api/mock/utils/tpl2entity'
 var normalAxios = axios.create();
 var mockAxios = axios.create();
@@ -232,10 +233,23 @@ mock.onGet('/items/auction').reply(config => {
         return [404, {message: "没有拍卖物品"}]
     }
 })
-
-export const service = axios.create({
+const service = axios.create({
     baseURL: process.env.BASE_API, // api的base_url
     timeout: 5000 // 请求超时时间
 })
 
-export default mockAxios;
+service.interceptors.request.use(config => {
+    console.log(store)
+    // Do something before request is sent
+    if (store.getState().user.token) {
+        config.headers['Access-Token'] = store.getState().user.token
+    }
+    console.log(config)
+    return config
+}, error => {
+    Promise.reject(error)
+})
+
+export default service
+
+// export default mockAxios;

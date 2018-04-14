@@ -4,6 +4,7 @@ import { Modal, Button, Input, Form, Automplete } from 'antd'
 import Iconfont from '@/components/Iconfont'
 import './index.less'
 
+import { getLetter, getLetters, postLetters } from '@/api/letter'
 // TODO: 考虑把form移出来成一个单独组件
 export default class PublishModal extends React.Component {
     constructor(props) {

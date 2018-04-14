@@ -1,4 +1,4 @@
-import service from './service'
+import service from './index'
 
 export const login = ({username, password}) => {
     return service.post('/users/login', {

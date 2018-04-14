@@ -1,5 +1,6 @@
 import React from 'react'
 // import api from '../../api';
+import { connect } from 'react-redux'
 
 import Mailcard from '../Common/Mailcard'
 import PublishModal from '../Common/PublishModal'
@@ -7,6 +8,16 @@ import DeleteModal from '../Common/DeleteModal'
 
 import './index.less'
 
+import { getLetters } from '@/api/letter'
+
+
+
+const mapStateToProps = (state) => {
+    return {
+        user: state.user
+    }
+}
+@connect(mapStateToProps)
 export default class MailboxPage extends React.Component {
     constructor(props) {
         super(props)
@@ -15,6 +26,11 @@ export default class MailboxPage extends React.Component {
             deleteModalVisible: false,
             operatingMail: null          // 当前正在操作的mail对象
         }
+    }
+    componentDidMount () {
+        getLetters().then(res => {
+            debugger
+        })
     }
     showPublishModal = () => {
         this.setState({
