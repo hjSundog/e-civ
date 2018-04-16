@@ -2,13 +2,42 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { message, Tabs, Spin } from 'antd';
 import PackagePane from './PackagePane'
-import api from '../../api'
+import {GetAllItems} from '@/api/person'
 import './index.less'
 // import * as PersonActionCreators from '../../actions/person'
-import {init_package}  from '@/actions//items'
+import {init_package}  from '@/actions/items'
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 const TabPane = Tabs.TabPane
+
+const ItemTypes = {
+    '全部': 'ALL',
+    '消耗品': 'Consumable',
+    '武器': 'Weapon',
+    '材料': 'MaterialCraft',
+    '防具': 'Armor',
+    '宠物': 'MiniPet',
+    '特殊': ['Bag', 'Container']
+}
+
+const extractItems = (type, storage) => {
+    if (typeof type === 'string') {
+        if (type === 'ALL') {
+            return storage;
+        }
+        return storage.filter(item => {
+            return item.type === type
+        })
+    }
+    let rt = [];
+    type.forEach(t => {
+        rt = [...rt, ...storage.filter(item => {
+            return item.type === t
+        })]
+    })
+    return rt
+}
+
 class Package extends React.Component {
     constructor (props) {
         super(props)
@@ -17,41 +46,22 @@ class Package extends React.Component {
         }
     }
     componentWillMount () {
-        const {user, hasInitialed} = this.props;
-        const url = `/persons/${user.name}/items`
-        if (hasInitialed) {
-            console.log('已经初始化背包了！！');
-            return
-        }
+        const {person, hasInitialed} = this.props;
+        // if (hasInitialed) {
+        //     console.log('已经初始化背包了！！');
+        //     return
+        // }
         this.setState({
             loading: true,
         })
         //获取物品
 
-        api({
-            method: 'get',
-            url: url,
-        }).then(res => {
+        GetAllItems(person.id).then(res => {
             this.setState({
                 loading: false
             })
             if (res.status === 200){
-                this.props.actions.init_package(res.data.map(item=> {
-                    return {
-                        item: item,
-                        count: 1
-                    }
-                }));
-                // const items = res.data.map(item=> {
-                //     return {
-                //         item: item,
-                //         count: 1
-                //     }
-                // })
-                // //console.log(items)
-                // this.setState({
-                //     items: items
-                // })
+                this.props.actions.init_package(res.data);
             } else {
                 console.log(res.message)
             }
@@ -64,20 +74,16 @@ class Package extends React.Component {
     }
     render () {
         const {items} = this.props
+        const Panes = Object.entries(ItemTypes).map(type => {
+            return (<TabPane tab={type[0]} key={type[1]}>
+                <PackagePane items={extractItems(type[1], items)} />
+            </TabPane>)
+        })
         return (
             <div className="package">
                 <Spin spinning={this.state.loading}>
                     <Tabs tabPosition={'top'}>
-                        <TabPane tab={'全部'} key='1'>
-                            <PackagePane items={items}/>
-                        </TabPane>
-                        <TabPane tab="食物" key="2"><PackagePane/></TabPane>
-                        <TabPane tab="药水" key="3"><PackagePane/></TabPane>
-                        <TabPane tab="材料" key="4"><PackagePane/></TabPane>
-                        <TabPane tab="武器" key="5"><PackagePane/></TabPane>
-                        <TabPane tab="防具" key="6"><PackagePane/></TabPane>
-                        <TabPane tab="宠物" key="7"><PackagePane/></TabPane>
-                        <TabPane tab="特殊" key="8"><PackagePane/></TabPane>
+                        {Panes}
                     </Tabs>
                 </Spin>
             </div>
@@ -98,7 +104,7 @@ Package.propTypes = {
 function mapStateToProps(state) {
     return {
         items: state.items.packageItems,
-        user: state.user,
+        person: state.person,
         hasInitialed: state.items.hasInitialed
     }
 }

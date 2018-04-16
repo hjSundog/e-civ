@@ -105,13 +105,13 @@ export function init_auction(items) {
 }
 
 export function sell_to_auction(items) {
-     return {
-         type: SELL_TO_AUCTION,
-         payload: [items]
-     }
- }
+    return {
+        type: SELL_TO_AUCTION,
+        payload: [items]
+    }
+}
 
- export function buy_from_auction(item) {
+export function buy_from_auction(item) {
     return {
         type: BUY_FROM_AUCTION,
         payload: item

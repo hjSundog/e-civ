@@ -70,6 +70,7 @@ export const UseItem = ({personId, itemId, count}) => {
 }
 
 // 创建物品
+// item {type count}
 export const CreateItem = ({id, item}) => {
     return service.post(`/persons/${id}/items`, {
         ...item

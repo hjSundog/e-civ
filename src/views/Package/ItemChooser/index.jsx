@@ -75,22 +75,22 @@ export default class ItemChooser extends React.Component {
     disabledStartDate = (startValue) => {
         const endValue = this.state.endValue;
         if (!startValue || !endValue) {
-          return false;
+            return false;
         }
         return startValue.valueOf() > endValue.valueOf();
-      }
+    }
     
     disabledEndDate = (endValue) => {
         const startValue = this.state.startValue;
         if (!endValue || !startValue) {
-          return false;
+            return false;
         }
         return endValue.valueOf() <= startValue.valueOf();
     }
     
     onChange = (field, value) => {
         this.setState({
-          [field]: value,
+            [field]: value,
         });
     }
     
@@ -104,7 +104,7 @@ export default class ItemChooser extends React.Component {
     
     handleStartOpenChange = (open) => {
         if (!open) {
-          this.setState({ endOpen: true });
+            this.setState({ endOpen: true });
         }
     }
     
