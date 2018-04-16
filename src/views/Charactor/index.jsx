@@ -5,7 +5,7 @@ import { Row, Col, message, Button } from 'antd'
 //import Iconfont from '../../components/Iconfont';
 import CharactorCard from './CharactorCard';
 import './index.less'
-import { createCharacter } from '@/api/person'
+import { CreateCharacter } from '@/api/person'
 import { withRouter } from 'react-router'
 import * as PersonActionCreators from '@/actions/person'
 import { update_user, clear_user } from '@/actions/user'
@@ -25,13 +25,13 @@ class Charactor extends React.Component {
     //这里有个问题。因为创建一个角色，user信息也会跟着变化，所以这里采取创建一个角色成功后将该id直接加入
     //加入redux进行保存以保持和后台同步而不是重新获取数据库user来更新redux
     handleCreatePerson = (person) => {
-        const {user, actions} = this.props;
+        const { actions } = this.props;
         this.setState({
             loading: true
         })
-        createCharacter({
+        CreateCharacter({
             ...person
-        }, user.token).then(res => {
+        }).then(res => {
             this.setState({
                 loading: false
             })

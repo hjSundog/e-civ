@@ -239,7 +239,7 @@ const service = axios.create({
 })
 
 service.interceptors.request.use(config => {
-    console.log(store)
+    console.log(store.getState())
     // Do something before request is sent
     if (store.getState().user.token) {
         config.headers['Access-Token'] = store.getState().user.token
