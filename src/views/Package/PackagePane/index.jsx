@@ -6,11 +6,11 @@ import ItemDetailModal from '@/components/ItemDetailModal'
 import ItemContextMenu from '@/components/ItemContextMenu'
 import ItemChooser from '../ItemChooser'
 import { Card } from 'antd'
-
+import {UseItem, UpdateCharacter} from '@/api/person'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { update_person } from '@/actions/person'
-import { sell_to_auction } from '@/actions//items'
+import { sell_to_auction, set_package } from '@/actions//items'
 
 
 // import api from '../../api';
@@ -24,24 +24,21 @@ const gridStyle = {
     height: '100px'
 };
 
-const testItem = {
-    description: "银闪闪的苹果，可以回复较多生命值",
-    details: { type: "Food", apply_count: 1 },
-    icon: "",
-    name: "sliver apple",
-    owner_id: 1,
-    rarity: "fine",
-    type: "consumable",
-    vendor_value: 30,
-    _id: 1
-}
+// const testItem = {
+//     description: "银闪闪的苹果，可以回复较多生命值",
+//     details: { type: "Food", apply_count: 1 },
+//     icon: "",
+//     name: "sliver apple",
+//     owner_id: 1,
+//     rarity: "fine",
+//     type: "consumable",
+//     vendor_value: 30,
+//     _id: 1
+// }
 
 const extraOp = [{
     action: 'USE',
     action_name: '使用'
-}, {
-    action: 'TEST',
-    action_name: '测试',
 }, {
     action: 'AUCTION',
     action_name: '拍卖',
@@ -55,6 +52,9 @@ const extraOp = [{
 }, {
     action: 'DROP',
     action_name: '丢弃'
+}, {
+    action: 'DROPALL',
+    action_name: '全部丢弃'
 }]
 
 class PackagePane extends React.Component {
@@ -127,25 +127,7 @@ class PackagePane extends React.Component {
         // 获取拍卖设置数据
         const { endValue, startValue, price, count } = setting;
         // 客户端拍卖操作
-        //actions.sell_to_auction(item);
         console.log('哈哈拍卖：' + item.name + '啦')
-        // websocket 操作
-        // websocket.send(JSON.stringify({
-        //     source: 'person',
-        //     type: 'AUCTION',
-        //     data: {
-        //         from: person.name,
-        //         payload:{
-
-        //         },
-        //         startTime: startValue,
-        //         endTime: endValue,
-        //         item: item,
-        //         count: count,
-        //         price: price
-        //     },
-        //     created_at: Date.now()
-        // }))
     }
 
     // 右键菜单单击处理，USE和DROP是自带的，如果不使用自带的传递rebuild参数即可
@@ -155,37 +137,79 @@ class PackagePane extends React.Component {
         // 使用物品处理
         if (data.action === 'USE') {
             console.log('你使用这个物品了');
-            Object.entries(data.item.effect).forEach(function (ele) {
-                //递归寻找对象是否有这个属性
-                function recursion(target) {
-                    for (let key in target) {
-                        //建相等
-                        if (key === ele[0]) {
-                            //如果值为对象
-                            if (toString.call(target[key]).slice(8, -1) === 'Object') {
-                                //建相等,这里先简单的这样做，不考虑深度克隆的情况
-                                target[key] = {
-                                    ...target[key],
-                                    ...ele[1]
-                                }
-                            } else {
-                                target[key] = target[key] + ele[1];
-                            }
-                        } else if (toString.call(target[key]).slice(8, -1) === 'Object') {
-                            recursion(target[key])
+            UseItem({
+                personId: person.id,
+                itemId: data.item.id,
+                count: 1
+            }).then(res => {
+                if (res.status === 200) {
+                    actions.set_package(res.data)                    
+                    // 更改人物属性
+                    // Object.entries(data.item.effect).forEach(function (ele) {
+                    //     //递归寻找对象是否有这个属性
+                    //     function recursion(target) {
+                    //         for (let key in target) {
+                    //             //建相等
+                    //             if (key === ele[0]) {
+                    //                 //如果值为对象
+                    //                 if (toString.call(target[key]).slice(8, -1) === 'Object') {
+                    //                     //建相等,这里先简单的这样做，不考虑深度克隆的情况
+                    //                     target[key] = {
+                    //                         ...target[key],
+                    //                         ...ele[1]
+                    //                     }
+                    //                 } else {
+                    //                     target[key] = target[key] + ele[1];
+                    //                 }
+                    //             } else if (toString.call(target[key]).slice(8, -1) === 'Object') {
+                    //                 recursion(target[key])
+                    //             }
+        
+                    //         }
+                    //     }
+                    //     recursion(person);
+                    // })
+                    UpdateCharacter({
+                        id: person.id,
+                        data: {
+                            ...data.item.effect
                         }
-
-                    }
+                    }).then(res => {
+                        if (res.status === 200) {
+                            actions.update_person(data.item.effect)
+                        }
+                    })
                 }
-                recursion(person);
             })
 
-            actions.update_person(person)
         }
 
         // 扔掉丢弃物品处理
         if (data.action === 'DROP' && count > 0) {
             console.log('你丢弃' + data.item.name + '物品了')
+            UseItem({
+                personId: person.id,
+                itemId: data.item.id,
+                count: 1
+            }).then(res => {
+                if (res.status === 200) {
+                    // 更改背包状态
+                    actions.set_package(res.data)                    
+                }
+            })
+        }
+
+        if (data.action === 'DROPALL' && count>0) {
+            UseItem({
+                personId: person.id,
+                itemId: data.item.id,
+                count: count
+            }).then(res => {
+                if (res.status === 200) {
+                    // 更改背包状态                    
+                    actions.set_package(res.data)
+                }
+            })
         }
 
         // 测试
@@ -257,7 +281,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ update_person, sell_to_auction }, dispatch)
+        actions: bindActionCreators({ update_person, sell_to_auction, set_package }, dispatch)
     }
 }
 

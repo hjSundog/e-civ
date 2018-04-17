@@ -3,9 +3,6 @@ import PropTypes from 'prop-types'
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Layout, Badge , Row, Col, Spin, message} from 'antd';
-import { Route, Redirect, Switch } from 'react-router-dom';
-
-import { childRoutes } from '@/route'
 import LayoutRouter from '@/route/layout'
 import Header from '@/components/Header'
 import Sidebar from '@/components/Sidebar'
@@ -14,12 +11,11 @@ import Iconfont from '@/components/Iconfont'
 import FeedbackModal from './FeedbackModal'
 import ChatWindow from '@/components/ChatWindow';
 import TradeWindow from '@/components/TradeWindow'
-import Websocket from '@/components/Websocket'
 import {add_message, add_invitation, init_websocket, cancle_invitation, change_trade_target} from '@/actions/websocket';
 import {init_package, add_to_item, change_to_extra, add_package_items} from '@/actions/items'
+import {RetreiveCharacter} from '@/api//person'
 import {clear_user} from '@/actions/user';
 import { init_person } from '../../actions/person'
-import api from '../../api'
 import './index.less';
 
 const { Content } = Layout;
@@ -36,63 +32,21 @@ class App extends React.Component {
         }
     }
     componentWillMount() {
-        const {actions, user} = this.props
-        // this.setState({
-        //     loading: true
-        // })
-        // actions.init_person(this.props.person);
-        // this.setState({
-        //     loading: false
-        // })
+        const {person, actions, user} = this.props
+        // if (!person.id) {
         // 初始化用户
-        // api({
-        //     url: `/persons/${user ? user.person_id : 1}`,
-        //     method: 'get',
-        // }).then(res => {
-        //     this.setState({
-        //         loading: false
-        //     })
-        //     if (res.status !== 200) {
-        //         message.error(res.data.error);
-        //     }
-        //     if (res.status === 200) {
-        //         console.log('init person')
-        //         actions.init_person(res.data)
-        //     }
-        // }).catch(err => {
-        //     this.setState({
-        //         loading: false
-        //     });
-        //     message.error(err);
-        // })
+        RetreiveCharacter(user.person_id).then(res => {
+            this.setState({
+                loading: false
+            })
 
-        // // 初始化背包
-        // const url = `/persons/${user.name}/items`
-        // api({
-        //     method: 'get',
-        //     url: url,
-        // }).then(res => {
-        //     this.setState({
-        //         loading: false
-        //     })
-        //     if (res.status === 200){
-        //         this.props.actions.init_package(res.data.map(item=> {
-        //             return {
-        //                 item: item,
-        //                 count: 1
-        //             }
-        //         }));
-
-        //     } else {
-        //         console.log(res.message)
-        //     }
-        // }).catch(error => {
-        //     message.error(error)
-        //     this.setState({
-        //         loading: false
-        //     })
-        // })
-
+            if (res.status !== 200) {
+                message.error(res.data.error)
+                return
+            }
+            actions.init_person(res.data)
+        })
+        
     }
 
 

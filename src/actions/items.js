@@ -17,6 +17,7 @@ export const ADD_PACKAGE_ITEMS = 'ADD_PACKAGE_ITEMS'
 export const REMOVE_PACKAGE_ITEM = 'REMOVE_PACAKGE_ITEM'
 export const REMOVE_PACKAGE_ITMES = 'REMOVE_PACAKGE_ITEMS'
 export const USE_ITEM = 'USE_ITEM'
+export const SET_PACKAGE = 'SET_PACKAGE'
 
 // 拍卖数据
 export const SELL_TO_AUCTION = 'SELL_TO_AUCTION'
@@ -92,6 +93,13 @@ export function init_package(items) {
 export function add_package_items(items) {
     return {
         type: ADD_PACKAGE_ITEMS,
+        payload: items
+    }
+}
+
+export function set_package(items) {
+    return {
+        type: SET_PACKAGE,
         payload: items
     }
 }

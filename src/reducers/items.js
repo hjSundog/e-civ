@@ -14,6 +14,7 @@ import {
     // package
     INIT_PACKAGE,
     ADD_PACKAGE_ITEMS,
+    SET_PACKAGE,
     // auction
     INIT_AUCTION,
     SELL_TO_AUCTION,
@@ -86,6 +87,11 @@ export default function auth(state = initialState, action = {}) {
             packageItems: action.payload,
             hasInitialed: true
         };
+    case SET_PACKAGE:
+        return {
+            ...state,
+            packageItems: action.payload
+        }
     case ADD_PACKAGE_ITEMS:
         return {
             ...state,

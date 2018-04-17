@@ -117,11 +117,10 @@ class ItemContextMenu extends React.Component {
     render() {
         const { count, item, onClickMenu, id, extraOp } = this.props;
         const attributes = {
-            'datacount': count,
+            'data-count': count,
             className: 'menu_action'
         };
         const { isVisible } = this.state
-        const self = this;
         return (
             <div className="context-menu">
                 <div>

@@ -25,10 +25,10 @@ export function create_person(person) {
     }
 }
 
-export function update_person(person) {
+export function update_person(patch) {
     return {
         type: UPDATE_PERSON,
-        person
+        patch
     }
 }
 

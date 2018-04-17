@@ -36,6 +36,12 @@ export const RetreiveCharacter = (id) => {
     return service.get(`/persons/${id}`)
 }
 
+export const UpdateCharacter = ({id, data}) => {
+    return service.patch(`/persons/${id}`, {
+        ...data
+    })
+}
+
 // 删除api
 export const DeleteCharacter = (id) => {
     return service.delete(`/persons/${id}`)
@@ -53,7 +59,7 @@ export const GetAllItems = (id) => {
 
 // 获取某类物品
 export const GetItemsOf = ({id, type}) => {
-    return service.get(`/persons/${id}/items`, {
+    return service.get(`/persons/${id}/items?type=`, {
         params:{
             type: type
         }

@@ -42,12 +42,29 @@ const initialState = {
 
 export default function auth(state = initialState, action = {}) {
     switch (action.type) {
+    case INIT_PERSON:
+        return { ...action.person }
     case RESET_PERSON:
         return initialState
     case CREATE_PERSON:
-        return {...state,...action.person}
+        return { ...state, ...action.person }
     case UPDATE_PERSON:
-        return _.assign(state, action.person)
+        let copy = { ...state };
+        const { patch } = action;
+        Object.keys(patch).forEach(key => {
+            // 是否顶级
+            if (state[key]) {
+                copy[key] = patch[key]
+            }
+
+            if (state['conditions'][key]) {
+                copy['conditions'][key] += patch[key]
+            }
+            if (state['attributes'][key]) {
+                copy['attributes'][key] += patch[key]
+            }
+        })
+        return {...state, ...copy}
     case DELETE_PERSON:
         return {}
     case UPDATE_PERSON_POI:
