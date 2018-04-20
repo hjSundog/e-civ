@@ -144,31 +144,6 @@ class PackagePane extends React.Component {
             }).then(res => {
                 if (res.status === 200) {
                     actions.set_package(res.data)                    
-                    // 更改人物属性
-                    // Object.entries(data.item.effect).forEach(function (ele) {
-                    //     //递归寻找对象是否有这个属性
-                    //     function recursion(target) {
-                    //         for (let key in target) {
-                    //             //建相等
-                    //             if (key === ele[0]) {
-                    //                 //如果值为对象
-                    //                 if (toString.call(target[key]).slice(8, -1) === 'Object') {
-                    //                     //建相等,这里先简单的这样做，不考虑深度克隆的情况
-                    //                     target[key] = {
-                    //                         ...target[key],
-                    //                         ...ele[1]
-                    //                     }
-                    //                 } else {
-                    //                     target[key] = target[key] + ele[1];
-                    //                 }
-                    //             } else if (toString.call(target[key]).slice(8, -1) === 'Object') {
-                    //                 recursion(target[key])
-                    //             }
-        
-                    //         }
-                    //     }
-                    //     recursion(person);
-                    // })
                     UpdateCharacter({
                         id: person.id,
                         data: {
@@ -286,3 +261,28 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(PackagePane)
+// 更改人物属性
+// Object.entries(data.item.effect).forEach(function (ele) {
+//     //递归寻找对象是否有这个属性
+//     function recursion(target) {
+//         for (let key in target) {
+//             //建相等
+//             if (key === ele[0]) {
+//                 //如果值为对象
+//                 if (toString.call(target[key]).slice(8, -1) === 'Object') {
+//                     //建相等,这里先简单的这样做，不考虑深度克隆的情况
+//                     target[key] = {
+//                         ...target[key],
+//                         ...ele[1]
+//                     }
+//                 } else {
+//                     target[key] = target[key] + ele[1];
+//                 }
+//             } else if (toString.call(target[key]).slice(8, -1) === 'Object') {
+//                 recursion(target[key])
+//             }
+        
+//         }
+//     }
+//     recursion(person);
+// })

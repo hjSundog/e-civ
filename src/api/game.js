@@ -6,3 +6,10 @@ export const getGameFrames = ({own, enemy}) => {
         enemy
     })
 }
+
+// 游戏
+export const sendFramesToServer = ({data}) => {
+    return service.post(`/games/`, {
+        ...data
+    })
+}
