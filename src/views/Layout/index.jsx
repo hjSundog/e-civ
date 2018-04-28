@@ -11,10 +11,11 @@ import Iconfont from '@/components/Iconfont'
 import FeedbackModal from './FeedbackModal'
 import ChatWindow from '@/components/ChatWindow';
 import TradeWindow from '@/components/TradeWindow'
+import Websocket from '@/components/Websocket'
 import {add_message, add_invitation, init_websocket, cancle_invitation, change_trade_target} from '@/actions/websocket';
 import {init_package, add_to_item, change_to_extra, add_package_items} from '@/actions/items'
 import {RetreiveCharacter} from '@/api//person'
-import {clear_user} from '@/actions/user';
+import {clear_user, search_user} from '@/actions/user';
 import { init_person } from '../../actions/person'
 import './index.less';
 
@@ -106,6 +107,10 @@ class App extends React.Component {
                 this.props.actions.add_to_item(tMessage.data.items)
                 break;
             }
+            case 'search': {
+                this.props.actions.search_user(tMessage.data.to)
+                break;
+            }
             case 'trade': {
                 this.props.actions.add_package_items(tMessage.data.items);
                 // 这里可以增加extra 现在不搞
@@ -131,7 +136,7 @@ class App extends React.Component {
 
 
     render() {
-        const {user, actions} = this.props;
+        const {user, actions, invitations} = this.props;
         const { feedbackVisible, tradeWindowVisible } = this.state
         const urlPrifx = 'ws://localhost:8089?token=';
         const token = user['token']
@@ -164,7 +169,7 @@ class App extends React.Component {
                         </div>
                     </Badge>
                     <div style={{backgroundColor: '#0f90ff', width: '45px'}}>
-                        <Badge count={1}>
+                        <Badge count={invitations.length}>
                             <div id="tradesaction" className="toolkit-item" onClick={this.handleTradeClick}>
                                 <Iconfont type="trade"></Iconfont>
                                 <p>交易所</p>
@@ -185,10 +190,10 @@ class App extends React.Component {
                         isOpen={this.state.chatroomsVisible}
                     />
                     <TradeWindow onClose={this.handleTradeWindowClose} isOpen={tradeWindowVisible} responseTradePane={this.state.responseTradePane}/>
-                    {/* <Websocket url={url}
+                    <Websocket url={url}
                         onMessage={this.handleWebsocket}
                         onOpen = {this.handleOpenWebsocket}
-                        debug={true}/> */}
+                        debug={true}/>
                 </div>
             </Layout>
         );
@@ -207,12 +212,13 @@ const mapStateToProps = (state) => {
     const { user } = state;
     return {
         user: user,
+        invitations: state.websocket.invitations,
         person: state.person
     };
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({add_package_items, add_to_item, change_to_extra, change_trade_target, init_package, init_websocket, cancle_invitation, add_invitation, add_message, init_person}, dispatch)};
+    return {actions: bindActionCreators({add_package_items, search_user, add_to_item, change_to_extra, change_trade_target, init_package, init_websocket, cancle_invitation, add_invitation, add_message, init_person}, dispatch)};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

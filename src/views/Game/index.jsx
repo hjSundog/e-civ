@@ -63,9 +63,9 @@ class App extends React.Component {
                 <Button type="primary" onClick={this.handleClick}>开始</Button>
                 <Button type="primary" onClick={this.handleDownload}>下载</Button>
                 {/* <iframe name="download" style={{display: 'none'}}></iframe> */}
-                <Player>
+                {/* <Player>
                     <source src="localhost:8800/games/videos/5ad598eea78c451b0c6c0d37@@1/game1524216367972.mp4"/>
-                </Player>
+                </Player> */}
             </div>
 
         )

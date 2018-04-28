@@ -2,6 +2,7 @@ import {
     SET_USER,
     CLEAR_USER,
     UPDATE_USER,
+    SEARCH_USER
 } from '../actions/user';
 
 const initialState = {
@@ -15,6 +16,11 @@ export default function user(state = initialState, action = {}) {
         return initialState
     case UPDATE_USER:
         return {...state,...action.payload.user}
+    case SEARCH_USER:
+        return {
+            ...state,
+            search: action.payload.users
+        }
     default:
         return state;
     }

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import * as Test from './test'
+// import * as Test from './test'
 
 class Websocket extends React.Component {
 
@@ -33,7 +33,7 @@ class Websocket extends React.Component {
             if (typeof this.props.onOpen === 'function') {
                 this.props.onOpen(websocket);
             }
-            Test.testStartInvitation();
+            // Test.testStartInvitation();
             // setTimeout(()=>{
             //     console.log('test refuse invitation')
             //     //Test.testCancleInvitation()

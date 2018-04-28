@@ -58,13 +58,11 @@ class AvartarUpload extends React.Component {
 
     componentDidMount() {
         const { maxSize, callback } = this.props;
-
         this.input.onclick = () => {
             this.setState({
                 loading: true
             })
         };
-
         this.input.onchange = (e) => {
             const fileObj = e.target.files[0] || e.dataTransfer.files[0];
             if (fileObj) {
@@ -83,8 +81,6 @@ class AvartarUpload extends React.Component {
                 reader.readAsDataURL(fileObj);
 
             }
-            // this.handlePreview(fileObj);
-            // this.handleChange({file: fileObj});
         }
     }
 

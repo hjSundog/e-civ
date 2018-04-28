@@ -2,15 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import noop from '@/utils/noop'
 import ReItem from '../ReItem'
-import {Pagination, Input} from 'antd'
+import {Pagination} from 'antd'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import {add_transaction, cancle_transaction} from '@/actions/websocket'
 import './index.less'
-const Search = Input.Search;
 const PAGESIZE = 8;
 
-class RelationPane extends React.Component {
+class SearchPane extends React.Component {
     constructor (props) {
         super(props)
         this.state = {
@@ -33,16 +32,6 @@ class RelationPane extends React.Component {
         this.setState({
             currentPage: page
         })
-    }
-    // 删除
-    handleDelete = (target) => {
-        const { type, datas } = this.props;
-
-        let ndx = datas.findIndex((data) => {
-            return data.id === target.id
-        })
-
-        this.props.onDelete(ndx, type);
     }
 
     handleSendMessage = () => {
@@ -76,9 +65,6 @@ class RelationPane extends React.Component {
         }
     }
 
-    handleSearch = (value) => {
-
-    }
 
     render () {
         const { datas } = this.props
@@ -87,17 +73,13 @@ class RelationPane extends React.Component {
         let showDatas = datas.slice((currentPage-1)*PAGESIZE,currentPage*PAGESIZE)
 
         const html = showDatas.reduce((arr, data) => {
-            arr.push(<ReItem onDelete={this.handleDelete} onSendMessage={this.handleSendMessage} onTrade={this.handleTrade} key={data.id} data={data} />)
+            arr.push(<ReItem onSendMessage={this.handleSendMessage} onTrade={this.handleTrade} key={data.id} data={{
+                name: data
+            }} special />)
             return arr;
         }, [])
         return (
-            <div className='RelationPane'>
-                <Search
-                    placeholder="input search text"
-                    style={{ width: 300, maxHeight:40, minHeight: 25 }}
-                    onSearch={this.handleSearch}
-                    enterButton
-                />
+            <div className='SearchPane'>
                 <div>{html}</div>
                 <Pagination pageSize={PAGESIZE} current={currentPage} total={datas.length} onChange={this.handlePageChange} hideOnSinglePage/>
             </div>
@@ -105,22 +87,16 @@ class RelationPane extends React.Component {
     }
 }
 
-RelationPane.defaultProps = {
+SearchPane.defaultProps = {
     datas: [],
     add_transaction: noop,
     cancle_transaction: noop,
-    onDelete: noop
 };
 
-RelationPane.propTypes = {
-    datas: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        level: PropTypes.number,
-        avatarUrl: PropTypes.string
-    })),
+SearchPane.propTypes = {
+    datas: PropTypes.array,
     add_transaction: PropTypes.func,
     cancle_transaction: PropTypes.func,
-    onDelete: PropTypes.func
 };
 
 function mapStateToProps (state) {
@@ -140,4 +116,4 @@ function mapDispatchToProps (dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RelationPane);
+export default connect(mapStateToProps, mapDispatchToProps)(SearchPane);

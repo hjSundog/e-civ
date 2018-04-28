@@ -1,13 +1,15 @@
 import React from 'react'
-import { Row, Col, Card, message, Tabs, Spin } from 'antd';
+import { Row, Col, Card, message, Tabs, Spin, Input } from 'antd';
 import api from '../../api'
 import './index.less'
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import RelationshipPane from './RelationshipPane'
+import SearchPane from './SearchPane'
 const TabPane = Tabs.TabPane
+const Search = Input.Search;
 class Relationship extends React.Component {
-    constructor (props) {
+    constructor(props) {
         super(props)
         this.state = {
             loading: false,
@@ -19,18 +21,18 @@ class Relationship extends React.Component {
 
     // }
 
-    componentWillMount () {
+    componentWillMount() {
         // this.setState({
         //     loading: true,
         // })
 
         const prifixs = ['mdzz', 'fuck', 'doubi']
-        const total = Array.from({length: 10}, (v, k) => {
+        const total = Array.from({ length: 10 }, (v, k) => {
             return {
-                name: prifixs[Math.floor(Math.random()*prifixs.length)]+':'+k,
+                name: prifixs[Math.floor(Math.random() * prifixs.length)] + ':' + k,
                 id: k,
                 avatarUrl: '',
-                level: Math.floor(Math.random()*50)
+                level: Math.floor(Math.random() * 50)
             }
         })
         total.unshift({
@@ -82,34 +84,67 @@ class Relationship extends React.Component {
         this.setState({
             relationship: {
                 ...this.state.relationship,
-                [type] : temp
+                [type]: temp
             }
         })
     }
 
-    render () {
-        const {relationship} = this.state
+    handleSearch = (value) => {
+        const {websocket, user} = this.props;
+        const tData = {
+            source: 'person',
+            type: 'INVITATION',
+            data: {
+                from: user.name,
+                to: value,
+                operation: 'search',
+            }
+        }
+        // 发送交易信息
+        if (websocket) {
+            websocket.send(JSON.stringify(tData))
+        } else {
+            console.error('没有websocket服务。无法发送交易请求。')
+        }
+    }
+
+    render() {
+        const { relationship } = this.state
+        const {user} = this.props;
+        let flag = false;
+        if (user.search && user.search.length>0) {
+            flag = true;
+        }
         return (
             <div className="relationship">
-                <Spin spinning={this.state.loading}>
-                    <Tabs tabPosition={'top'}>
-                        <TabPane tab="好友" key="2"><RelationshipPane type="FRIENDS" onDelete={this.handleDelete}  datas={relationship.friends}/></TabPane>
-                        <TabPane tab="最近" key="3"><RelationshipPane type="LATEST" onDelete={this.handleDelete}  datas={relationship.latest}/></TabPane>
-                        <TabPane tab="陌生" key="4"><RelationshipPane type="STRANGERS" onDelete={this.handleDelete}  datas={relationship.strangers}/></TabPane>
-                        <TabPane tab="黑名单" key="5"><RelationshipPane type="BLACKLISTS" onDelete={this.handleDelete}  datas={relationship.blacklists}/></TabPane>
-                    </Tabs>
-                </Spin>
+                <Search
+                    placeholder="input search text"
+                    style={{ width: 300, maxHeight: 40, minHeight: 25, position: 'absolute', right: 20, top: 10 }}
+                    onSearch={this.handleSearch}
+                    enterButton
+                />
+                {flag
+                    ?<SearchPane type="SERACH" datas={user.search}/>
+                    :<Spin spinning={this.state.loading}>
+                        <Tabs tabPosition={'top'}>
+                            <TabPane tab="好友" key="2"><RelationshipPane type="FRIENDS" onDelete={this.handleDelete} datas={relationship.friends} /></TabPane>
+                            <TabPane tab="最近" key="3"><RelationshipPane type="LATEST" onDelete={this.handleDelete} datas={relationship.latest} /></TabPane>
+                            <TabPane tab="陌生" key="4"><RelationshipPane type="STRANGERS" onDelete={this.handleDelete} datas={relationship.strangers} /></TabPane>
+                            <TabPane tab="黑名单" key="5"><RelationshipPane type="BLACKLISTS" onDelete={this.handleDelete} datas={relationship.blacklists} /></TabPane>
+                        </Tabs>
+                    </Spin>}
             </div>
         )
     }
 }
 
-// function mapStateToProps(state) {
-//     const {items = []} = state
-//     return {
-//         items: items
-//     }
-// }
+function mapStateToProps(state) {
+    return {
+        user: state.user,
+        person: state.person,
+        websocket: state.websocket.ws
+    }
+}
 
 // function mapDispatchToProps(dispatch) {
 //     return {
@@ -117,5 +152,5 @@ class Relationship extends React.Component {
 //     }
 // }
 
-export default Relationship
-// export default connect(mapStateToProps,mapDispatchToProps)(Interaction)
+// export default Relationship
+export default connect(mapStateToProps)(Relationship)

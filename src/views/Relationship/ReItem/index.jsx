@@ -31,19 +31,19 @@ class ReItem extends React.Component {
     }
 
     render () {
-        const { data} = this.props
+        const { data, special} = this.props
         return (
             <div className='ReItem' style={{...verticalAlign,justifyContent: 'space-between'}}>
                 <div style={{...verticalAlign, minWidth: '150px',justifyContent: 'space-around'}}>
                     <Avatar src={data.avatarUrl} style={{margin: '4px 10px 4px 5px'}}>{data.avatarUrl?null:'U'}</Avatar>
                     <span style={{marginRight: '10px'}}>{data.name}</span>
-                    <span style={{marginRight: '10px'}}>{data.level}</span>
+                    {special?null:<span style={{marginRight: '10px'}}>{data.level}</span>}
                 </div>
                 <div style={{flexGrow: 1,display: 'flex',justifyContent: 'space-around', maxWidth: '450px'}}>
                     <Button type="primary" onClick={this.handleSendMessage}>通信</Button>
                     <Button type="primary" onClick={this.handleTrade}>交易</Button>
                     <Button type="primary" onClick={this.handleCheck}>查看</Button>
-                    <Button type="danger" onClick={this.handleDelete}>删除</Button>
+                    {special?null:<Button type="danger" onClick={this.handleDelete}>删除</Button>}
                 </div>
             </div>
         )
