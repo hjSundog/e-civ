@@ -4,8 +4,33 @@ import { Modal, Button, Input, Form, Automplete } from 'antd'
 import Iconfont from '@/components/Iconfont'
 import './index.less'
 
-import { getLetter, getLetters, postLetters } from '@/api/letter'
-// TODO: 考虑把form移出来成一个单独组件
+import { postLetters } from '@/api/letter'
+
+class RegistrationForm extends React.Component {
+    render() {
+        const { mail, form } = this.props
+        const { getFieldDecorator } = form;
+        return <Form>
+            <Form.Item>
+                {getFieldDecorator('toUserId', {
+                    initialValue: '',
+                })(
+                    <Input placeholder="填写对方的用户id(考虑输入用户名并优化autocomplete)" disabled={mail && Boolean(mail.to.id)} />
+                )}
+            </Form.Item>
+            <Form.Item>
+                {getFieldDecorator('content', {
+                    initialValue: '',
+                })(
+                    <Input.TextArea placeholder="填写私信内容" autosize={{ minRows: 2, maxRows: 6 }} />
+                )}
+            </Form.Item>
+        </Form>
+    }
+
+}
+const WrappedNewLetterForm = Form.create()(RegistrationForm);
+
 export default class PublishModal extends React.Component {
     constructor(props) {
         super(props)
@@ -19,17 +44,23 @@ export default class PublishModal extends React.Component {
             visible: nextProps.visible
         })
     }
-    handleSubmit = () => {
-        // 如果成功了
-        setTimeout(() => {
-            this.props.onAfterSubmit();
-        }, 3000)
-    }
     handleCancel = () => {
         this.setState({
             publishLoading: false,
         })
         this.props.onCancel && this.props.onCancel();
+    }
+    saveFormRef = (el) => {
+        this.formRef = el;
+    }
+    handleSubmit = () => {
+        postLetters({
+            title: '默认标题',
+            content: this.formRef.props.form.getFieldValue('content'),
+            toUserId: '5ab89a49e98e131c9180c020'
+        }).then(({data}) => {
+            this.props.onAfterSubmit();
+        })
     }
 
     onSelect = (value) => {
@@ -49,14 +80,7 @@ export default class PublishModal extends React.Component {
                     </Button>,
                 ]}
             >
-                <Form>
-                    <Form.Item>
-                        <Input placeholder="填写对方的用户名" disabled={mail && Boolean(mail.to.id)} />
-                    </Form.Item>
-                    <Form.Item>
-                        <Input.TextArea placeholder="填写私信内容" autosize={{ minRows: 2, maxRows: 6 }} />
-                    </Form.Item>
-                </Form>
+                <WrappedNewLetterForm mail={mail} wrappedComponentRef={(this.saveFormRef)} />
             </Modal>
         );
     }
@@ -79,5 +103,7 @@ PublishModal.propTypes = {
 }
 
 PublishModal.defaultProps = {
-    onCancel: () => {}
+    onCancel: () => {},
+    onAfterSubmit: () => {}
 };
+

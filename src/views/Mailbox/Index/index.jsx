@@ -24,12 +24,16 @@ export default class MailboxPage extends React.Component {
         this.state = {
             publishModalVisible: false,
             deleteModalVisible: false,
-            operatingMail: null          // 当前正在操作的mail对象
+            operatingMail: null,          // 当前正在操作的mail对象
+            letters: null,
         }
     }
     componentDidMount () {
-        getLetters().then(res => {
-            debugger
+        getLetters().then(({data}) => {
+            console.log(data.letters)
+            this.setState({
+                letters: data.letters
+            })
         })
     }
     showPublishModal = () => {
@@ -57,7 +61,7 @@ export default class MailboxPage extends React.Component {
         })
     }
     render() {
-        const { publishModalVisible, deleteModalVisible, operatingMail } = this.state;
+        const { publishModalVisible, deleteModalVisible, operatingMail, letters } = this.state;
         return (
             <div className="wrapper">
                 <div className="mailbox-content">
@@ -68,27 +72,14 @@ export default class MailboxPage extends React.Component {
                             onClick={this.showPublishModal}>写私信</button>
                     </header>
                     <div className="mailbox-conversations">
-                        <Mailcard
-                            mail={{
-                                id: "asdioq-a131",
-                                from: {
-                                    name: "梁王",
-                                    img_url: "http://lwio.me/resume/img/head.jpg",
-                                    id: "liangwang",
-                                    icon: "administrator",
-                                    icon_tip: "这是创世者之一的梁王"
-                                },
-                                to: {
-                                    name: "admin",
-                                    img_url: "",
-                                    id: "keke"
-                                },
-                                content: "玩蛇TV，之后变富文本编辑器"
-                            }}
-                            onReply={this.handleReply}
-                            onDelete={this.handleDelete}
-                        >
-                        </Mailcard>
+                        {letters !== null ? letters.map((mail) => {
+                            return <Mailcard
+                                key={mail.id}
+                                mail={mail}
+                                onReply={this.handleReply}
+                                onDelete={this.handleDelete}
+                            />
+                        }) : null}
                     </div>
                 </div>
                 <aside className="mailbox-aside">

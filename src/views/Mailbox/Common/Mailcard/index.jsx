@@ -16,13 +16,13 @@ export default class Mailcard extends React.Component {
         return (
             <div className="mailcard">
                 <a className="mailcard-avatar link-avatar50">
-                    <img className="img-avatar50" src={mail.from.img_url} />
+                    <img className="img-avatar50" src={mail.from_user.avatar_url} />
                 </a>
                 <div className="mailcard-main">
                     <header>
-                        <a className="mailcard-from">{mail.from.name}</a>
-                        <Tooltip placement="top" title={mail.from.icon_tip}>
-                            <Iconfont type={mail.from.icon}></Iconfont>
+                        <a className="mailcard-from">{mail.from_user.name}</a>
+                        <Tooltip placement="top" title='这是创世者之一的梁王'>
+                            <Iconfont type='administrator'></Iconfont>
                         </Tooltip>
                     </header>
                     <div className="mailcard-content">
@@ -46,9 +46,9 @@ Mailcard.propTypes = {
     onReply: PropTypes.func,
     onDelete: PropTypes.func,
     mail: PropTypes.shape({
-        from: PropTypes.shape({
+        from_user: PropTypes.shape({
             name: PropTypes.string.isRequired,
-            img_url: PropTypes.string,
+            avatar_url: PropTypes.string,
             person_id: PropTypes.string,
             icon: PropTypes.string,
             icon_tip: PropTypes.string,
