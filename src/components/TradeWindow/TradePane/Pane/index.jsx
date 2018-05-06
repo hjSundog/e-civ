@@ -158,7 +158,7 @@ class Pane extends Component {
                     <Col key={j.toString()} span={24 / colCount}>
                         <DragItemWithTarget target={ItemType} moveItem={this.moveItem} data={data[i * colCount+j]}>
                             <div className="paneItem">
-                                <img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3880507419,2968712832&fm=27&gp=0.jpg" />
+                                <img src= {data[i * colCount + j].icon || "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3880507419,2968712832&fm=27&gp=0.jpg"} />
                                 <span>{data[i * colCount + j]['name']}</span>
                             </div>
                         </DragItemWithTarget>
@@ -280,7 +280,6 @@ class DragPane extends Component{
 
     componentWillReceiveProps (nextProps) {
         // if(this.props.source === '')
-        console.log('change data');
         if(this.props.data !== nextProps.data) {
             this.setState({
                 data: nextProps.data.payload,

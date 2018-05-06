@@ -128,7 +128,11 @@ class Pane extends Component {
         const self = this;
         return this.state.layouts[this.state.currentBreakpoint].map(function (l, i) {
             return (
-                <div key={i}><DragPackageItem  moveItem={self.moveItem} data={data[i]} /></div>
+                <div key={i}>
+                    <DragPackageItem  moveItem={self.moveItem} data={data[i]}>
+                        <img src={data[i].icon} style={{width: '100%', height: '100%'}}/>
+                    </DragPackageItem>
+                </div>
             );
         });
     }

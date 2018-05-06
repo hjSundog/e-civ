@@ -47,7 +47,7 @@ export function add_transaction(data) {
 }
 
 
-export function cancle_transaction(data) {
+export function cancel_transaction(data) {
     return {
         type: CANCLE_TRANSACTION,
         payload: {
@@ -56,7 +56,7 @@ export function cancle_transaction(data) {
     }
 }
 
-export function cancle_invitation(data) {
+export function cancel_invitation(data) {
     return {
         type: CANCLE_INVITATION,
         payload: {

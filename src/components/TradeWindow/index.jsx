@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux'
 import Invitation from './Invitation'
 import TradePane from './TradePane'
-import {change_trade_target, cancel_invitation, cancle_transaction} from '@/actions/websocket'
+import {change_trade_target, cancel_invitation, cancel_transaction} from '@/actions/websocket'
 import {empty_from_item, empty_to_item} from '@/actions/items'
 import  './style'
 import './index.less'
@@ -29,9 +29,9 @@ class TradeWindow extends Component {
             })
         }
 
-        if(nextProps.responseTradePane) {
+        if(nextProps.responseTradePane !== this.props.responseTradePane) {
             this.setState({
-                paneVisible: true
+                paneVisible: nextProps.responseTradePane
             })
         }
     }
@@ -59,7 +59,7 @@ class TradeWindow extends Component {
             },
             created_at: new Date().toLocaleDateString()
         }))
-        actions.cancle_transaction(trasactions[target])
+        actions.cancel_transaction(trasactions[target])
     }
 
 
@@ -114,7 +114,7 @@ class TradeWindow extends Component {
                 operation: 'refuse'
             }
         }))
-        actions.cancle_invitation(invitations[target])
+        actions.cancel_invitation(invitations[target])
     }
     // 关闭交易邀请窗口
     handleInvitationClose = () => {
@@ -229,7 +229,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({change_trade_target, cancle_transaction, empty_from_item, empty_to_item, cancel_invitation}, dispatch)
+        actions: bindActionCreators({change_trade_target, cancel_transaction, empty_from_item, empty_to_item, cancel_invitation}, dispatch)
     }
 }
 

@@ -13,7 +13,7 @@ import './index.less'
 import { DragDropContextProvider } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import ItemTypes from './ItemTypes'
-
+import {empty_to_item, empty_from_item} from '@/actions/items'
 const ResponsiveReactGridLayout = ReactGridLayout.Responsive;
 
 class TradePane extends Component {
@@ -111,7 +111,7 @@ class TradePane extends Component {
     // 处理交易,敲板决定交易数据了，tradeWindow 的确认交易按钮
     handleTradeReceive = () => {
         console.log('receive trade')
-        const {websocket, tradingWith,items} = this.props;
+        const {websocket, tradingWith, items} = this.props;
         const from = tradingWith.from;
         const to = tradingWith.to;
         // 有回调就好了。。这里理想的认为都可达
@@ -122,30 +122,45 @@ class TradePane extends Component {
                 from: from,
                 to: to,
                 message: '我们开始了一场交fa易',
-                operation: 'trade',
+                operation: 'confirm',
                 items: [...items.fromItems.payload],
                 extra: [...items.fromItems.extra]
             }
         }))
-        // 删除本地背包的物品
-        // code here
     }
 
     // 取消这次交易
     handleTradeCancle = () => {
+        const {websocket, tradingWith, actions} = this.props;
+        const from = tradingWith.from;
+        const to = tradingWith.to;
         console.log('cancle the trade')
+        // 重置fromItems 和 toItems
         this.handleCloseClick();
+        actions.empty_to_item();
+        actions.empty_from_item();
+        websocket.send(JSON.stringify({
+            source: 'person',
+            type: 'INVITATION',
+            data: {
+                from: from,
+                to: to,
+                message: '我拒绝了你喔',
+                operation: 'refuse'
+            }
+        }))
     }
 
     render() {
         //console.log('tradingWith: '+this.props.tradingWith)
         const {visible, items} = this.props;
         const self = this;
-        const packageItems = items.packageItems.map((item) => {
-            return {
-                ...item.item
-            }
-        })
+        const packageItems = items.packageItems;
+        // const packageItems = items.packageItems.map((item) => {
+        //     return {
+        //         ...item.item
+        //     }
+        // })
         //console.log('state width is:' + this.state.width);
         return (
             <DragDropContextProvider backend={HTML5Backend}>
@@ -223,5 +238,10 @@ TradePane.defaultProps = {
     }
 };
 
+function mapDispatchToState(dispatch) {
+    return {
+        actions: bindActionCreators({empty_to_item, empty_from_item}, dispatch)
+    }
+}
 
-export default (TradePane);
+export default connect(null, mapDispatchToState)(TradePane);

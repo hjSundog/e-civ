@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types'
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
-import {Layout, Badge , Row, Col, Spin, message} from 'antd';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Layout, Badge, Row, Col, Spin, message, Modal } from 'antd';
 import LayoutRouter from '@/route/layout'
 import Header from '@/components/Header'
 import Sidebar from '@/components/Sidebar'
@@ -12,14 +12,15 @@ import FeedbackModal from './FeedbackModal'
 import ChatWindow from '@/components/ChatWindow';
 import TradeWindow from '@/components/TradeWindow'
 import Websocket from '@/components/Websocket'
-import {add_message, add_invitation, init_websocket, cancle_invitation, change_trade_target} from '@/actions/websocket';
-import {init_package, add_to_item, change_to_extra, add_package_items} from '@/actions/items'
-import {RetreiveCharacter} from '@/api//person'
-import {clear_user, search_user} from '@/actions/user';
+import { add_message, add_invitation, init_websocket, cancel_invitation, change_trade_target } from '@/actions/websocket';
+import { init_package, add_to_item, change_to_extra, add_package_items } from '@/actions/items'
+import { RetreiveCharacter } from '@/api//person'
+import { clear_user, search_user } from '@/actions/user';
 import { init_person } from '../../actions/person'
 import './index.less';
 
 const { Content } = Layout;
+const confirm = Modal.confirm;
 
 class App extends React.Component {
     constructor(props) {
@@ -33,7 +34,7 @@ class App extends React.Component {
         }
     }
     componentWillMount() {
-        const {person, actions, user} = this.props
+        const { person, actions, user } = this.props
         // if (!person.id) {
         // 初始化用户
         RetreiveCharacter(user.person_id).then(res => {
@@ -47,7 +48,7 @@ class App extends React.Component {
             }
             actions.init_person(res.data)
         })
-        
+
     }
 
 
@@ -77,17 +78,20 @@ class App extends React.Component {
     handleWebsocket = (message) => {
         const tMessage = JSON.parse(message)
         if (tMessage.type === "INVITATION") {
-            if(!tMessage.data) {
+            if (!tMessage.data) {
                 return
             }
-            switch(tMessage.data.operation) {
+            switch (tMessage.data.operation) {
             case 'invite':
                 this.props.actions.add_invitation(tMessage);
                 break;
             case 'cancle':
-                this.props.actions.cancle_invitation(tMessage);
+                this.props.actions.cancel_invitation(tMessage);
                 break;
             case 'refuse':
+                this.setState({
+                    responseTradePane: false
+                })
                 break;
             case 'receive':
                 // 打开交易窗口
@@ -101,7 +105,7 @@ class App extends React.Component {
                 })
                 break;
             case 'trading': {
-                if(tMessage.data.extra.length) {
+                if (tMessage.data.extra.length) {
                     this.props.actions.change_to_extra(tMessage.data.extra)
                 }
                 this.props.actions.add_to_item(tMessage.data.items)
@@ -111,9 +115,19 @@ class App extends React.Component {
                 this.props.actions.search_user(tMessage.data.to)
                 break;
             }
+            case 'confirm': {
+                this.handleConfirmTradePane();
+                break;
+            }
+            case 'hang_up': {
+                message.info(tMessage.data.from+' 拒绝了你的这次交易请求！。。。');
+                break;
+            }
             case 'trade': {
                 this.props.actions.add_package_items(tMessage.data.items);
                 // 这里可以增加extra 现在不搞
+                // 结果保存到数据库
+
                 break
             }
             default:
@@ -133,11 +147,47 @@ class App extends React.Component {
             tradeWindowVisible: false,
         })
     }
-
+ 
+    // 由于cofirm不是个组件所以不能灵活的控制其状态
+    handleConfirmTradePane = () => {
+        const {websocket, tradingWith} = this.props
+        const {from, to} = tradingWith
+        confirm({
+            title: '你确定接受这次交易吗?',
+            content: '你可以点击确定确认这次交易，也可以点击取消继续调整交易物品！',
+            onOk() {
+                websocket.send(JSON.stringify({
+                    source: 'person',
+                    type: 'INVITATION',
+                    data: {
+                        from: from,
+                        to: to,
+                        message: '欣然接受了',
+                        operation: 'trade'
+                    }
+                }))
+                // return new Promise((resolve, reject) => {
+                //     setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
+                // }).catch(() => console.log('Oops errors!'));
+            },
+            onCancel() {
+                websocket.send(JSON.stringify({
+                    source: 'person',
+                    type: 'INVITATION',
+                    data: {
+                        from: from,
+                        to: to,
+                        message: '丑拒',
+                        operation: 'hang_up'
+                    }
+                }))
+            },
+        })
+    }
 
     render() {
-        const {user, actions, invitations} = this.props;
-        const { feedbackVisible, tradeWindowVisible } = this.state
+        const { user, actions, invitations } = this.props;
+        const { feedbackVisible, tradeWindowVisible, confirmTradePane } = this.state
         const urlPrifx = 'ws://localhost:8089?token=';
         const token = user['token']
 
@@ -168,7 +218,7 @@ class App extends React.Component {
                             <p>聊天室</p>
                         </div>
                     </Badge>
-                    <div style={{backgroundColor: '#0f90ff', width: '45px'}}>
+                    <div style={{ backgroundColor: '#0f90ff', width: '45px' }}>
                         <Badge count={invitations.length}>
                             <div id="tradesaction" className="toolkit-item" onClick={this.handleTradeClick}>
                                 <Iconfont type="trade"></Iconfont>
@@ -189,11 +239,11 @@ class App extends React.Component {
                         onClose={this.handleChatroomsMini}
                         isOpen={this.state.chatroomsVisible}
                     />
-                    <TradeWindow onClose={this.handleTradeWindowClose} isOpen={tradeWindowVisible} responseTradePane={this.state.responseTradePane}/>
+                    <TradeWindow onClose={this.handleTradeWindowClose} isOpen={tradeWindowVisible} responseTradePane={this.state.responseTradePane} />
                     <Websocket url={url}
                         onMessage={this.handleWebsocket}
-                        onOpen = {this.handleOpenWebsocket}
-                        debug={true}/>
+                        onOpen={this.handleOpenWebsocket}
+                        debug={true} />
                 </div>
             </Layout>
         );
@@ -213,12 +263,14 @@ const mapStateToProps = (state) => {
     return {
         user: user,
         invitations: state.websocket.invitations,
-        person: state.person
+        person: state.person,
+        websocket: state.websocket.ws,
+        tradingWith: state.websocket.tradingWith
     };
 };
 
 function mapDispatchToProps(dispatch) {
-    return {actions: bindActionCreators({add_package_items, search_user, add_to_item, change_to_extra, change_trade_target, init_package, init_websocket, cancle_invitation, add_invitation, add_message, init_person}, dispatch)};
+    return { actions: bindActionCreators({ add_package_items, search_user, add_to_item, change_to_extra, change_trade_target, init_package, init_websocket, cancel_invitation, add_invitation, add_message, init_person }, dispatch) };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

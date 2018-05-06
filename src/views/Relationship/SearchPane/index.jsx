@@ -5,7 +5,7 @@ import ReItem from '../ReItem'
 import {Pagination} from 'antd'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-import {add_transaction, cancle_transaction} from '@/actions/websocket'
+import {add_transaction, cancel_transaction} from '@/actions/websocket'
 import './index.less'
 const PAGESIZE = 8;
 
@@ -73,7 +73,7 @@ class SearchPane extends React.Component {
         let showDatas = datas.slice((currentPage-1)*PAGESIZE,currentPage*PAGESIZE)
 
         const html = showDatas.reduce((arr, data) => {
-            arr.push(<ReItem onSendMessage={this.handleSendMessage} onTrade={this.handleTrade} key={data.id} data={{
+            arr.push(<ReItem onSendMessage={this.handleSendMessage} onTrade={this.handleTrade} key={data} data={{
                 name: data
             }} special />)
             return arr;
@@ -90,13 +90,13 @@ class SearchPane extends React.Component {
 SearchPane.defaultProps = {
     datas: [],
     add_transaction: noop,
-    cancle_transaction: noop,
+    cancel_transaction: noop,
 };
 
 SearchPane.propTypes = {
     datas: PropTypes.array,
     add_transaction: PropTypes.func,
-    cancle_transaction: PropTypes.func,
+    cancel_transaction: PropTypes.func,
 };
 
 function mapStateToProps (state) {
@@ -111,7 +111,7 @@ function mapDispatchToProps (dispatch) {
     return {
         actions: bindActionCreators({
             add_transaction,
-            cancle_transaction
+            cancel_transaction
         }, dispatch)
     }
 }

@@ -5,7 +5,7 @@ import ReItem from '../ReItem'
 import {Pagination, Input} from 'antd'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-import {add_transaction, cancle_transaction} from '@/actions/websocket'
+import {add_transaction, cancel_transaction} from '@/actions/websocket'
 import './index.less'
 const Search = Input.Search;
 const PAGESIZE = 8;
@@ -108,7 +108,7 @@ class RelationPane extends React.Component {
 RelationPane.defaultProps = {
     datas: [],
     add_transaction: noop,
-    cancle_transaction: noop,
+    cancel_transaction: noop,
     onDelete: noop
 };
 
@@ -119,7 +119,7 @@ RelationPane.propTypes = {
         avatarUrl: PropTypes.string
     })),
     add_transaction: PropTypes.func,
-    cancle_transaction: PropTypes.func,
+    cancel_transaction: PropTypes.func,
     onDelete: PropTypes.func
 };
 
@@ -135,7 +135,7 @@ function mapDispatchToProps (dispatch) {
     return {
         actions: bindActionCreators({
             add_transaction,
-            cancle_transaction
+            cancel_transaction
         }, dispatch)
     }
 }
