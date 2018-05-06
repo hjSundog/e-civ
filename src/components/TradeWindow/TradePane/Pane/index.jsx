@@ -28,7 +28,7 @@ const boxTarget = {
             console.log('nested didn\'t drop')
         }
         const targetItem = monitor.getItem();
-        //console.log('item ' + targetItem.id + ' result ' + monitor.getDropResult());
+        console.log('item ' + targetItem.id + ' result ' + monitor.getDropResult());
         if(props.data.findIndex((item) => {
             return item.name === targetItem.name
         }) !== -1) {

@@ -95,6 +95,7 @@ class TradeWindow extends Component {
                 operation: 'receive'
             }
         }))
+        // 这个操作最好是在交易结束或者拒绝交易的使用进行，不必再接受交易就进行
         actions.cancel_invitation(invitations[target])
     }
     // 拒绝邀请，在别人邀请列表中拒绝某个对象的邀请

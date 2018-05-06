@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { DragSource, DropTarget } from 'react-dnd'
 const boxSource = {
     beginDrag(props) {
-        //console.log('drag box!');
+        console.log('drag box!');
         return {
             ...props.data
         }

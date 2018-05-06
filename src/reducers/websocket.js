@@ -56,7 +56,7 @@ export default function websocket(state = initialState, action = {}) {
     case CANCLE_INVITATION: {
         const invitations = [...state.invitations]
         const index = invitations.findIndex((invitation) => {
-            return invitation.from === action.payload.data.from
+            return invitation.from === action.payload.data.data.from
         })
         invitations.splice(index, 1)
         return {
@@ -67,7 +67,7 @@ export default function websocket(state = initialState, action = {}) {
     case CANCLE_TRANSACTION: {
         const trasactions = [...state.trasactions]
         const index = trasactions.findIndex((trasaction) => {
-            return trasaction.from === action.payload.data.from
+            return trasaction.from === action.payload.data.data.from
         })
         trasactions.splice(index, 1)
         return {

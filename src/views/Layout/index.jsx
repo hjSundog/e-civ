@@ -103,6 +103,7 @@ class App extends React.Component {
                     from: tMessage.data.to,
                     to: tMessage.data.from
                 })
+                // 删除邀请者的邀请信息
                 break;
             case 'trading': {
                 if (tMessage.data.extra.length) {
@@ -123,6 +124,7 @@ class App extends React.Component {
                 message.info(tMessage.data.from+' 拒绝了你的这次交易请求！。。。');
                 break;
             }
+            // 最终确定交易的结果
             case 'trade': {
                 this.props.actions.add_package_items(tMessage.data.items);
                 // 这里可以增加extra 现在不搞
