@@ -14,9 +14,10 @@ import TradeWindow from '@/components/TradeWindow'
 import Websocket from '@/components/Websocket'
 import { add_message, add_invitation, init_websocket, cancel_invitation, change_trade_target } from '@/actions/websocket';
 import { init_package, add_to_item, change_to_extra, add_package_items } from '@/actions/items'
-import { RetreiveCharacter } from '@/api//person'
+import { RetreiveCharacter, UseItem, CreateItem, GetAllItems } from '@/api/person'
 import { clear_user, search_user } from '@/actions/user';
 import { init_person } from '../../actions/person'
+import {empty_to_item, empty_from_item, set_package} from '@/actions/items'
 import './index.less';
 
 const { Content } = Layout;
@@ -92,6 +93,9 @@ class App extends React.Component {
                 this.setState({
                     responseTradePane: false
                 })
+                // 清空fromItem toItem
+                this.props.actions.empty_to_item();
+                this.props.actions.empty_from_item();
                 break;
             case 'receive':
                 // 打开交易窗口
@@ -126,10 +130,62 @@ class App extends React.Component {
             }
             // 最终确定交易的结果
             case 'trade': {
-                this.props.actions.add_package_items(tMessage.data.items);
+                const {items, person, actions} = this.props;
+                const {fromItems, toItems} = items;
+                const {payload} = fromItems;
+                const {id} = person;
+                // 首先删除元素
+                // 然后添加对方给的物品
+                // 最后初始化背包
+                Promise.all(payload.map(item=> {
+                    return new Promise((resolve, reject) => {
+                        UseItem({
+                            personId: id,
+                            itemId: item.id,
+                            count: 1
+                        }).then(res=> {
+                            if (res.status === 200) {
+                                resolve(res.data);
+                            }else {
+                                reject()
+                            }
+                        })
+                    }).then((data)=>{
+                        actions.set_package(data)
+                    })
+                })).then(()=> {
+                    return Promise.all(toItems.payload.map(item=> {
+                        return new Promise((resolve, reject) => {
+                            CreateItem({
+                                id: id,
+                                item: {
+                                    type: item.name,
+                                    count: 1
+                                }
+                            }).then(res=>{
+                                if (res.status === 200) {
+                                    resolve()
+                                } else {
+                                    reject()
+                                }
+                            })
+                        })
+                    }))
+                }).then(()=>{
+                    // 显示所有物品
+                    GetAllItems(id).then(res=>{
+                        if (res.status === 200) {
+                            actions.init_package(res.data);
+                        } else {
+                            console.log(res.message);
+                        }
+                    }).catch(err=>{
+                        message.error(err);
+                    })
+                })
+                // this.props.actions.add_package_items(tMessage.data.items);
                 // 这里可以增加extra 现在不搞
                 // 结果保存到数据库
-
                 break
             }
             default:
@@ -267,12 +323,28 @@ const mapStateToProps = (state) => {
         invitations: state.websocket.invitations,
         person: state.person,
         websocket: state.websocket.ws,
-        tradingWith: state.websocket.tradingWith
+        tradingWith: state.websocket.tradingWith,
+        items: state.items
     };
 };
 
 function mapDispatchToProps(dispatch) {
-    return { actions: bindActionCreators({ add_package_items, search_user, add_to_item, change_to_extra, change_trade_target, init_package, init_websocket, cancel_invitation, add_invitation, add_message, init_person }, dispatch) };
+    return { actions: bindActionCreators({ 
+        add_package_items, 
+        search_user, 
+        add_to_item, 
+        change_to_extra, 
+        change_trade_target, 
+        init_package, 
+        init_websocket, 
+        cancel_invitation, 
+        add_invitation, 
+        add_message, 
+        init_person, 
+        empty_from_item, 
+        empty_to_item,
+        set_package
+    }, dispatch) };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

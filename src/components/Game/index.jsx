@@ -2,6 +2,8 @@ import React from 'react'
 import Game from 'e-civ-game';
 import PropTypes from 'prop-types'
 import * as PIXI from 'pixi.js';
+import {bindActionCreators} from 'redux'
+import {set_game} from "@/actions/game"
 // test
 // import Data from './test';
 import { withRouter } from 'react-router'
@@ -37,7 +39,7 @@ class GameScene extends React.Component {
     }
 
     componentDidMount() {
-        const { person, width, height, layout, background, enemy, over, bind } = this.props
+        const { person, width, height, layout, background, enemy, over, bind, actions } = this.props
         // const own = this.getMySoldiers();
         // const enemy = this.getEnemySoldiers();
         this.gs = new Game();
@@ -82,7 +84,10 @@ class GameScene extends React.Component {
             }).then(res => {
                 if (res.status === 200) {
                     console.log("generate video successfully!");
-                    console.log('the url return is: ' + res.data);
+                    console.log('the url return is: ' + res.data.url);
+                    console.log('the filename is '+res.data.filename);
+                    console.log('the folder is: '+ res.data.folder);
+                    actions.set_game(res.data);
                     typeof over === 'function' ? over(res.data) : null
                 } else {
                     message.error('某系地方出错了')
@@ -206,5 +211,11 @@ function mapStateToProps(state) {
     };
 }
 
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({set_game}, dispatch)
+    }
+}
 
-export default withRouter(connect(mapStateToProps)(GameScene))
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(GameScene))

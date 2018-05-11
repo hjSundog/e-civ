@@ -10,7 +10,7 @@ import {UseItem, UpdateCharacter} from '@/api/person'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { update_person } from '@/actions/person'
-import { sell_to_auction, set_package } from '@/actions//items'
+import { sell_to_auction, set_package } from '@/actions/items'
 
 
 // import api from '../../api';

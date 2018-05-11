@@ -11,8 +11,9 @@ import './index.less'
 
 import ItemTypes from '../ItemTypes'
 import DragItem from '../DragItem'
-import Item from '../Item'
+import Item, {PackageItem} from '../Item'
 const ItemType = ItemTypes.DragItem
+
 const DragPackageItem = DragItem(ItemType)(Item)
 
 // const WithProvider = ReactGridLayout.WidthProvider;
@@ -130,7 +131,6 @@ class Pane extends Component {
             return (
                 <div key={i}>
                     <DragPackageItem  moveItem={self.moveItem} data={data[i]}>
-                        <img src={data[i].icon} style={{width: '100%', height: '100%'}}/>
                     </DragPackageItem>
                 </div>
             );

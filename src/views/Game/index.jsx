@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Player } from 'video-react';
 import Scene from 'components/Game'
+import {connect} from 'react-redux';
 // test
 import { withRouter } from 'react-router'
 import {Button} from 'antd';
@@ -22,8 +23,15 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-       
+    
 
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.game !== this.props.game) {
+            const {folder, filename} = nextProps.game;
+            this.player.load(`http://localhost:8800/games/videos/${folder}/${filename}`)
+        }
     }
 
     componentWillUnmount() {
@@ -48,11 +56,20 @@ class App extends React.Component {
 
     handleDownload = () => {
         // const {url} = this.data
-        const url = 'localhost:8800/games/5ad598eea78c451b0c6c0d37@@1/game1524216367972.mp4';
-        window.open(url, '_blank')
+        const {game} = this.props;
+        const prefix = 'localhost:8800/';
+        let url = prefix + game.url;
+        url = url.split('&&').join('@@');
+        console.log(url);
+        let a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('target','_blank');
+        a.click();
     }
 
     render () {
+        const {game} = this.props;
+        const {folder, filename} = game;
         return (
             <div>
                 <Scene 
@@ -62,17 +79,21 @@ class App extends React.Component {
                 />
                 <Button type="primary" onClick={this.handleClick}>开始</Button>
                 <Button type="primary" onClick={this.handleDownload}>下载</Button>
-                {/* <iframe name="download" style={{display: 'none'}}></iframe> */}
-                {/* <Player>
-                    <source src="localhost:8800/games/videos/5ad598eea78c451b0c6c0d37@@1/game1524216367972.mp4"/>
-                </Player> */}
+                <Player fluid={false} width={800} height={600} ref={(node)=>this.player=node}>
+                    <source src={`http://localhost:8800/games/videos/${folder}/${filename}`}/>
+                </Player>
             </div>
 
         )
     }
 }
 
+function mapStateToProps(state) {
+    return {
+        game: state.game
+    }
+}
 
 
 
-export default withRouter(App)
+export default connect(mapStateToProps)(App)

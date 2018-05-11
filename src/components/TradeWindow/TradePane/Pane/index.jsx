@@ -12,7 +12,7 @@ import * as ItemsActionCreators from '@/actions/items'
 const Resizable = RResizable.Resizable
 // 拖拽功能考虑使用react-dnd来实现
 import DragItem from '../DragItem'
-import Item from '../Item'
+import Item, {PaneItem} from '../Item'
 import ItemTypes from '../ItemTypes'
 
 
@@ -158,9 +158,9 @@ class Pane extends Component {
                     <Col key={j.toString()} span={24 / colCount}>
                         <DragItemWithTarget target={ItemType} moveItem={this.moveItem} data={data[i * colCount+j]}>
                             <div className="paneItem">
-                                <img src= {data[i * colCount + j].icon || "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3880507419,2968712832&fm=27&gp=0.jpg"} />
-                                <span>{data[i * colCount + j]['name']}</span>
-                            </div>
+                                <img src= {data[i * colCount+j].icon || "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3880507419,2968712832&fm=27&gp=0.jpg"} />
+                                <span>{data[i * colCount+j]['name']}</span>
+                            </div>     
                         </DragItemWithTarget>
                     </Col>
                 );

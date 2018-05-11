@@ -149,6 +149,7 @@ class TradePane extends Component {
                 operation: 'refuse'
             }
         }))
+        // 清除数据
     }
 
     render() {
