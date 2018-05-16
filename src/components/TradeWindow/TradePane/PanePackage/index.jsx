@@ -8,13 +8,13 @@ import ReactGridLayout from 'react-grid-layout'
 import '@/../node_modules/react-grid-layout/css/styles.css'
 import '@/../node_modules/react-resizable/css/styles.css'
 import './index.less'
-
+import * as ItemsActionCreators from '@/actions/items'
 import ItemTypes from '../ItemTypes'
 import DragItem from '../DragItem'
 import Item, {PackageItem} from '../Item'
 const ItemType = ItemTypes.DragItem
 
-const DragPackageItem = DragItem(ItemType)(Item)
+const DragPackageItem = DragItem(ItemType)(PackageItem)
 
 // const WithProvider = ReactGridLayout.WidthProvider;
 const ResponsiveReactGridLayout = ReactGridLayout.Responsive
@@ -121,6 +121,28 @@ class Pane extends Component {
 
     }
 
+    addItem = (item) => {
+        // this.setState({
+        //     data: [...this.state.data, item]
+        // })
+        // 这里add_from_items action
+        const {actions, websocket, tradingWith} = this.props;
+        actions.add_from_item(item)
+        console.log('will send %s to %s', tradingWith.from, tradingWith.to);
+        websocket.send(JSON.stringify({
+            type: 'INVITATION',
+            source: 'person',
+            data: {
+                ...tradingWith,
+                items: [...[item]],
+                extra: [],
+                operation: 'trading',
+                message: '收到新的变化了，哈哈哈'
+            },
+            created_at: new Date().toLocaleDateString()
+        }))
+    }
+
     handleWidthChange = (cw, margin, cols, cp) => {
         console.log(`width changed: ${cw}`)
     }
@@ -130,7 +152,7 @@ class Pane extends Component {
         return this.state.layouts[this.state.currentBreakpoint].map(function (l, i) {
             return (
                 <div key={i}>
-                    <DragPackageItem  moveItem={self.moveItem} data={data[i]}>
+                    <DragPackageItem addItem={self.addItem}  moveItem={self.moveItem} data={data[i]}>
                     </DragPackageItem>
                 </div>
             );
@@ -199,4 +221,18 @@ class Pane extends Component {
     }
 }
 
-export default Pane;
+
+function mapStateToState(state){
+    return {
+        websocket: state.websocket.ws,
+        tradingWith: state.websocket.tradingWith
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({...ItemsActionCreators}, dispatch)
+    }
+}
+
+export default connect(mapStateToState, mapDispatchToProps)(Pane)

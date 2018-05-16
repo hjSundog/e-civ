@@ -176,6 +176,13 @@ class App extends React.Component {
                     GetAllItems(id).then(res=>{
                         if (res.status === 200) {
                             actions.init_package(res.data);
+                            // 关闭窗口
+                            this.setState({
+                                responseTradePane: false
+                            })
+                            // 清空fromItem toItem
+                            this.props.actions.empty_to_item();
+                            this.props.actions.empty_from_item();
                         } else {
                             console.log(res.message);
                         }

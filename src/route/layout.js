@@ -22,6 +22,7 @@ import Donation from '@/views/Donation';
 import Relationship from '@/views/Relationship';
 import Auction from '@/views/Auction';
 import Game from '@/views/Game'
+import Building from '@/views/Building'
 
 export const childRoutes = [
     {
@@ -92,6 +93,10 @@ export const childRoutes = [
     {
         'path': '/game',
         'component': Game
+    },
+    {
+        'path': '/building',
+        'component': Building
     }
 ];
 
