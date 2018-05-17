@@ -16,7 +16,7 @@ class App extends React.Component {
     constructor () {
         super()
         this.state = {
-            isPlay: true,
+            isPlay: false,
             count: 1,
             isLoading: true
         }
@@ -30,7 +30,9 @@ class App extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.game !== this.props.game) {
             const {folder, filename} = nextProps.game;
-            this.player.load(`http://localhost:8800/games/videos/${folder}/${filename}`)
+            if (this.player) {
+                this.player.load(`http://localhost:8800/games/videos/${folder}/${filename}`)
+            }
         }
     }
 
@@ -47,7 +49,11 @@ class App extends React.Component {
     }
 
     handleClick = () => {
-        this.startGame()
+        this.setState({
+            isPlay: false
+        }, ()=>{
+            this.startGame()
+        })
     }
 
     handleBind = (obj) => {
@@ -67,21 +73,36 @@ class App extends React.Component {
         a.click();
     }
 
+    handlePlay = () => {
+        this.setState({
+            isPlay: true
+        })
+    }
+
     render () {
         const {game} = this.props;
         const {folder, filename} = game;
+        const {isPlay} = this.state;
         return (
             <div>
-                <Scene 
-                    bind={this.handleBind}
-                    over={this.handleOver}
-                    start={this.startGame}
-                />
-                <Button type="primary" onClick={this.handleClick}>开始</Button>
-                <Button type="primary" onClick={this.handleDownload}>下载</Button>
-                <Player fluid={false} width={800} height={600} ref={(node)=>this.player=node}>
-                    <source src={`http://localhost:8800/games/videos/${folder}/${filename}`}/>
-                </Player>
+                {
+                    isPlay?(
+                    <Player fluid={false} width={800} height={600} ref={(node)=>this.player=node}>
+                        <source src={`http://localhost:8800/games/videos/${folder}/${filename}`}/>
+                    </Player>)
+                    :(
+                        <Scene 
+                            bind={this.handleBind}
+                            over={this.handleOver}
+                            start={this.startGame}
+                    />
+                    )
+                }
+                <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                    <Button type="primary" onClick={this.handleClick}>开始</Button>
+                    <Button type="primary" onClick={this.handleDownload}>下载</Button>
+                    <Button type="primary" onClick={this.handlePlay}>播放</Button>
+                </div>
             </div>
 
         )

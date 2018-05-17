@@ -1,6 +1,7 @@
 import React from 'react';
-import {Form, Row, Col, InputNumber, Input, Select, Button} from 'antd';
+import {Form, Row, Col, InputNumber, message, Input, Select, Button} from 'antd';
 import PropTypes from 'prop-types'
+import {CreateBuilding, GetAllBuilding} from '@/api//building'
 import './index.less';
 const FormItem = Form.Item
 const Option = Select.Option
@@ -26,8 +27,18 @@ class Building extends React.Component {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                // console.log('Received values of form: ', values);
+                //console.log('Received values of form: ', values);
                 // this.props.callback(values);
+                CreateBuilding({
+                    ...values
+                }).then(res => {
+                    if (res.status === 200) {
+                        message.success('创建成功！');
+                        console.log(res.data);
+                    }
+                }).catch(err => {
+                    message.error(err);
+                })
             }
         }); 
     }
@@ -83,7 +94,7 @@ class Building extends React.Component {
                         </FormItem>
                     </Col>
                     <Col style={{ display: 'flex', justifyContent: 'center' }}>
-                        <FormItem label="精度"> 
+                        <FormItem label="经度"> 
                             {getFieldDecorator('lon', {
                                 rules: [{
                                     required: true,

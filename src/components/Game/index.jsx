@@ -72,8 +72,10 @@ class GameScene extends React.Component {
 
         // 指定结束场景,及其回调
         this.gs.overScene('gameOver', null, null, (result, scene, battleGround) => {
-            console.log('所有的操作都在这里啦！')
-            console.log('gameOver 啦');
+            // console.log('所有的操作都在这里啦！')
+            // console.log('gameOver 啦');
+            const mal = battleGround.MAL;
+            mal.uploadAnimation(mal._generatePng(battleGround.game.view))
             // 传给服务器动画
             sendFramesToServer({
                 data: {
