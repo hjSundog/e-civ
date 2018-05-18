@@ -116,6 +116,15 @@ export default function auth(state = initialState, action = {}) {
         }
     }
     case MAKING_BID: {
+        const target = action.payload;
+        const totalItems = state.auctionItems.totalItems;
+        const index = totalItems.findIndex(item => {
+            return item.id === target.id
+        })
+        if (index < 0) {
+            return state
+        }
+        totalItems[index] = {...totalItems[index], ...target}
         return {
             ...state,
             auctionItems: {

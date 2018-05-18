@@ -123,11 +123,34 @@ class PackagePane extends React.Component {
 
     // 发起拍卖操作
     handleSellToAuction = (item, setting) => {
-        const { actions, websocket, person } = this.props;
+        const { websocket, user, person } = this.props;
         // 获取拍卖设置数据
-        const { endValue, startValue, price, count } = setting;
+        const { endValue, startValue, price } = setting;
         // 客户端拍卖操作
         console.log('哈哈拍卖：' + item.name + '啦')
+        // 删除该物品
+        const {count, ...data} = item;
+        websocket.send(JSON.stringify({
+            source: 'person',
+            type: 'AUCTION',
+            data: {
+                operation: 'sell',
+                auctionItem: {
+                    item: data,
+                    startTime: startValue,
+                    endTime: endValue,
+                    count: setting.count,
+                    price: price,
+                    holder: person
+                },
+                message: '寄存到拍卖行',
+                payload: {
+                    name: user.name,
+                }
+            },
+            created_at: new Date().toLocaleDateString()
+        }))
+        // 加入
     }
 
     // 右键菜单单击处理，USE和DROP是自带的，如果不使用自带的传递rebuild参数即可
@@ -250,7 +273,8 @@ PackagePane.propTypes = {
 function mapStateToProps(state) {
     return {
         person: state.person,
-        websocket: state.websocket
+        user: state.user,
+        websocket: state.websocket.ws
     }
 }
 

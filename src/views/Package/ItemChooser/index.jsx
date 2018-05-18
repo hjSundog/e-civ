@@ -147,7 +147,7 @@ export default class ItemChooser extends React.Component {
                             <h2>拍卖物品: {item && item.name}</h2>
                         </div>
                         <div className="item-input">
-                            <div>数目:<InputNumber onChange={this.onCountChange} min={1} defaultValue={1} /></div>
+                            <div className="single">数目:<InputNumber onChange={this.onCountChange} min={1} defaultValue={1} /></div>
                             <div className="item-time-picker">
                                 <DatePicker
                                     disabledDate={this.disabledStartDate}
@@ -169,11 +169,11 @@ export default class ItemChooser extends React.Component {
                                     onOpenChange={this.handleEndOpenChange}
                                 />
                             </div>
-                            <div>起始价:<InputNumber min={0} defaultValue={0} onChange={this.onPriceChange} /></div>
+                            <div className="single">起始价:<InputNumber min={0} defaultValue={0} onChange={this.onPriceChange} /></div>
                         </div>
                         <div className="item-op">
-                            <Button onClick={this.handleSellAuction}>发布</Button>
-                            <Button onClick={this.handleCancleAuction}>取消</Button>
+                            <Button type="primary" onClick={this.handleSellAuction}>发布</Button>
+                            <Button type="primary" onClick={this.handleCancleAuction}>取消</Button>
                         </div>
                     </section>
                 </div>

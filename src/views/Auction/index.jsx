@@ -17,36 +17,16 @@ class Package extends React.Component {
         }
     }
     componentWillMount () {
-        // const {user, hasInitialed} = this.props;
-        const url = `/items/auction`
-        this.setState({
-            loading: true,
-        })
-        //获取物品
-
-        api({
-            method: 'get',
-            url: url,
-        }).then(res => {
-            this.setState({
-                loading: false
-            })
-            if (res.status === 200){
-                this.props.actions.init_auction(res.data.map(item=> {
-                    return {
-                        item: item,
-                        count: 1
-                    }
-                }));
-            } else {
-                console.log(res.message)
-            }
-        }).catch(error => {
-            message.error(error)
-            this.setState({
-                loading: false
-            })
-        })
+        const {person, websocket}  = this.props;
+        websocket.send(JSON.stringify({
+            source: 'person',
+            type: 'AUCTION',
+            data: {
+                operation: 'init',
+                message: '初始化拍卖行数据'
+            },
+            created_at: new Date().toLocaleDateString()
+        }))
     }
 
 
@@ -114,7 +94,7 @@ function mapStateToProps(state) {
     const tItems = state.items.auctionItems.totalItems.reduce((pre, cur) => {
         Object.keys(pre).forEach(key => {
             key = key.toUpperCase();
-            if(key === cur.item.type.toUpperCase() || key === cur.item.details.type.toUpperCase()) {
+            if(key === cur.item.type.toUpperCase() || key === cur.item.details.category.toUpperCase()) {
                 pre[key.toLowerCase()].push(cur)
             }
             if(key === 'ALL') {
@@ -127,6 +107,8 @@ function mapStateToProps(state) {
     return {
         items: tItems,
         user: state.user,
+        person: state.person,
+        websocket: state.websocket.ws,
     }
 }
 
