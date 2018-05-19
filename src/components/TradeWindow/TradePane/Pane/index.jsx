@@ -24,9 +24,6 @@ const boxTarget = {
         return true;
     },
     drop(props, monitor, component) {
-        if (!monitor.didDrop()) {
-            console.log('nested didn\'t drop')
-        }
         const targetItem = monitor.getItem();
         console.log('item ' + targetItem.id + ' result ' + monitor.getDropResult());
         if(props.data.findIndex((item) => {
@@ -34,11 +31,14 @@ const boxTarget = {
         }) !== -1) {
             //console.log('switch '+targetItem.id);
             // props.switchItem()
+            return {name: 'YourWindow'}
         } else {
-            
-            props.addItem(monitor.getItem());
+            // props.addItem(monitor.getItem());
+            return {
+                item: monitor.getItem(),
+                action: 'addItem'
+            }
         }
-        return { name: 'YourWindow' }
     }
 }
 
@@ -104,7 +104,7 @@ class Pane extends Component {
         })
     }
 
-    swithcItem = (tIndex, dIndex, target, dist) => {
+    switchItem = (tIndex, dIndex, target, dist) => {
         const items = [...this.state.items];
         items[tIndex] = {...dist};
         items[dIndex] = {...target}
@@ -129,9 +129,10 @@ class Pane extends Component {
             this.addItemIn(distIndex, dist);
             return;
         }
-        this.swithcItem(srcIndex, distIndex, src, dist);
+        this.switchItem(srcIndex, distIndex, src, dist);
 
     }
+    
 
     // 悬浮
     hoverItem = (src, dist) => {
@@ -156,7 +157,7 @@ class Pane extends Component {
                 }
                 cols.push(
                     <Col key={j.toString()} span={24 / colCount}>
-                        <DragItemWithTarget target={ItemType} moveItem={this.moveItem} data={data[i * colCount+j]}>
+                        <DragItemWithTarget target={ItemType} moveItem={this.moveItem} addItem={this.addItem} data={data[i * colCount+j]}>
                             <div className="paneItem">
                                 <img src= {data[i * colCount+j].icon || "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3880507419,2968712832&fm=27&gp=0.jpg"} />
                                 <span>{data[i * colCount+j]['name']}</span>
@@ -293,27 +294,27 @@ class DragPane extends Component{
 
     }
 
-    addItem = (item) => {
-        // this.setState({
-        //     data: [...this.state.data, item]
-        // })
-        // 这里add_from_items action
-        const {actions, websocket, tradingWith} = this.props;
-        actions.add_from_item(item)
-        console.log('will send %s to %s', tradingWith.from, tradingWith.to);
-        websocket.send(JSON.stringify({
-            type: 'INVITATION',
-            source: 'person',
-            data: {
-                ...tradingWith,
-                items: [...[item]],
-                extra: [],
-                operation: 'trading',
-                message: '收到新的变化了，哈哈哈'
-            },
-            created_at: new Date().toLocaleDateString()
-        }))
-    }
+    // addItem = (item) => {
+    //     // this.setState({
+    //     //     data: [...this.state.data, item]
+    //     // })
+    //     // 这里add_from_items action
+    //     const {actions, websocket, tradingWith} = this.props;
+    //     actions.add_from_item(item)
+    //     console.log('will send %s to %s', tradingWith.from, tradingWith.to);
+    //     websocket.send(JSON.stringify({
+    //         type: 'INVITATION',
+    //         source: 'person',
+    //         data: {
+    //             ...tradingWith,
+    //             items: [...[item]],
+    //             extra: [],
+    //             operation: 'trading',
+    //             message: '收到新的变化了，哈哈哈'
+    //         },
+    //         created_at: new Date().toLocaleDateString()
+    //     }))
+    // }
 
     changeState = (newState)=> {
         this.setState({
@@ -336,7 +337,7 @@ class DragPane extends Component{
                     colCounts={this.colCounts} 
                     onColCountChange={self.onColCountChange} 
                     {...rest}
-                    addItem={this.addItem}
+                    // addItem={this.addItem}
                     data={self.state.data}
                     changeState={this.changeState}/>
             </div>
@@ -344,17 +345,18 @@ class DragPane extends Component{
     }
 }
 
-function mapStateToState(state){
-    return {
-        websocket: state.websocket.ws,
-        tradingWith: state.websocket.tradingWith
-    }
-}
+// function mapStateToState(state){
+//     return {
+//         websocket: state.websocket.ws,
+//         tradingWith: state.websocket.tradingWith
+//     }
+// }
 
-function mapDispatchToProps(dispatch) {
-    return {
-        actions: bindActionCreators({...ItemsActionCreators}, dispatch)
-    }
-}
+// function mapDispatchToProps(dispatch) {
+//     return {
+//         actions: bindActionCreators({...ItemsActionCreators}, dispatch)
+//     }
+// }
 
-export default connect(mapStateToState, mapDispatchToProps)(DragPane)
+// export default connect(mapStateToState, mapDispatchToProps)(DragPane)
+export default DragPane

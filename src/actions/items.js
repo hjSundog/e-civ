@@ -126,9 +126,9 @@ export function buy_from_auction(item) {
     }
 }
 
-export function making_bid (price) {
+export function making_bid (target) {
     return {
         type: MAKING_BID,
-        payload: price
+        payload: target
     }
 }

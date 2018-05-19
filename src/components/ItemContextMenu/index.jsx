@@ -128,8 +128,8 @@ class ItemContextMenu extends React.Component {
                         id={id} name={item.name}
                         holdToDisplay={1000}
                         collect={collect} attributes={attributes}>
-                        <div style={itemStyle.outerStyle}>
-                            <img onClick={onClickMenu} onMouseLeave={this.handleItemDetailFade} onMouseMove={this.debounce(this.handleItemDetail)} src={item.icon || 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1519471427785&di=e70781b51434dba6673f4191716104c3&imgtype=0&src=http%3A%2F%2Fpic35.photophoto.cn%2F20150601%2F0005018349076194_b.png'} alt="item pic" />
+                        <div style={itemStyle.outerStyle}  onMouseLeave={this.handleItemDetailFade} onMouseMove={this.debounce(this.handleItemDetail)}>
+                            <img onClick={onClickMenu} src={item.icon || 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1519471427785&di=e70781b51434dba6673f4191716104c3&imgtype=0&src=http%3A%2F%2Fpic35.photophoto.cn%2F20150601%2F0005018349076194_b.png'} alt="item pic" />
                             <div className="item-info" style={isVisible ? { ...itemStyle.abstractStyle, display: 'flex' } : itemStyle.abstractStyle} ref={this.abstractRef}>
                                 <span>{item.name}</span>
                                 <span>{item.description}</span>

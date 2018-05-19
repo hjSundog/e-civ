@@ -5,7 +5,9 @@ class Item extends Component{
 
     static propTypes = {
         data: PropTypes.object.isRequired,
-        moveItem: PropTypes.func
+        moveItem: PropTypes.func,
+        addItem: PropTypes.func,
+        removeItem: PropTypes.func
     };
 
     static defaultProps = {

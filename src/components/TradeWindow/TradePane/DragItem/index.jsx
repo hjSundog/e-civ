@@ -10,11 +10,25 @@ const boxSource = {
     },
 
     endDrag(props, monitor) {
-        const item = monitor.getItem()
-        const dropResult = monitor.getDropResult()
+        const item = monitor.getItem();
+        const dropResult = monitor.getDropResult();
+        const didDrop = monitor.didDrop();
+        if (!didDrop) {
+            console.log('did drop !');
+            return;
+        }
         // 可以在readux中处理 先不这样
         if (dropResult) {
-            console.log(`You dropped ${item.name} into ${dropResult.name}!`)
+            switch(dropResult.action) {
+            case 'addItem':
+                props.addItem(dropResult.item);
+                break;
+            case 'moveItem':
+                props.moveItem(dropResult.src, dropResult.dist);
+                break;
+            default:
+                console.log(`You dropped ${item.name} into ${dropResult.name}!`)
+            }
         }
     },
 }
@@ -22,7 +36,11 @@ const boxSource = {
 const boxTarget = {
     drop(props, monitor) {
         const source = monitor.getItem();
-        props.moveItem(source, props.data);
+        // props.moveItem(source, props.data);
+        return {
+            src: source,
+            dist: props.data
+        }
     }
 }
 

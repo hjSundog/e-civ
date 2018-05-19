@@ -163,7 +163,7 @@ class TradePane extends Component {
         //     }
         // })
         //console.log('state width is:' + this.state.width);
-        return (
+        return (visible?(
             <DragDropContextProvider backend={HTML5Backend}>
                 <Rnd
                     default={{
@@ -182,7 +182,7 @@ class TradePane extends Component {
                     onResizeStop={this.handleResizeStop}
                     cancel=".Panes"
                 >
-                    <div className="TradePane" style={{display: visible?'flex':'none'}}>
+                    <div className="TradePane">
                         <div className="PaneHead">交易窗口<span onClick={this.handleCloseClick}><Iconfont type="close"></Iconfont></span></div>
                         <div className="Panes">
                             <div className="paneContainer">
@@ -213,7 +213,7 @@ class TradePane extends Component {
                     </div>
                 </Rnd>
             </DragDropContextProvider>
-        );
+        ):null)
     }
 }
 

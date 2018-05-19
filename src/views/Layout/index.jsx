@@ -17,7 +17,7 @@ import { init_package, add_to_item, change_to_extra, add_package_items } from '@
 import { RetreiveCharacter, UseItem, CreateItem, GetAllItems } from '@/api/person'
 import { clear_user, search_user } from '@/actions/user';
 import { init_person } from '../../actions/person'
-import {empty_to_item, empty_from_item, set_package} from '@/actions/items'
+import {empty_to_item, empty_from_item, set_package, init_auction, sell_to_auction, making_bid} from '@/actions/items'
 import './index.less';
 
 const { Content } = Layout;
@@ -76,8 +76,46 @@ class App extends React.Component {
         })
     }
 
-    handleWebsocket = (message) => {
-        const tMessage = JSON.parse(message)
+    handleAuction = (tMessage) => {
+        const {actions, person, websocket} = this.props;
+        if (tMessage.type === 'AUCTION') {
+            if (!tMessage.data) {
+                return
+            }
+            switch (tMessage.data.operation) {
+            case 'init':
+                // 设置
+                // console.log(tMessage.data.items);
+                actions.init_auction(tMessage.data.items);
+                break;
+            case 'sell': {
+                const target = tMessage.data.items;
+                const {data, count} = target;
+                actions.sell_to_auction(target);
+                // 删除该元素
+                UseItem({
+                    personId: person.id,
+                    itemId: data.id,
+                    count: count
+                }).then(res => {
+                    if (res.status === 200) {
+                        actions.set_package(res.data)
+                    }
+                })
+                break;
+            }
+            case 'makingBid':
+                console.log(tMessage.data.target);
+                // 更新该数据
+                actions.making_bid(tMessage.data.target);
+                break;
+            case 'error':
+                break;
+            } 
+        }
+    }
+
+    handleInvitation = (tMessage) => {
         if (tMessage.type === "INVITATION") {
             if (!tMessage.data) {
                 return
@@ -176,6 +214,13 @@ class App extends React.Component {
                     GetAllItems(id).then(res=>{
                         if (res.status === 200) {
                             actions.init_package(res.data);
+                            // 关闭窗口
+                            this.setState({
+                                responseTradePane: false
+                            })
+                            // 清空fromItem toItem
+                            this.props.actions.empty_to_item();
+                            this.props.actions.empty_from_item();
                         } else {
                             console.log(res.message);
                         }
@@ -194,6 +239,12 @@ class App extends React.Component {
         } else {
             this.props.actions.add_message(tMessage);
         }
+    }
+
+    handleWebsocket = (message) => {
+        const tMessage = JSON.parse(message)
+        this.handleInvitation(tMessage);
+        this.handleAuction(tMessage);
     }
 
     handleOpenWebsocket = (ws) => {
@@ -343,7 +394,10 @@ function mapDispatchToProps(dispatch) {
         init_person, 
         empty_from_item, 
         empty_to_item,
-        set_package
+        set_package,
+        init_auction,
+        sell_to_auction,
+        making_bid
     }, dispatch) };
 }
 
