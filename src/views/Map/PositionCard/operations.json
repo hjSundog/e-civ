@@ -1,0 +1,13 @@
+{
+    "resource": {
+        "wood": {
+            "cut": {
+                "displayName": "伐木",
+                "required": {
+                    "stamina": 10
+                },
+                "api": "/actions/cut?target=:resourceId"
+            }
+        }
+    }
+}
