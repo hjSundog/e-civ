@@ -80,16 +80,16 @@ class Map extends React.Component {
 
     handleShowBuildings = () => {
         this.globe.showPositions([{
-            lon: 12.6,
-            lat: 30,
+            lon: 12.803629,
+            lat: 30.001324,
             type: 'building',
             meta: {
                 name: '矮山潭',
                 class: []
             }
         }, {
-            lon: 12.9,
-            lat: 31,
+            lon: 12.810400,
+            lat: 30.000421,
             type: 'building',
             meta: {
                 name: '桂中',
@@ -129,7 +129,7 @@ class Map extends React.Component {
         const self = this;
         var options = new GlobeOptions();
         options.satellite = true;
-        options.level = 6;
+        options.level = 13;
         options.lonlat = 'auto';
         this.globe = Globe.getInstance(options);
         const container = document.querySelector('#global_map');
