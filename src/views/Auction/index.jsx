@@ -16,7 +16,7 @@ class Package extends React.Component {
             loading: false,
         }
     }
-    componentWillMount () {
+    componentDidMount () {
         const {person, websocket}  = this.props;
         websocket.send(JSON.stringify({
             source: 'person',

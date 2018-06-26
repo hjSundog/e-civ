@@ -116,9 +116,9 @@ class commonHeader extends React.Component {
                                     <Menu.Item key="setting:4">Option 4</Menu.Item>
                                 </MenuItemGroup>
                             </SubMenu>
-                            <Menu.Item key="alipay">
+                            {/* <Menu.Item key="alipay">
                                 <a href="https://ant.design" target="_blank" rel="noopener noreferrer">Navigation Four - Link</a>
-                            </Menu.Item>
+                            </Menu.Item> */}
                             <Menu.Item key="relationship">
                                 我的关系
                             </Menu.Item>
@@ -128,9 +128,9 @@ class commonHeader extends React.Component {
                             <Menu.Item key="auction">
                                 拍卖行
                             </Menu.Item>
-                            <Menu.Item key="game">
+                            {/* <Menu.Item key="game">
                                 游戏
-                            </Menu.Item>
+                            </Menu.Item> */}
                         </Menu>
                     </Col>
                     <Col span={3}>

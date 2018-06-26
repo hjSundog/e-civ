@@ -109,6 +109,57 @@ class App extends React.Component {
                 // 更新该数据
                 actions.making_bid(tMessage.data.target);
                 break;
+            // case 'sold': 
+            //     console.log('sold: '+ tMessage.data);
+            //     break;
+            // 成功拍卖得到物品
+            case 'success': {
+                console.log('success: ' + tMessage.data.item);
+                const {item, count} = tMessage.data;
+                const { person, } = this.props;
+                const {id} = person;
+                CreateItem({
+                    id: id,
+                    item: {
+                        type: item.name,
+                        count: count
+                    }
+                }).then(res=>{
+                    if (res.status === 200) {
+                        GetAllItems(id).then(res=>{
+                            if (res.status === 200) {
+                                actions.init_package(res.data);
+                                // 关闭窗口
+                                this.setState({
+                                    responseTradePane: false
+                                })
+                                // 清空fromItem toItem
+                                this.props.actions.empty_to_item();
+                                this.props.actions.empty_from_item();
+                            } else {
+                                console.log(res.message);
+                            }
+                        }).catch(err=>{
+                            message.error(err);
+                        })
+                    } else {
+                        message.error(res.message)
+                    }
+                })
+                break;
+            }
+            case 'timeout':
+                // console.log('timeout: '+tMessage.data);
+                websocket.send(JSON.stringify({
+                    source: 'person',
+                    type: 'AUCTION',
+                    data: {
+                        operation: 'init',
+                        message: '初始化拍卖行数据'
+                    },
+                    created_at: new Date().toLocaleDateString()
+                }))
+                break;
             case 'error':
                 break;
             } 
@@ -308,7 +359,7 @@ class App extends React.Component {
                     <Header profile={user} logout={actions.clear_user} />
                     <Layout>
                         <Sidebar>Sider</Sidebar>
-                        <Content>
+                        <Content className='layout-content'>
                             <div style={{ minHeight: 360 }}>
                                 {LayoutRouter}
                             </div>

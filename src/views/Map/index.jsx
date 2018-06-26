@@ -95,6 +95,13 @@ class Map extends React.Component {
                 name: '桂中',
                 class: []
             }
+        }, {
+            lon: 13.2,
+            lat: 29,
+            type: 'event',
+            meta: {
+                type: 'battle',
+            }
         }])
     }
 
@@ -157,6 +164,11 @@ class Map extends React.Component {
         })
         this.globe.poiLayer.setPickListener((target) => {
             console.log('[map] position clicked')
+            if (target.attributes.meta.type === 'battle') {
+                // 跳转
+                this.props.history.replace('/game')
+                return;
+            }
             self.positionCard.show()
             self.setState({
                 position: target.attributes

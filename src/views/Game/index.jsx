@@ -23,8 +23,12 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-    
-
+        const content = document.getElementsByClassName('layout-content')[0];
+        const {clientWidth, clientHeight} = content;
+        this.setState({
+            width: clientWidth,
+            height: clientHeight - 50
+        })
     }
 
     componentWillReceiveProps(nextProps) {
@@ -82,21 +86,23 @@ class App extends React.Component {
     render () {
         const {game} = this.props;
         const {folder, filename} = game;
-        const {isPlay} = this.state;
+        const {isPlay, width, height} = this.state;
         return (
-            <div>
+            <div id='game_pane'>
                 {
                     isPlay?(
-                    <Player fluid={false} width={800} height={600} ref={(node)=>this.player=node}>
-                        <source src={`http://localhost:8800/games/videos/${folder}/${filename}`}/>
-                    </Player>)
-                    :(
-                        <Scene 
-                            bind={this.handleBind}
-                            over={this.handleOver}
-                            start={this.startGame}
-                    />
-                    )
+                        <Player fluid={false} width={800} height={600} ref={(node)=>this.player=node}>
+                            <source src={`http://localhost:8800/games/videos/${folder}/${filename}`}/>
+                        </Player>)
+                        :(
+                            <Scene 
+                                bind={this.handleBind}
+                                over={this.handleOver}
+                                start={this.startGame}
+                                width = {width}
+                                height = {height}
+                            />
+                        )
                 }
                 <div style={{display: 'flex', justifyContent: 'space-around'}}>
                     <Button type="primary" onClick={this.handleClick}>开始</Button>
